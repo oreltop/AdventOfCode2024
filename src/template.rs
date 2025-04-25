@@ -22,8 +22,7 @@ fn parse_string(input: &str) -> Vec<i32> {
 pub mod tests {
     use super::*;
     #[test]
-    fn test_dummy(){
+    fn test_parse_string(){
         println!("{}", "this is test dummy")
     }
-
 }
