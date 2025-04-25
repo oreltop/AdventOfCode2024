@@ -1,14 +1,14 @@
 use std::fs;
 
-const FILE_NAME: &'static str = "artifacts/input_day1.txt";
+const FILE_NAME: &'static str = "input_day2.txt";
 
 pub fn main() {
     println!("{}", "this is main");
     let file_path = format!("artifacts/{}",FILE_NAME);
     let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
     println!("input: {:?}", input);
-    let parsed = parse_string(&input);
-    println!("input parsed: {:?}", parsed);
+    // let parsed = parse_string(&input);
+    // println!("input parsed: {:?}", parsed);
 
 }
 
