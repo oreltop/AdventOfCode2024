@@ -8,7 +8,7 @@ pub fn main() {
     let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
     println!("input: {:?}", input);
     let parsed = parse_string(&input);
-    println!("input parsed: {:?}", parsed);
+    println!("input parsed: {:?}", &parsed);
 
 }
 
