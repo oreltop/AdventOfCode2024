@@ -1,8 +1,8 @@
 use std::fs;
 
 const FILE_NAME: &'static str = "input_day2.txt";
-const MAX_STEP: &'static i32 = &3;
-const MIN_STEP: &'static i32 = &1;
+const MAX_STEP: i32 = 3;
+const MIN_STEP: i32 = 1;
 
 pub fn main() {
     let file_path = format!("artifacts/{}", FILE_NAME);
@@ -38,10 +38,10 @@ fn check_safety_one_direction_part1(list: &Vec<i32>) -> bool {
         start: 0,
         end: list.len() - 1,
     }) {
-        if list[i + 1] - list[i] > *MAX_STEP {
+        if list[i + 1] - list[i] > MAX_STEP {
             return false;
         }
-        if list[i + 1] - list[i] < *MIN_STEP {
+        if list[i + 1] - list[i] < MIN_STEP {
             return false;
         }
     }
@@ -56,30 +56,52 @@ fn is_safe_part2(list: &Vec<i32>) -> bool {
 }
 
 fn check_safety_one_direction_part2(list: &Vec<i32>) -> bool {
-    use std::ops::Range;
+    if let Some(index) =  find_unsafe_index(list){
+        tolerate_a_single_bad_level(list, index)
+    }
+    else { true }
+}
 
-    for i in (Range {
-        start: 0,
-        end: list.len() - 1,
-    }) {
-        if list[i + 1] - list[i] > *MAX_STEP {
-            return false;
+fn tolerate_a_single_bad_level(list: &Vec<i32>, bad_level: usize) -> bool {
+    tolerate_ith_level(list, bad_level) || tolerate_ith_level(list, bad_level+1)
+}
+
+fn find_unsafe_index(list: &Vec<i32>) -> Option<usize> {
+
+
+    for i in 0..list.len() - 1{
+        if list[i + 1] - list[i] > MAX_STEP {
+
+            return Some(i);
         }
-        if list[i + 1] - list[i] < *MIN_STEP {
-            return false;
+        if list[i + 1] - list[i] < MIN_STEP {
+            return Some(i);
         }
     }
 
-    true
+    None
+}
+
+fn tolerate_ith_level(list: &Vec<i32>, i: usize) -> bool{
+    let new_list = clone_vec_without_ith_item(list, i);
+    check_safety_one_direction_part1(&new_list)
+}
+
+fn clone_vec_without_ith_item<T: Clone>(list: &Vec<T>, i: usize) -> Vec<T> {
+    list.iter()
+        .enumerate()
+        .filter(|&(index, _)| index != i) // Exclude item at index `i`
+        .map(|(_, item)| item.clone()) // Clone values to avoid move issues
+        .collect()
 }
 
 fn count_safe_lists(input: &Vec<Vec<i32>>) -> usize {
     input
         .iter()
-        .map(|list| is_safe_part1(list))
-        .filter(|x| *x == true)
+        .filter(|list| is_safe_part2(list))
         .count()
 }
+
 
 #[cfg(test)]
 pub mod tests {
