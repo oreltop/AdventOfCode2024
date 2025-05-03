@@ -12,7 +12,7 @@ pub fn main() {
     main_part2(&input);
 }
 
-fn main_part1(input: &str){
+fn main_part1(input: &str) {
     let result: i32 = find_regex_in_str(REGEX_PART_1, input)
         .iter()
         .map(|expression| parse_mul_arg(expression))
@@ -20,22 +20,23 @@ fn main_part1(input: &str){
     println!("{}", result);
 }
 
-fn main_part2(input: &str){
+fn main_part2(input: &str) {
     let mut active = true;
-    
-    let matches = find_regex_in_str(REGEX_PART_2,input);
+
+    let matches = find_regex_in_str(REGEX_PART_2, input);
     let mut result = 0;
-    for item in matches{
-        match item{
+    for item in matches {
+        match item {
             "do" => active = true,
             "don't" => active = false,
-            _ => if active{
-                result += parse_mul_arg(item)
-            } else {  }
+            _ => {
+                if active {
+                    result += parse_mul_arg(item)
+                }
+            }
         }
     }
     println!("{}", result)
-    
 }
 
 fn parse_mul_arg(input: &str) -> i32 {
@@ -83,7 +84,7 @@ pub mod tests {
         );
     }
     #[test]
-    fn test_find_regex_part2(){
+    fn test_find_regex_part2() {
         let text = "xmul(2,4)%&mul[3,7]!@^do_not_mul(5,5)+mul(32,64]then(mul(11,8)mul(8,5))";
         assert_eq!(
             find_regex_in_str(REGEX_PART_2, text),
@@ -92,8 +93,14 @@ pub mod tests {
         let text = "xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))";
         assert_eq!(
             find_regex_in_str(REGEX_PART_2, text),
-            vec!["mul(2,4)", "don't", "mul(5,5)", "mul(11,8)", "do", "mul(8,5)"]
+            vec![
+                "mul(2,4)",
+                "don't",
+                "mul(5,5)",
+                "mul(11,8)",
+                "do",
+                "mul(8,5)"
+            ]
         );
     }
-    
 }
