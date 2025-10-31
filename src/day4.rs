@@ -18,20 +18,19 @@ fn parse_string(input: &str) -> Vec<char> {
     input.chars().filter(|&c| !c.is_whitespace()).collect()
 }
 
-fn count_horizontal(input: Vec<char>) -> usize {
+fn count_xmas(input: Vec<char>, jump: usize) -> usize {
     let mut count = 0;
-    let indexes = 1..input.len()-3;
-    let jump = 1;
-    for index in indexes{
-        if input[index] == 'X' && 
-            input[index +1] == 'M' &&
-            input[index +2] == 'A' &&
-            input[index +3] == 'S' 
-            {
-                count += 1;
+    let indexes = 1..input.len() - jump * 3;
+    for index in indexes {
+        if input[index] == 'X'
+            && input[index + jump] == 'M'
+            && input[index + jump * 2] == 'A'
+            && input[index + jump * 3] == 'S'
+        {
+            count += 1;
         }
     }
-    
+
     count
 }
 
@@ -60,12 +59,18 @@ pub mod tests {
         assert_eq!(result[17], 'A');
         assert_eq!(result[22], 'S');
     }
-    
+
     #[test]
     fn test_find_horizontal() {
         let file_path = "artifacts/test_files/day4-one-horizontal";
         let input = parse_string(&fs::read_to_string(file_path).unwrap());
-        
-        assert_eq!(count_horizontal(input), 1);
+        assert_eq!(count_xmas(input, 1), 1);
     }
+    #[test]
+    fn test_find_horizontal_backwards() {
+        let file_path = "artifacts/test_files/day4-one-horizontal";
+        let input = parse_string(&fs::read_to_string(file_path).unwrap());
+        assert_eq!(count_xmas_backwards(input, 1), 1);
+    }
+
 }
