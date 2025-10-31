@@ -79,13 +79,13 @@ pub mod tests {
 
     #[test]
     fn test_find_horizontal() {
-        let file_path = "artifacts/test_files/day4-one-horizontal";
+        let file_path = "artifacts/test_files/day4-one-horizontal.txt";
         let input = parse_string(&fs::read_to_string(file_path).unwrap());
         assert_eq!(count_xmas(input, 1), 1);
     }
     #[test]
     fn test_find_horizontal_backwards() {
-        let file_path = "artifacts/test_files/day4-one-horizontal";
+        let file_path = "artifacts/test_files/day4-one-horizontal.txt";
         let input = parse_string(&fs::read_to_string(file_path).unwrap());
         assert_eq!(count_xmas_backwards(input, 1), 1);
     }
