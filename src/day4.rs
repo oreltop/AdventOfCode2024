@@ -18,6 +18,23 @@ fn parse_string(input: &str) -> Vec<char> {
     input.chars().filter(|&c| !c.is_whitespace()).collect()
 }
 
+fn count_horizontal(input: Vec<char>) -> usize {
+    let mut count = 0;
+    let indexes = 1..input.len()-3;
+    let jump = 1;
+    for index in indexes{
+        if input[index] == 'X' && 
+            input[index +1] == 'M' &&
+            input[index +2] == 'A' &&
+            input[index +3] == 'S' 
+            {
+                count += 1;
+        }
+    }
+    
+    count
+}
+
 #[cfg(test)]
 pub mod tests {
     use super::*;
@@ -47,7 +64,7 @@ pub mod tests {
     #[test]
     fn test_find_horizontal() {
         let file_path = "artifacts/test_files/day4-one-horizontal";
-        let input = fs::read_to_string(file_path).unwrap();
+        let input = parse_string(&fs::read_to_string(file_path).unwrap());
         
         assert_eq!(count_horizontal(input), 1);
     }
