@@ -9,6 +9,11 @@ pub fn main() {
     println!("input: {:?}", input);
 }
 
+fn find_shape(input: &str) -> (usize, usize) {
+    let split: Vec<&str> = input.split_whitespace().collect();
+    (split[0].len(), split.len())
+}
+
 fn parse_string(input: &str) -> Vec<char> {
     input.chars().filter(|&c| !c.is_whitespace()).collect()
 }
@@ -16,15 +21,15 @@ fn parse_string(input: &str) -> Vec<char> {
 #[cfg(test)]
 pub mod tests {
     use super::*;
-    
+
     #[test]
     fn test_input_shape() {
         let file_path = "artifacts/test_files/day4-one-vertical.txt";
         let input = fs::read_to_string(file_path).unwrap();
         let result = find_shape(&input);
-        assert_eq!(result, (5,5));
+        assert_eq!(result, (5, 5));
     }
-    
+
     #[test]
     fn test_parse_string() {
         let file_path = "artifacts/test_files/day4-one-vertical.txt";
