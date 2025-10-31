@@ -34,6 +34,22 @@ fn count_xmas(input: Vec<char>, jump: usize) -> usize {
     count
 }
 
+fn count_xmas_backwards(input: Vec<char>, jump: usize) -> usize {
+    let mut count = 0;
+    let indexes = 1..input.len() - jump * 3;
+    for index in indexes {
+        if input[input.len() - index] == 'X'
+            && input[input.len() - index + jump] == 'M'
+            && input[input.len() - index + jump * 2] == 'A'
+            && input[input.len() - index + jump * 3] == 'S'
+        {
+            count += 1;
+        }
+    }
+
+    count
+}
+
 #[cfg(test)]
 pub mod tests {
     use super::*;
