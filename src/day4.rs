@@ -43,4 +43,12 @@ pub mod tests {
         assert_eq!(result[17], 'A');
         assert_eq!(result[22], 'S');
     }
+    
+    #[test]
+    fn test_find_horizontal() {
+        let file_path = "artifacts/test_files/day4-one-horizontal";
+        let input = fs::read_to_string(file_path).unwrap();
+        
+        assert_eq!(count_horizontal(input), 1);
+    }
 }
