@@ -1,7 +1,7 @@
 use itertools::sorted;
 use std::fs;
 
-fn main() {
+pub fn main() {
     let file_path = "artifacts/input_day1.txt";
     let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
     let lists = parse_string(&input);
