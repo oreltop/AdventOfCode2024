@@ -9,9 +9,8 @@ pub fn main() {
     println!("input: {:?}", input);
 }
 
-fn parse_string(input: &str) -> Vec<&str> {
-    let column1: Vec<&str> = Vec::new();
-    column1
+fn parse_string(input: &str) -> Vec<char> {
+    input.chars().filter(|&c| !c.is_whitespace()).collect()
 }
 
 #[cfg(test)]
@@ -22,14 +21,14 @@ pub mod tests {
         let file_path = "artifacts/test_files/day4-one-vertical.txt";
         let input = fs::read_to_string(file_path).unwrap();
         let result = parse_string(&input);
-        
-        assert_eq!(result.len(), 25); 
-        assert_eq!(result[0], "O");
-        assert_eq!(result[8], "X");
-        assert_eq!(result[13], "M");
-        assert_eq!(result[18], "A");
-        assert_eq!(result[23], "S");
-        
-        
+        println!("{:?}", result);
+        assert_eq!(result.len(), 25);
+        assert_eq!(result[0], 'O');
+        assert_eq!(result[7], 'X');
+        assert_eq!(result[12], 'M');
+        assert_eq!(result[17], 'A');
+        assert_eq!(result[22], 'S');
+
+
     }
 }
