@@ -3,7 +3,7 @@ use std::fs;
 const FILE_NAME: &'static str = "input_day1.txt";
 
 pub fn main() {
-    println!("{}", "this is main");
+    println!("this is main");
     let file_path = format!("artifacts/{}",FILE_NAME);
     let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
     println!("input: {:?}", input);
