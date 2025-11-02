@@ -12,11 +12,6 @@ pub fn main() {
     println!("input: {:?}", &input);
 }
 
-fn count_rows(input: &str) -> usize {
-    let split: Vec<&str> = input.split_whitespace().collect();
-    split.len()
-}
-
 fn init_shape(input: &str) -> &(usize, usize) {
     INPUT_SIZE.get_or_init(|| {
         let split: Vec<&str> = input.split_whitespace().collect();
@@ -56,13 +51,6 @@ fn reverse_vec<T: Clone>(vec: Vec<T>) -> Vec<T> {
 pub mod tests {
     use super::*;
 
-    #[test]
-    fn test_count_rows() {
-        let file_path = "artifacts/test_files/day4-one-vertical.txt";
-        let input = fs::read_to_string(file_path).unwrap();
-        let result = count_rows(&input);
-        assert_eq!(result, 5);
-    }
     #[test]
     fn test_input_shape() {
         let file_path = "artifacts/test_files/day4-one-vertical.txt";
