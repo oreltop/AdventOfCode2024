@@ -32,43 +32,75 @@ fn parse_string(input: &str) -> Vec<char> {
     input.chars().filter(|&c| !c.is_whitespace()).collect()
 }
 
+// fn count_xmas(input: Vec<char>, jump: usize) -> usize {
+//     let mut count = 0;
+//     let columns = get_shape().1;
+//     let search_up_to = columns - jump % columns * 3;
+//     let indexes = (1..input.len() - jump * 3)
+//         .filter(|&i|  i % columns < search_up_to);
+//     for index in indexes {
+//         if input[index] == 'X'
+//             && input[index + jump] == 'M'
+//             && input[index + jump * 2] == 'A'
+//             && input[index + jump * 3] == 'S'
+//         {
+//             count += 1;
+//         }
+//     }
+//
+//     count
+// }
+
 fn count_xmas(input: Vec<char>, jump: usize) -> usize {
-    let mut count = 0;
     let columns = get_shape().1;
     let search_up_to = columns - jump % columns * 3;
-    let indexes = (1..input.len() - jump * 3)
-        .filter(|&i|  i % columns < search_up_to);
-    for index in indexes {
-        if input[index] == 'X'
-            && input[index + jump] == 'M'
-            && input[index + jump * 2] == 'A'
-            && input[index + jump * 3] == 'S'
-        {
-            count += 1;
-        }
-    }
-
-    count
+    input
+        .windows(1 + jump * 3)
+        .enumerate()
+        .filter(|&(i, _)| i % columns < search_up_to)
+        .filter(|&(_, window)| {
+            window[0] == 'X'
+                && window[jump] == 'M'
+                && window[jump * 2] == 'A'
+                && window[jump * 3] == 'S'
+        })
+        .count()
 }
+
+// fn count_xmas_backwards2(input: Vec<char>, jump: usize) -> usize {
+//     let mut count = 0;
+//     let columns = get_shape().1;
+//     let indexes = (1..input.len() - jump * 3).filter(|&i| i % columns >= jump % columns * 3);
+//     for index in indexes {
+//         if input[index] == 'X'
+//             && input[index - jump] == 'M'
+//             && input[index - jump * 2] == 'A'
+//             && input[index - jump * 3] == 'S'
+//         {
+//             count += 1;
+//         }
+//     }
+//
+//     count
+// }
 
 fn count_xmas_backwards(input: Vec<char>, jump: usize) -> usize {
-    let mut count = 0;
     let columns = get_shape().1;
-    let indexes = (1..input.len() - jump * 3)
-        .filter(|&i| i % columns >= jump%columns*3);
-    for index in indexes {
-        if input[index] == 'X'
-            && input[index - jump] == 'M'
-            && input[index - jump * 2] == 'A'
-            && input[index - jump * 3] == 'S'
-        {
-            count += 1;
-        }
-    }
+    let search_up_to = columns - jump % columns * 3;
+    let input: Vec<_> = input.iter().cloned().rev().collect();
 
-    count
+    input
+        .windows(1 + jump * 3)
+        .enumerate()
+        .filter(|&(i, _)| i % columns < search_up_to)
+        .filter(|&(_, window)| {
+            window[0] == 'X'
+                && window[jump] == 'M'
+                && window[jump * 2] == 'A'
+                && window[jump * 3] == 'S'
+        })
+        .count()
 }
-
 #[cfg(test)]
 pub mod tests {
     use super::*;
