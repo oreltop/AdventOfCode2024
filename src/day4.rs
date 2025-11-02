@@ -14,6 +14,11 @@ fn count_rows(input: &str) -> usize {
     split.len()
 }
 
+fn find_shape(input: &str) -> (usize, usize) {
+    let split: Vec<&str> = input.split_whitespace().collect();
+    (split.len(), split[0].len())
+}
+
 fn parse_string(input: &str) -> Vec<char> {
     input.chars().filter(|&c| !c.is_whitespace()).collect()
 }
@@ -61,6 +66,13 @@ pub mod tests {
         let input = fs::read_to_string(file_path).unwrap();
         let result = count_rows(&input);
         assert_eq!(result, 5);
+    }
+    #[test]
+    fn test_input_shape() {
+        let file_path = "artifacts/test_files/day4-one-vertical.txt";
+        let input = fs::read_to_string(file_path).unwrap();
+        let result = find_shape(&input);
+        assert_eq!(result, (5,5));
     }
 
     #[test]
