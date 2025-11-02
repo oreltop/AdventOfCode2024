@@ -119,3 +119,12 @@ fn test_dont_find_wraps_backwards() {
     let input = reverse_vec(parse_string(&raw_input));
     assert_eq!(count_xmas(input, 1), 1);
 }
+
+#[test]
+fn test_find_vertical() {
+    let file_path = "artifacts/test_files/day4-one-vertical.txt";
+    let raw_input = fs::read_to_string(file_path).unwrap();
+    init_shape(&raw_input);
+    let input = parse_string(&raw_input);
+    assert_eq!(count_xmas(input, get_shape().1), 1);
+}
