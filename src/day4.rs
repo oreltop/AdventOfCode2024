@@ -39,7 +39,7 @@ fn count_xmas(input: Vec<char>, jump: usize) -> usize {
     let columns = get_shape().1;
     let num_of_excluded_columns = columns-jump%columns*3;
     let indexes = (1..input.len() - jump * 3)
-        .filter(|&i| num_of_excluded_columns>=i%columns);
+        .filter(|&i| num_of_excluded_columns>i%columns);
     for index in indexes {
         if input[index] == 'X'
             && input[index + jump] == 'M'
