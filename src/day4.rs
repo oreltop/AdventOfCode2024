@@ -48,10 +48,9 @@ fn count_xmas(input: Vec<char>, jump: usize) -> usize {
         .count()
 }
 
-fn reverse_vec <T: Clone>(vec: Vec<T>) -> Vec<T>{
+fn reverse_vec<T: Clone>(vec: Vec<T>) -> Vec<T> {
     vec.iter().cloned().rev().collect()
 }
-
 
 #[cfg(test)]
 pub mod tests {
@@ -93,63 +92,63 @@ pub mod tests {
         let input = reverse_vec(parse_string(&raw_input));
         assert_eq!(count_xmas(input, 1), 1);
     }
-}
 
-#[test]
-fn test_find_horizontal() {
-    let file_path = "artifacts/test_files/day4-one-horizontal.txt";
-    let raw_input = fs::read_to_string(file_path).unwrap();
-    init_shape(&raw_input);
-    let input = parse_string(&raw_input);
-    assert_eq!(count_xmas(input, 1), 1);
-}
-#[test]
-fn test_dont_find_wraps() {
-    let file_path = "artifacts/test_files/day4-one-horizontal-wrap.txt";
-    let raw_input = fs::read_to_string(file_path).unwrap();
-    init_shape(&raw_input);
-    let input = parse_string(&raw_input);
-    assert_eq!(count_xmas(input, 1), 1);
-}
-#[test]
-fn test_dont_find_wraps_backwards() {
-    let file_path = "artifacts/test_files/day4-one-horizontal-backwards-wrap.txt";
-    let raw_input = fs::read_to_string(file_path).unwrap();
-    init_shape(&raw_input);
-    let input = reverse_vec(parse_string(&raw_input));
-    assert_eq!(count_xmas(input, 1), 1);
-}
+    #[test]
+    fn test_find_horizontal() {
+        let file_path = "artifacts/test_files/day4-one-horizontal.txt";
+        let raw_input = fs::read_to_string(file_path).unwrap();
+        init_shape(&raw_input);
+        let input = parse_string(&raw_input);
+        assert_eq!(count_xmas(input, 1), 1);
+    }
+    #[test]
+    fn test_dont_find_wraps() {
+        let file_path = "artifacts/test_files/day4-one-horizontal-wrap.txt";
+        let raw_input = fs::read_to_string(file_path).unwrap();
+        init_shape(&raw_input);
+        let input = parse_string(&raw_input);
+        assert_eq!(count_xmas(input, 1), 1);
+    }
+    #[test]
+    fn test_dont_find_wraps_backwards() {
+        let file_path = "artifacts/test_files/day4-one-horizontal-backwards-wrap.txt";
+        let raw_input = fs::read_to_string(file_path).unwrap();
+        init_shape(&raw_input);
+        let input = reverse_vec(parse_string(&raw_input));
+        assert_eq!(count_xmas(input, 1), 1);
+    }
 
-#[test]
-fn test_find_vertical() {
-    let file_path = "artifacts/test_files/day4-one-vertical.txt";
-    let raw_input = fs::read_to_string(file_path).unwrap();
-    init_shape(&raw_input);
-    let input = parse_string(&raw_input);
-    assert_eq!(count_xmas(input, get_shape().1), 1);
-}
-#[test]
-fn test_find_vertical_backwards() {
-    let file_path = "artifacts/test_files/day4-one-verticalc-backwards.txt";
-    let raw_input = fs::read_to_string(file_path).unwrap();
-    init_shape(&raw_input);
-    let input = reverse_vec(parse_string(&raw_input));
-    assert_eq!(count_xmas(input, get_shape().1), 1);
-}
+    #[test]
+    fn test_find_vertical() {
+        let file_path = "artifacts/test_files/day4-one-vertical.txt";
+        let raw_input = fs::read_to_string(file_path).unwrap();
+        init_shape(&raw_input);
+        let input = parse_string(&raw_input);
+        assert_eq!(count_xmas(input, get_shape().1), 1);
+    }
+    #[test]
+    fn test_find_vertical_backwards() {
+        let file_path = "artifacts/test_files/day4-one-verticalc-backwards.txt";
+        let raw_input = fs::read_to_string(file_path).unwrap();
+        init_shape(&raw_input);
+        let input = reverse_vec(parse_string(&raw_input));
+        assert_eq!(count_xmas(input, get_shape().1), 1);
+    }
 
-#[test]
-fn test_find_diagonal() {
-    let file_path = "artifacts/test_files/day4-one-diagonal.txt";
-    let raw_input = fs::read_to_string(file_path).unwrap();
-    init_shape(&raw_input);
-    let input = parse_string(&raw_input);
-    assert_eq!(count_xmas(input, get_shape().1+1), 1);
-}
-#[test]
-fn test_find_diagonal_backwards() {
-    let file_path = "artifacts/test_files/day4-one-diagonal-backwards.txt";
-    let raw_input = fs::read_to_string(file_path).unwrap();
-    init_shape(&raw_input);
-    let input = reverse_vec(parse_string(&raw_input));
-    assert_eq!(count_xmas(input, get_shape().1+1), 1);
+    #[test]
+    fn test_find_diagonal() {
+        let file_path = "artifacts/test_files/day4-one-diagonal.txt";
+        let raw_input = fs::read_to_string(file_path).unwrap();
+        init_shape(&raw_input);
+        let input = parse_string(&raw_input);
+        assert_eq!(count_xmas(input, get_shape().1 + 1), 1);
+    }
+    #[test]
+    fn test_find_diagonal_backwards() {
+        let file_path = "artifacts/test_files/day4-one-diagonal-backwards.txt";
+        let raw_input = fs::read_to_string(file_path).unwrap();
+        init_shape(&raw_input);
+        let input = reverse_vec(parse_string(&raw_input));
+        assert_eq!(count_xmas(input, get_shape().1 + 1), 1);
+    }
 }
