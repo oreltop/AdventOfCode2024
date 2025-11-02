@@ -1,18 +1,24 @@
 use std::fs;
 use std::sync::OnceLock;
-const FILE_NAME: &str = "input_day4.txt";
 
 static INPUT_SIZE: OnceLock<(usize, usize)> = OnceLock::new();
 
 pub fn main() {
     println!("this is main");
-    let file_path = format!("artifacts/{}", FILE_NAME);
+    let file_path = "artifacts/input_files/input_day4.txt";
     let raw_input = fs::read_to_string(file_path).expect("Should have been able to read the file");
     init_shape(&raw_input);
     let forward_input = parse_string(&raw_input);
     let reverse_input = reverse_vec(&forward_input);
-    
-
+    let result: usize = [forward_input, reverse_input]
+        .iter()
+        .map(|input| {
+            count_xmas(&input, 1)
+                + count_xmas(&input, get_shape().1)
+                + count_xmas(&input, get_shape().1 + 1)
+        })
+        .sum();
+    println!("{result}");
 }
 
 fn init_shape(input: &str) -> &(usize, usize) {
@@ -56,7 +62,7 @@ pub mod tests {
 
     #[test]
     fn test_input_shape() {
-        let file_path = "artifacts/test_files/day4-one-vertical.txt";
+        let file_path = "artifacts/test_files/day4/day4-one-vertical.txt";
         let input = fs::read_to_string(file_path).unwrap();
         let result = init_shape(&input);
         assert_eq!(*result, (5, 5));
@@ -64,7 +70,7 @@ pub mod tests {
 
     #[test]
     fn test_parse_string() {
-        let file_path = "artifacts/test_files/day4-one-vertical.txt";
+        let file_path = "artifacts/test_files/day4/day4-one-vertical.txt";
         let input = fs::read_to_string(file_path).unwrap();
         let result = parse_string(&input);
         println!("{:?}", result);
@@ -78,7 +84,7 @@ pub mod tests {
 
     #[test]
     fn test_find_horizontal_backwards() {
-        let file_path = "artifacts/test_files/day4-one-horizontal-backwards.txt";
+        let file_path = "artifacts/test_files/day4/day4-one-horizontal-backwards.txt";
         let raw_input = &fs::read_to_string(file_path).unwrap();
         let input = reverse_vec(&parse_string(&raw_input));
         assert_eq!(count_xmas(&input, 1), 1);
@@ -86,7 +92,7 @@ pub mod tests {
 
     #[test]
     fn test_find_horizontal() {
-        let file_path = "artifacts/test_files/day4-one-horizontal.txt";
+        let file_path = "artifacts/test_files/day4/day4-one-horizontal.txt";
         let raw_input = fs::read_to_string(file_path).unwrap();
         init_shape(&raw_input);
         let input = parse_string(&raw_input);
@@ -94,7 +100,7 @@ pub mod tests {
     }
     #[test]
     fn test_dont_find_wraps() {
-        let file_path = "artifacts/test_files/day4-one-horizontal-wrap.txt";
+        let file_path = "artifacts/test_files/day4/day4-one-horizontal-wrap.txt";
         let raw_input = fs::read_to_string(file_path).unwrap();
         init_shape(&raw_input);
         let input = parse_string(&raw_input);
@@ -102,7 +108,7 @@ pub mod tests {
     }
     #[test]
     fn test_dont_find_wraps_backwards() {
-        let file_path = "artifacts/test_files/day4-one-horizontal-backwards-wrap.txt";
+        let file_path = "artifacts/test_files/day4/day4-one-horizontal-backwards-wrap.txt";
         let raw_input = fs::read_to_string(file_path).unwrap();
         init_shape(&raw_input);
         let input = reverse_vec(&parse_string(&raw_input));
@@ -111,7 +117,7 @@ pub mod tests {
 
     #[test]
     fn test_find_vertical() {
-        let file_path = "artifacts/test_files/day4-one-vertical.txt";
+        let file_path = "artifacts/test_files/day4/day4-one-vertical.txt";
         let raw_input = fs::read_to_string(file_path).unwrap();
         init_shape(&raw_input);
         let input = parse_string(&raw_input);
@@ -119,7 +125,7 @@ pub mod tests {
     }
     #[test]
     fn test_find_vertical_backwards() {
-        let file_path = "artifacts/test_files/day4-one-verticalc-backwards.txt";
+        let file_path = "artifacts/test_files/day4/day4-one-verticalc-backwards.txt";
         let raw_input = fs::read_to_string(file_path).unwrap();
         init_shape(&raw_input);
         let input = reverse_vec(&parse_string(&raw_input));
@@ -128,7 +134,7 @@ pub mod tests {
 
     #[test]
     fn test_find_diagonal() {
-        let file_path = "artifacts/test_files/day4-one-diagonal.txt";
+        let file_path = "artifacts/test_files/day4/day4-one-diagonal.txt";
         let raw_input = fs::read_to_string(file_path).unwrap();
         init_shape(&raw_input);
         let input = parse_string(&raw_input);
@@ -136,7 +142,7 @@ pub mod tests {
     }
     #[test]
     fn test_find_diagonal_backwards() {
-        let file_path = "artifacts/test_files/day4-one-diagonal-backwards.txt";
+        let file_path = "artifacts/test_files/day4/day4-one-diagonal-backwards.txt";
         let raw_input = fs::read_to_string(file_path).unwrap();
         init_shape(&raw_input);
         let input = reverse_vec(&parse_string(&raw_input));
