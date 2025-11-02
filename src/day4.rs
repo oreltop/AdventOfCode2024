@@ -32,25 +32,6 @@ fn parse_string(input: &str) -> Vec<char> {
     input.chars().filter(|&c| !c.is_whitespace()).collect()
 }
 
-// fn count_xmas(input: Vec<char>, jump: usize) -> usize {
-//     let mut count = 0;
-//     let columns = get_shape().1;
-//     let search_up_to = columns - jump % columns * 3;
-//     let indexes = (1..input.len() - jump * 3)
-//         .filter(|&i|  i % columns < search_up_to);
-//     for index in indexes {
-//         if input[index] == 'X'
-//             && input[index + jump] == 'M'
-//             && input[index + jump * 2] == 'A'
-//             && input[index + jump * 3] == 'S'
-//         {
-//             count += 1;
-//         }
-//     }
-//
-//     count
-// }
-
 fn count_xmas(input: Vec<char>, jump: usize) -> usize {
     let columns = get_shape().1;
     let search_up_to = columns - jump % columns * 3;
@@ -67,40 +48,11 @@ fn count_xmas(input: Vec<char>, jump: usize) -> usize {
         .count()
 }
 
-// fn count_xmas_backwards2(input: Vec<char>, jump: usize) -> usize {
-//     let mut count = 0;
-//     let columns = get_shape().1;
-//     let indexes = (1..input.len() - jump * 3).filter(|&i| i % columns >= jump % columns * 3);
-//     for index in indexes {
-//         if input[index] == 'X'
-//             && input[index - jump] == 'M'
-//             && input[index - jump * 2] == 'A'
-//             && input[index - jump * 3] == 'S'
-//         {
-//             count += 1;
-//         }
-//     }
-//
-//     count
-// }
-
-fn count_xmas_backwards(input: Vec<char>, jump: usize) -> usize {
-    let columns = get_shape().1;
-    let search_up_to = columns - jump % columns * 3;
-    let input: Vec<_> = input.iter().cloned().rev().collect();
-
-    input
-        .windows(1 + jump * 3)
-        .enumerate()
-        .filter(|&(i, _)| i % columns < search_up_to)
-        .filter(|&(_, window)| {
-            window[0] == 'X'
-                && window[jump] == 'M'
-                && window[jump * 2] == 'A'
-                && window[jump * 3] == 'S'
-        })
-        .count()
+fn reverse_vec <T: Clone>(vec: Vec<T>) -> Vec<T>{
+    vec.iter().cloned().rev().collect()
 }
+
+
 #[cfg(test)]
 pub mod tests {
     use super::*;
@@ -137,8 +89,9 @@ pub mod tests {
     #[test]
     fn test_find_horizontal_backwards() {
         let file_path = "artifacts/test_files/day4-one-horizontal-backwards.txt";
-        let input = parse_string(&fs::read_to_string(file_path).unwrap());
-        assert_eq!(count_xmas_backwards(input, 1), 1);
+        let raw_input = &fs::read_to_string(file_path).unwrap();
+        let input = reverse_vec(parse_string(&raw_input));
+        assert_eq!(count_xmas(input, 1), 1);
     }
 }
 
@@ -163,6 +116,6 @@ fn test_dont_find_wraps_backwards() {
     let file_path = "artifacts/test_files/day4-one-horizontal-backwards-wrap.txt";
     let raw_input = fs::read_to_string(file_path).unwrap();
     init_shape(&raw_input);
-    let input = parse_string(&raw_input);
-    assert_eq!(count_xmas_backwards(input, 1), 1);
+    let input = reverse_vec(parse_string(&raw_input));
+    assert_eq!(count_xmas(input, 1), 1);
 }
