@@ -1,13 +1,17 @@
 use std::fs;
-use std::sync::OnceLock;
+use std::sync::{OnceLock};
 const FILE_NAME: &str = "input_day4.txt";
+
+
 static INPUT_SIZE: OnceLock<(usize, usize)> = OnceLock::new();
+
 
 pub fn main() {
     println!("this is main");
     let file_path = format!("artifacts/{}", FILE_NAME);
     let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
-    println!("input: {:?}", input);
+    init_shape(&input);
+    println!("input: {:?}", &input);
 }
 
 fn count_rows(input: &str) -> usize {
@@ -15,13 +19,15 @@ fn count_rows(input: &str) -> usize {
     split.len()
 }
 
-fn find_shape(input: &str) -> &(usize, usize) {
+fn init_shape(input: &str) -> &(usize, usize) {
     INPUT_SIZE.get_or_init(||{
         let split: Vec<&str> = input.split_whitespace().collect();
         (split.len(), split[0].len())
     })
+}
 
-
+fn get_shape() -> &'static (usize, usize) {
+    INPUT_SIZE.get().unwrap()
 }
 
 fn parse_string(input: &str) -> Vec<char> {
@@ -30,7 +36,13 @@ fn parse_string(input: &str) -> Vec<char> {
 
 fn count_xmas(input: Vec<char>, jump: usize) -> usize {
     let mut count = 0;
-    let indexes = 1..input.len() - jump * 3;
+    // let rows = get_shape().0;
+    let columns = get_shape().1;
+    let num_of_excluded_columns = columns-jump%columns*3;
+    println!("num_of_excluded_columns = {num_of_excluded_columns} ");
+    let indexes = (1..input.len() - jump * 3)
+        .filter(|&i| num_of_excluded_columns>=i%columns);
+    println!("{:?}", indexes);
     for index in indexes {
         if input[index] == 'X'
             && input[index + jump] == 'M'
@@ -49,9 +61,9 @@ fn count_xmas_backwards(input: Vec<char>, jump: usize) -> usize {
     let indexes = 1..input.len() - jump * 3;
     for index in indexes {
         if input[input.len() - index] == 'X'
-            && input[input.len() - index + jump] == 'M'
-            && input[input.len() - index + jump * 2] == 'A'
-            && input[input.len() - index + jump * 3] == 'S'
+            && input[input.len() - index - jump] == 'M'
+            && input[input.len() - index - jump * 2] == 'A'
+            && input[input.len() - index - jump * 3] == 'S'
         {
             count += 1;
         }
@@ -76,7 +88,7 @@ pub mod tests {
     fn test_input_shape() {
         let file_path = "artifacts/test_files/day4-one-vertical.txt";
         let input = fs::read_to_string(file_path).unwrap();
-        let result = find_shape(&input);
+        let result = init_shape(&input);
         assert_eq!(*result, (5,5));
     }
 
@@ -96,7 +108,7 @@ pub mod tests {
 
     #[test]
     fn test_find_horizontal_backwards() {
-        let file_path = "artifacts/test_files/day4-one-horizontal.txt";
+        let file_path = "artifacts/test_files/day4-one-horizontal-backwards.txt";
         let input = parse_string(&fs::read_to_string(file_path).unwrap());
         assert_eq!(count_xmas_backwards(input, 1), 1);
     }
@@ -105,12 +117,24 @@ pub mod tests {
 #[test]
 fn test_find_horizontal() {
     let file_path = "artifacts/test_files/day4-one-horizontal.txt";
-    let input = parse_string(&fs::read_to_string(file_path).unwrap());
+    let raw_input = fs::read_to_string(file_path).unwrap();
+    init_shape(&raw_input);
+    let input = parse_string(&raw_input);
     assert_eq!(count_xmas(input, 1), 1);
 }
 #[test]
 fn test_dont_find_wraps() {
     let file_path = "artifacts/test_files/day4-one-horizontal-wrap.txt";
-    let input = parse_string(&fs::read_to_string(file_path).unwrap());
+    let raw_input = fs::read_to_string(file_path).unwrap();
+    init_shape(&raw_input);
+    let input = parse_string(&raw_input);
     assert_eq!(count_xmas(input, 1), 1);
+}
+#[test]
+fn test_dont_find_wraps_backwards() {
+    let file_path = "artifacts/test_files/day4-one-horizontal-backwards-wrap.txt";
+    let raw_input = fs::read_to_string(file_path).unwrap();
+    init_shape(&raw_input);
+    let input = parse_string(&raw_input);
+    assert_eq!(count_xmas_backwards(input, 1), 1);
 }
