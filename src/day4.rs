@@ -1,6 +1,7 @@
 use std::fs;
-
+use std::sync::OnceLock;
 const FILE_NAME: &str = "input_day4.txt";
+static INPUT_SIZE: OnceLock<(usize, usize)> = OnceLock::new();
 
 pub fn main() {
     println!("this is main");
@@ -14,9 +15,13 @@ fn count_rows(input: &str) -> usize {
     split.len()
 }
 
-fn find_shape(input: &str) -> (usize, usize) {
-    let split: Vec<&str> = input.split_whitespace().collect();
-    (split.len(), split[0].len())
+fn find_shape(input: &str) -> &(usize, usize) {
+    INPUT_SIZE.get_or_init(||{
+        let split: Vec<&str> = input.split_whitespace().collect();
+        (split.len(), split[0].len())
+    })
+
+
 }
 
 fn parse_string(input: &str) -> Vec<char> {
@@ -72,7 +77,7 @@ pub mod tests {
         let file_path = "artifacts/test_files/day4-one-vertical.txt";
         let input = fs::read_to_string(file_path).unwrap();
         let result = find_shape(&input);
-        assert_eq!(result, (5,5));
+        assert_eq!(*result, (5,5));
     }
 
     #[test]
