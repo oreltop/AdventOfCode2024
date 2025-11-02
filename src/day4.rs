@@ -55,12 +55,12 @@ fn count_xmas_backwards(input: Vec<char>, jump: usize) -> usize {
     let mut count = 0;
     let columns = get_shape().1;
     let indexes = (1..input.len() - jump * 3)
-        .filter(|&i| i % columns > jump%columns*3);
+        .filter(|&i| i % columns >= jump%columns*3);
     for index in indexes {
-        if input[input.len() - index] == 'X'
-            && input[input.len() - index - jump] == 'M'
-            && input[input.len() - index - jump * 2] == 'A'
-            && input[input.len() - index - jump * 3] == 'S'
+        if input[index] == 'X'
+            && input[index - jump] == 'M'
+            && input[index - jump * 2] == 'A'
+            && input[index - jump * 3] == 'S'
         {
             count += 1;
         }
