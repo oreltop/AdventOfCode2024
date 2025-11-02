@@ -1,10 +1,8 @@
 use std::fs;
-use std::sync::{OnceLock};
+use std::sync::OnceLock;
 const FILE_NAME: &str = "input_day4.txt";
 
-
 static INPUT_SIZE: OnceLock<(usize, usize)> = OnceLock::new();
-
 
 pub fn main() {
     println!("this is main");
@@ -20,7 +18,7 @@ fn count_rows(input: &str) -> usize {
 }
 
 fn init_shape(input: &str) -> &(usize, usize) {
-    INPUT_SIZE.get_or_init(||{
+    INPUT_SIZE.get_or_init(|| {
         let split: Vec<&str> = input.split_whitespace().collect();
         (split.len(), split[0].len())
     })
@@ -37,9 +35,9 @@ fn parse_string(input: &str) -> Vec<char> {
 fn count_xmas(input: Vec<char>, jump: usize) -> usize {
     let mut count = 0;
     let columns = get_shape().1;
-    let num_of_excluded_columns = columns-jump%columns*3;
+    let search_up_to = columns - jump % columns * 3;
     let indexes = (1..input.len() - jump * 3)
-        .filter(|&i| num_of_excluded_columns>i%columns);
+        .filter(|&i|  i % columns < search_up_to);
     for index in indexes {
         if input[index] == 'X'
             && input[index + jump] == 'M'
@@ -56,9 +54,8 @@ fn count_xmas(input: Vec<char>, jump: usize) -> usize {
 fn count_xmas_backwards(input: Vec<char>, jump: usize) -> usize {
     let mut count = 0;
     let columns = get_shape().1;
-    let num_of_excluded_columns = columns-jump%columns*3;
     let indexes = (1..input.len() - jump * 3)
-        .filter(|&i| num_of_excluded_columns<=i%columns + jump%columns*3);
+        .filter(|&i| i % columns > jump%columns*3);
     for index in indexes {
         if input[input.len() - index] == 'X'
             && input[input.len() - index - jump] == 'M'
@@ -71,7 +68,6 @@ fn count_xmas_backwards(input: Vec<char>, jump: usize) -> usize {
 
     count
 }
-
 
 #[cfg(test)]
 pub mod tests {
@@ -89,7 +85,7 @@ pub mod tests {
         let file_path = "artifacts/test_files/day4-one-vertical.txt";
         let input = fs::read_to_string(file_path).unwrap();
         let result = init_shape(&input);
-        assert_eq!(*result, (5,5));
+        assert_eq!(*result, (5, 5));
     }
 
     #[test]
