@@ -36,13 +36,10 @@ fn parse_string(input: &str) -> Vec<char> {
 
 fn count_xmas(input: Vec<char>, jump: usize) -> usize {
     let mut count = 0;
-    // let rows = get_shape().0;
     let columns = get_shape().1;
     let num_of_excluded_columns = columns-jump%columns*3;
-    println!("num_of_excluded_columns = {num_of_excluded_columns} ");
     let indexes = (1..input.len() - jump * 3)
         .filter(|&i| num_of_excluded_columns>=i%columns);
-    println!("{:?}", indexes);
     for index in indexes {
         if input[index] == 'X'
             && input[index + jump] == 'M'
@@ -58,7 +55,10 @@ fn count_xmas(input: Vec<char>, jump: usize) -> usize {
 
 fn count_xmas_backwards(input: Vec<char>, jump: usize) -> usize {
     let mut count = 0;
-    let indexes = 1..input.len() - jump * 3;
+    let columns = get_shape().1;
+    let num_of_excluded_columns = columns-jump%columns*3;
+    let indexes = (1..input.len() - jump * 3)
+        .filter(|&i| num_of_excluded_columns<=i%columns + jump%columns*3);
     for index in indexes {
         if input[input.len() - index] == 'X'
             && input[input.len() - index - jump] == 'M'
