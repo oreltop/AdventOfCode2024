@@ -8,17 +8,17 @@ pub fn main() {
     println!("{result}")
 }
 
-fn count_all(raw_input: &String) -> usize {
-    let forward_input = parse_string(&raw_input);
+fn count_all(raw_input: &str) -> usize {
+    let forward_input = parse_string(raw_input);
     let reverse_input = reverse_vec(&forward_input);
-    let line_size = count_columns(&raw_input);
+    let line_size = count_columns(raw_input);
     let result: usize = [forward_input, reverse_input]
         .iter()
         .map(|input| {
-            count_xmas(&input, 1, line_size)
-                + count_xmas(&input, line_size, line_size)
-                + count_xmas(&input, line_size + 1, line_size)
-                + count_xmas(&input, line_size - 1, line_size)
+            count_xmas(input, 1, line_size)
+                + count_xmas(input, line_size, line_size)
+                + count_xmas(input, line_size + 1, line_size)
+                + count_xmas(input, line_size - 1, line_size)
         })
         .sum();
     result
@@ -29,7 +29,7 @@ fn count_columns(input: &str) -> usize {
 }
 
 fn parse_string(input: &str) -> Vec<char> {
-    input.chars().filter(|&c| !(c == '\r')).collect()
+    input.chars().filter(|&c| c != '\r').collect()
 }
 fn count_xmas(input: &[char], jump: usize, line_size: usize) -> usize {
     let letter_count = 1 + jump * 3;
@@ -46,7 +46,7 @@ fn count_xmas(input: &[char], jump: usize, line_size: usize) -> usize {
         .count()
 }
 
-fn reverse_vec<T: Clone>(vec: &Vec<T>) -> Vec<T> {
+fn reverse_vec<T: Clone>(vec: &[T]) -> Vec<T> {
     vec.iter().cloned().rev().collect()
 }
 
