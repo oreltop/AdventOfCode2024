@@ -36,7 +36,6 @@ fn count_xmas(input: &[char], jump: usize, line_size: usize) -> usize {
     let new_line = if letter_count >= line_size { 1 } else { 0 };
     input
         .windows(letter_count + new_line * 3)
-        .filter(|&window| window.iter().filter(|&&c| c == '\n').count() == new_line * 3)
         .filter(|&window| {
             window[0] == 'X'
                 && window[jump + new_line] == 'M'
