@@ -8,7 +8,6 @@ pub fn main() {
     println!("{result}")
 }
 
-
 fn count_columns(input: &str) -> usize {
     input.split_once('\r').unwrap().0.len()
 }
@@ -17,11 +16,16 @@ fn parse_string(input: &str) -> Vec<char> {
     input.chars().filter(|&c| c != '\r').collect()
 }
 fn count_xmas(input: Vec<char>, line_size: usize) -> usize {
-    0
-}
-
-fn reverse_vec<T: Clone>(vec: &[T]) -> Vec<T> {
-    vec.iter().cloned().rev().collect()
+    input
+        .windows(line_size * 2 + 5)
+        .filter(|&window| {
+            [window[0], window[line_size * 2 + 4]].contains(&'M')
+                && [window[0], window[line_size * 2 + 4]].contains(&'S')
+                && [window[2], window[line_size * 2 + 2]].contains(&'M')
+                && [window[2], window[line_size * 2 + 2]].contains(&'S')
+                && window[line_size + 2] == 'A'
+        })
+        .count()
 }
 
 #[cfg(test)]
@@ -51,11 +55,10 @@ pub mod tests {
     }
 
     #[test]
-    fn test_trivial(){
+    fn test_trivial() {
         let file_path = "artifacts/test_files/day4/part2-3x3.txt";
         let raw_input = &fs::read_to_string(file_path).unwrap();
         let input = parse_string(&raw_input);
-        assert_eq!(count_xmas(input, count_columns(raw_input)),1);
+        assert_eq!(count_xmas(input, count_columns(raw_input)), 1);
     }
-
 }
