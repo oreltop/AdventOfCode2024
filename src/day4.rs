@@ -29,20 +29,34 @@ fn count_columns(input: &str) -> usize {
 }
 
 fn parse_string(input: &str) -> Vec<char> {
-    input.chars().filter(|&c| !c.is_whitespace()).collect()
+    input.chars().filter(|&c| !(c == '\r')).collect()
 }
-
+//
+// fn count_xmas(input: &[char], jump: usize, line_size: usize) -> usize {
+//     let search_up_to = line_size - jump % line_size * 3;
+//     input
+//         .windows(1 + jump * 3)
+//         .enumerate()
+//         .filter(|&(i, _)| i % line_size < search_up_to)
+//         .filter(|&(_, window)| {
+//             window[0] == 'X'
+//                 && window[jump] == 'M'
+//                 && window[jump * 2] == 'A'
+//                 && window[jump * 3] == 'S'
+//         })
+//         .count()
+// }
 fn count_xmas(input: &[char], jump: usize, line_size: usize) -> usize {
-    let search_up_to = line_size - jump % line_size * 3;
+    let letter_count = 1 + jump * 3;
+    let new_line = if letter_count >= line_size { 1 } else { 0 };
     input
-        .windows(1 + jump * 3)
-        .enumerate()
-        .filter(|&(i, _)| i % line_size < search_up_to)
-        .filter(|&(_, window)| {
+        .windows(letter_count + new_line * 3)
+        .filter(|&window| window.iter().filter(|&&c|c=='\n').count()==new_line*3)
+        .filter(|&window| {
             window[0] == 'X'
-                && window[jump] == 'M'
-                && window[jump * 2] == 'A'
-                && window[jump * 3] == 'S'
+                && window[jump+new_line] == 'M'
+                && window[(jump+new_line) * 2] == 'A'
+                && window[(jump+new_line) * 3] == 'S'
         })
         .count()
 }
@@ -69,12 +83,12 @@ pub mod tests {
         let input = fs::read_to_string(file_path).unwrap();
         let result = parse_string(&input);
         println!("{:?}", result);
-        assert_eq!(result.len(), 25);
+        assert_eq!(result.len(), 29);
         assert_eq!(result[0], 'O');
-        assert_eq!(result[7], 'X');
-        assert_eq!(result[12], 'M');
-        assert_eq!(result[17], 'A');
-        assert_eq!(result[22], 'S');
+        assert_eq!(result[8], 'X');
+        assert_eq!(result[14], 'M');
+        assert_eq!(result[20], 'A');
+        assert_eq!(result[26], 'S');
     }
 
     #[test]
@@ -89,10 +103,15 @@ pub mod tests {
     fn test_find_horizontal() {
         let file_path = "artifacts/test_files/day4/day4-one-horizontal.txt";
         let raw_input = fs::read_to_string(file_path).unwrap();
-
         let input = parse_string(&raw_input);
-        println!("{}", count_columns(&raw_input));
         assert_eq!(count_xmas(&input, 1, count_columns(&raw_input)), 1);
+    }
+    #[test]
+    fn test_find_something() {
+        let file_path = "artifacts/test_files/day4/day4-one-horizontal.txt";
+        let raw_input = fs::read_to_string(file_path).unwrap();
+        let input = parse_string(&raw_input);
+        assert!(count_xmas(&input, 1, count_columns(&raw_input)) >= 1);
     }
     #[test]
     fn test_dont_find_wraps() {
@@ -115,7 +134,6 @@ pub mod tests {
     fn test_find_vertical() {
         let file_path = "artifacts/test_files/day4/day4-one-vertical.txt";
         let raw_input = fs::read_to_string(file_path).unwrap();
-
         let input = parse_string(&raw_input);
         assert_eq!(
             count_xmas(&input, count_columns(&raw_input), count_columns(&raw_input)),
