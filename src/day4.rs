@@ -18,7 +18,7 @@ fn count_all(raw_input: &String) -> usize {
             count_xmas(&input, 1, line_size)
                 + count_xmas(&input, line_size, line_size)
                 + count_xmas(&input, line_size + 1, line_size)
-            // + count_xmas(&input, get_shape().1 - 1)
+                + count_xmas(&input, line_size - 1, line_size)
         })
         .sum();
     result
@@ -31,32 +31,17 @@ fn count_columns(input: &str) -> usize {
 fn parse_string(input: &str) -> Vec<char> {
     input.chars().filter(|&c| !(c == '\r')).collect()
 }
-//
-// fn count_xmas(input: &[char], jump: usize, line_size: usize) -> usize {
-//     let search_up_to = line_size - jump % line_size * 3;
-//     input
-//         .windows(1 + jump * 3)
-//         .enumerate()
-//         .filter(|&(i, _)| i % line_size < search_up_to)
-//         .filter(|&(_, window)| {
-//             window[0] == 'X'
-//                 && window[jump] == 'M'
-//                 && window[jump * 2] == 'A'
-//                 && window[jump * 3] == 'S'
-//         })
-//         .count()
-// }
 fn count_xmas(input: &[char], jump: usize, line_size: usize) -> usize {
     let letter_count = 1 + jump * 3;
     let new_line = if letter_count >= line_size { 1 } else { 0 };
     input
         .windows(letter_count + new_line * 3)
-        .filter(|&window| window.iter().filter(|&&c|c=='\n').count()==new_line*3)
+        .filter(|&window| window.iter().filter(|&&c| c == '\n').count() == new_line * 3)
         .filter(|&window| {
             window[0] == 'X'
-                && window[jump+new_line] == 'M'
-                && window[(jump+new_line) * 2] == 'A'
-                && window[(jump+new_line) * 3] == 'S'
+                && window[jump + new_line] == 'M'
+                && window[(jump + new_line) * 2] == 'A'
+                && window[(jump + new_line) * 3] == 'S'
         })
         .count()
 }
