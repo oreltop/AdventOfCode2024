@@ -61,4 +61,11 @@ pub mod tests {
         let input = parse_string(&raw_input);
         assert_eq!(count_xmas(input, count_columns(raw_input)), 1);
     }
+    #[test]
+    fn test_10x10() {
+        let file_path = "artifacts/test_files/day4/part2-10x10.txt";
+        let raw_input = &fs::read_to_string(file_path).unwrap();
+        let input = parse_string(&raw_input);
+        assert_eq!(count_xmas(input, count_columns(raw_input)), 9);
+    }
 }
