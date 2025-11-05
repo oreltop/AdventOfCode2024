@@ -18,16 +18,13 @@ fn parse_string(input: &str) -> Vec<i32> {
 }
 
 fn does_break_rule(update: &[i32], rule: &(i32, i32)) -> bool {
-    let first_pos = update
-        .iter()
-        .position(|&item| item == rule.0 || item == rule.1);
-    if first_pos.is_none() {return false}
-    if first_pos.unwrap()== rule.1 as usize {return false}
+    let first_pos = update.iter().position(|&item| item == rule.0);
+    let later_pos = update.iter().position(|&item| item == rule.1);
 
-    let second_pos = update
-        .iter()
-        .position(|&item| item == rule.1);
-    second_pos.is_some()
+    if first_pos.is_none() || later_pos.is_none() {
+        return false;
+    };
+    first_pos > later_pos
 }
 
 #[cfg(test)]
@@ -35,7 +32,7 @@ pub mod tests {
     use super::*;
     #[test]
     fn rule_breaking() {
-        let rule = (2,1);
+        let rule = (2, 1);
         let update = vec![1, 2, 3, 4, 5];
         assert!(does_break_rule(&update, &rule))
     }
@@ -43,24 +40,24 @@ pub mod tests {
     fn rule_not_breaking() {
         let rule = (1, 2);
         let update = vec![1, 2, 3, 4, 5];
-        assert!(does_break_rule(&update, &rule))
+        assert!(!does_break_rule(&update, &rule))
     }
     #[test]
     fn rule_not_apply() {
         let rule = (1, 6);
         let update = vec![1, 2, 3, 4, 5];
-        assert!(does_break_rule(&update, &rule))
+        assert!(!does_break_rule(&update, &rule))
     }
     #[test]
     fn rule_not_apply2() {
         let rule = (9, 6);
         let update = vec![1, 2, 3, 4, 5];
-        assert!(does_break_rule(&update, &rule))
+        assert!(!does_break_rule(&update, &rule))
     }
     #[test]
     fn rule_not_apply3() {
         let rule = (9, 2);
         let update = vec![1, 2, 3, 4, 5];
-        assert!(does_break_rule(&update, &rule))
+        assert!(!does_break_rule(&update, &rule))
     }
 }
