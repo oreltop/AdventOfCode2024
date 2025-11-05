@@ -36,7 +36,7 @@ fn is_update_correct(update: &[i32], rules: &[(i32,i32)]) -> bool {
 }
 
 fn get_middle(update: &[i32]) -> i32{
-    update[update.len()/2+1]
+    update[update.len()/2]
 }
 #[cfg(test)]
 pub mod tests {
