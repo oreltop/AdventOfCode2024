@@ -31,6 +31,9 @@ fn does_break_rule(update: &[i32], rule: &(i32, i32)) -> bool {
     first_pos > later_pos
 }
 
+fn is_update_correct(update: &[i32], rules: &[(i32,i32)]) -> bool {
+    !rules.iter().any(|rule| does_break_rule(update, rule))
+}
 #[cfg(test)]
 pub mod tests {
     use super::*;
@@ -65,9 +68,10 @@ pub mod tests {
         assert!(!does_break_rule(&update, &rule))
     }
 
+    #[test]
     fn doesnt_break_any_rule(){
         let rules = vec![(1,2), (3,5), (1,9), (5,6), (8,4)];
         let update = vec![1,2,3,4,5];
-        assert!(is_update_correct(update, rules))
+        assert!(is_update_correct(&update, &rules))
     }
 }
