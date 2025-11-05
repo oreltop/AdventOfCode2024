@@ -39,4 +39,10 @@ pub mod tests {
         let update = vec![1, 2, 3, 4, 5];
         assert!(does_break_rule(&update, &rule))
     }
+    #[test]
+    fn rule_breaking() {
+        let rule = (2,1);
+        let update = vec![1, 2, 3, 4, 5];
+        assert!(does_break_rule(&update, &rule))
+    }
 }
