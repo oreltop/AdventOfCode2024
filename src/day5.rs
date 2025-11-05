@@ -34,6 +34,10 @@ fn does_break_rule(update: &[i32], rule: &(i32, i32)) -> bool {
 fn is_update_correct(update: &[i32], rules: &[(i32,i32)]) -> bool {
     !rules.iter().any(|rule| does_break_rule(update, rule))
 }
+
+fn get_middle(update: &[i32]) -> i32{
+    update[update.len()/2+1]
+}
 #[cfg(test)]
 pub mod tests {
     use super::*;
@@ -80,4 +84,15 @@ pub mod tests {
         let update = vec![1,2,3,4,5];
         assert!(!is_update_correct(&update, &rules))
     }
+
+    #[test]
+    fn test_get_middle(){
+        let update = vec![1,2,3,4,5];
+        assert_eq!(get_middle(&update), 3);
+        let update2 = vec![1,2,3];
+        assert_eq!(get_middle(&update2), 2);
+        let update3 = vec![1,2,3,4,5,6,7];
+        assert_eq!(get_middle(&update3), 4);
+    }
+
 }
