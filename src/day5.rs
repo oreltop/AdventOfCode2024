@@ -74,4 +74,10 @@ pub mod tests {
         let update = vec![1,2,3,4,5];
         assert!(is_update_correct(&update, &rules))
     }
+    #[test]
+    fn break_one_rule(){
+        let rules = vec![(1,2), (5,2), (1,9), (5,6), (8,4)];
+        let update = vec![1,2,3,4,5];
+        assert!(!is_update_correct(&update, &rules))
+    }
 }
