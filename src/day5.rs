@@ -38,6 +38,13 @@ fn is_update_correct(update: &[i32], rules: &[(i32,i32)]) -> bool {
 fn get_middle(update: &[i32]) -> i32{
     update[update.len()/2]
 }
+
+fn sum_middles(updates: Vec<Vec<i32>>)-> i32{
+    updates
+        .iter()
+        .map(|u| get_middle(u))
+        .sum()
+}
 #[cfg(test)]
 pub mod tests {
     use super::*;
