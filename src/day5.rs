@@ -19,11 +19,15 @@ fn parse_string(input: &str) -> Vec<i32> {
 
 fn does_break_rule(update: &[i32], rule: &(i32, i32)) -> bool {
     let first_pos = update.iter().position(|&item| item == rule.0);
-    let later_pos = update.iter().position(|&item| item == rule.1);
-
-    if first_pos.is_none() || later_pos.is_none() {
+    if first_pos.is_none() {
         return false;
     };
+
+    let later_pos = update.iter().position(|&item| item == rule.1);
+    if later_pos.is_none() {
+        return false;
+    };
+
     first_pos > later_pos
 }
 
