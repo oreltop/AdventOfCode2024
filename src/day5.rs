@@ -22,7 +22,9 @@ fn parse_string(input: &str) -> Vec<i32> {
 pub mod tests {
     use super::*;
     #[test]
-    fn test_parse_string(){
-        println!("{}", "this is test dummy")
+    fn rule_not_breaking(){
+        let rule = (1,2);
+        let update = vec![1,2,3,4,5];
+        assert!(does_break_rule(update, rule))
     }
 }
