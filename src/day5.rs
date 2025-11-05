@@ -95,4 +95,10 @@ pub mod tests {
         assert_eq!(get_middle(&update3), 4);
     }
 
+    #[test]
+    fn test_sum_middle(){
+        let updates = vec![vec![1,2,3,4,5], vec![1,2,3], vec![1,2,3,4,5,6,7]];
+        assert_eq!(sum_middles(updates), 9);
+    }
+
 }
