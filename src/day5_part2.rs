@@ -210,4 +210,15 @@ pub mod tests {
         let sorted_graph = topological_sort(&graph);
         assert_eq!(sorted_graph, vec![&1, &2, &3, &4, &5])
     }
+
+    fn fix_incorrect_update() {
+        let rules = vec![(1, 2), (1, 3), (2, 4), (4, 5), (1, 5), (2, 3), (3, 4)];
+        let graph = create_constraint_graph(&rules);
+        let sorted_graph = topological_sort(&graph);
+
+        let incorrect_update = vec![3,2,4,1,5];
+        assert!(!is_update_correct(&incorrect_update, &rules))
+
+        let correct_update = correct_update(&incorrect_update, sorted_graph);
+    }
 }
