@@ -64,6 +64,7 @@ fn sum_middles(updates: &Vec<&Vec<i32>>) -> i32 {
 }
 #[cfg(test)]
 pub mod tests {
+    use std::collections::{HashMap, HashSet};
     use super::*;
     #[test]
     fn rule_breaking() {
@@ -126,5 +127,14 @@ pub mod tests {
         let binding3 = vec![1, 2, 3, 4, 5];
         let updates = vec![&binding1, &binding2, &binding3];
         assert_eq!(sum_middles(&updates), 9);
+    }
+
+    #[test]
+    fn test_create_constraint_graph() {
+        rules = vec![(1, 2), (1, 3), (2, 4), (4, 5), (1, 5)];
+        let constraint_graph = create_constraint_graph(&rules);
+        assert_eq!(constraint_graph[1], vec![2, 3, 5]);
+        assert_eq!(constraint_graph[2], vec![4]);
+        assert_eq!(constraint_graph[4], vec![5]);
     }
 }
