@@ -1,4 +1,5 @@
 use itertools::{Itertools, Update};
+use std::collections::HashMap;
 use std::fs;
 
 const FILE_NAME: &'static str = "input_day5.txt";
@@ -62,10 +63,20 @@ fn get_middle(update: &[i32]) -> i32 {
 fn sum_middles(updates: &Vec<&Vec<i32>>) -> i32 {
     updates.iter().map(|u| get_middle(u)).sum()
 }
+
+fn create_constraint_graph(rules: &[(i32, i32)]) -> HashMap<&i32, Vec<&i32>> {
+    let mut result = HashMap::new();
+    for (first, later) in rules {
+        result.entry(first).or_insert(vec![]).push(later);
+    }
+
+    result
+}
+
 #[cfg(test)]
 pub mod tests {
-    use std::collections::{HashMap, HashSet};
     use super::*;
+    use std::collections::{HashMap, HashSet};
     #[test]
     fn rule_breaking() {
         let rule = (2, 1);
@@ -131,10 +142,10 @@ pub mod tests {
 
     #[test]
     fn test_create_constraint_graph() {
-        rules = vec![(1, 2), (1, 3), (2, 4), (4, 5), (1, 5)];
-        let constraint_graph = create_constraint_graph(&rules);
-        assert_eq!(constraint_graph[1], vec![2, 3, 5]);
-        assert_eq!(constraint_graph[2], vec![4]);
-        assert_eq!(constraint_graph[4], vec![5]);
+        let rules = vec![(1, 2), (1, 3), (2, 4), (4, 5), (1, 5)];
+        let graph = create_constraint_graph(&rules);
+        assert_eq!(graph.get(&1), Some(&vec![&2, &3, &5]));
+        assert_eq!(graph.get(&2), Some(&vec![&4]));
+        assert_eq!(graph.get(&4), Some(&vec![&5]));
     }
 }
