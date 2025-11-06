@@ -1,5 +1,5 @@
 use itertools::{Itertools, Update};
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs;
 
 const FILE_NAME: &'static str = "input_day5.txt";
@@ -69,14 +69,68 @@ fn create_constraint_graph(rules: &[(i32, i32)]) -> HashMap<&i32, Vec<&i32>> {
     for (first, later) in rules {
         result.entry(first).or_insert(vec![]).push(later);
     }
+    // println!("create_constraint_graph: {:?} ", &result);
+    result
+}
 
+fn visit<'a>(
+    node: &'a i32,
+    call_stack: &mut HashSet<&'a i32>,
+    visited: &mut HashSet<&'a i32>,
+    result: &mut Vec<&'a i32>,
+    constraint_graph: &&HashMap<&i32, Vec<&'a i32>>,
+) {
+    // println!(
+    //     "visiting node: {:?}, neighbors: {:?}",
+    //     node,
+    //     constraint_graph.get(node)
+    // );
+    let Some(neighbors) = constraint_graph.get(node) else {
+        visited.insert(node);
+        call_stack.remove(node);
+        result.push(node);
+        return;
+    };
+
+    for neighbor in neighbors {
+        if call_stack.contains(neighbor) {
+            panic!(
+                "cyclic graph found! aborting.\nDebug data: node: {:?}\nneighbor: {:?}, call_stack: {:?}",
+                node, neighbor, call_stack
+            )
+        }
+        if !visited.contains(neighbor) {
+            call_stack.insert(neighbor);
+            visit(neighbor, call_stack, visited, result, constraint_graph)
+        }
+    }
+    visited.insert(node);
+    call_stack.remove(node);
+    result.push(node);
+}
+fn topological_sort<'a>(constraint_graph: &HashMap<&'a i32, Vec<&'a i32>>) -> Vec<&'a i32> {
+    let mut call_stack = HashSet::new();
+    let mut visited = HashSet::new();
+    let mut result = Vec::new();
+
+    for (node, _) in constraint_graph {
+        if !visited.contains(node) {
+            visit(
+                node,
+                &mut call_stack,
+                &mut visited,
+                &mut result,
+                &constraint_graph,
+            );
+        }
+    }
+    result.reverse();
     result
 }
 
 #[cfg(test)]
 pub mod tests {
     use super::*;
-    use std::collections::{HashMap, HashSet};
     #[test]
     fn rule_breaking() {
         let rule = (2, 1);
@@ -147,5 +201,13 @@ pub mod tests {
         assert_eq!(graph.get(&1), Some(&vec![&2, &3, &5]));
         assert_eq!(graph.get(&2), Some(&vec![&4]));
         assert_eq!(graph.get(&4), Some(&vec![&5]));
+    }
+
+    #[test]
+    fn test_top_sort() {
+        let rules = vec![(1, 2), (1, 3), (2, 4), (4, 5), (1, 5), (2, 3), (3, 4)];
+        let graph = create_constraint_graph(&rules);
+        let sorted_graph = topological_sort(&graph);
+        assert_eq!(sorted_graph, vec![&1, &2, &3, &4, &5])
     }
 }
