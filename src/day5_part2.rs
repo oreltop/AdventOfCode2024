@@ -128,6 +128,14 @@ fn topological_sort<'a>(constraint_graph: &HashMap<&'a i32, Vec<&'a i32>>) -> Ve
     result
 }
 
+fn correct_update(update: &[i32], constraint_graph: &[&i32]) -> Vec<i32> {
+    constraint_graph
+        .iter()
+        .filter(|item| update.contains(item))
+        .map(|&&i| i)
+        .collect()
+}
+
 #[cfg(test)]
 pub mod tests {
     use super::*;
@@ -211,14 +219,16 @@ pub mod tests {
         assert_eq!(sorted_graph, vec![&1, &2, &3, &4, &5])
     }
 
+    #[test]
     fn fix_incorrect_update() {
         let rules = vec![(1, 2), (1, 3), (2, 4), (4, 5), (1, 5), (2, 3), (3, 4)];
         let graph = create_constraint_graph(&rules);
         let sorted_graph = topological_sort(&graph);
 
-        let incorrect_update = vec![3,2,4,1,5];
-        assert!(!is_update_correct(&incorrect_update, &rules))
+        let incorrect_update = vec![3, 2, 4, 1, 5];
+        assert!(!is_update_correct(&incorrect_update, &rules));
 
-        let correct_update = correct_update(&incorrect_update, sorted_graph);
+        let correct_update = correct_update(&incorrect_update, &sorted_graph);
+        assert!(is_update_correct(&correct_update, &rules));
     }
 }
