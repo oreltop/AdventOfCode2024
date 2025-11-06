@@ -9,12 +9,24 @@ pub fn main() {
     let file_path = format!("artifacts/input_files/{}", FILE_NAME);
     let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
     let (updates, rules) = parse_string(&input);
-    let correct_updates: Vec<_> = updates
+    let incorrect_updates: Vec<_> = updates
         .iter()
-        .filter(|&update| is_update_correct(&update, &rules))
+        .filter(|&update| !is_update_correct(&update, &rules))
+        .map(|update| correct_update(&update, &rules))
         .collect();
-    let result = sum_middles(&correct_updates);
+    let result = sum_middles(&incorrect_updates);
     println!("{}", result);
+}
+
+fn filter_irrelevant_rules(
+    rules_unfiltered: &[(i32, i32)],
+    update: &[i32],
+) -> Vec<(i32, i32)> {
+    rules_unfiltered
+        .iter()
+        .filter(|(first, later)| update.contains(first) && update.contains(later))
+        .cloned()
+        .collect()
 }
 
 fn parse_string(input: &str) -> (Vec<Vec<i32>>, Vec<(i32, i32)>) {
@@ -60,7 +72,7 @@ fn get_middle(update: &[i32]) -> i32 {
     update[update.len() / 2]
 }
 
-fn sum_middles(updates: &Vec<&Vec<i32>>) -> i32 {
+fn sum_middles(updates: &Vec<Vec<i32>>) -> i32 {
     updates.iter().map(|u| get_middle(u)).sum()
 }
 
@@ -69,7 +81,7 @@ fn create_constraint_graph(rules: &[(i32, i32)]) -> HashMap<&i32, Vec<&i32>> {
     for (first, later) in rules {
         result.entry(first).or_insert(vec![]).push(later);
     }
-    // println!("create_constraint_graph: {:?} ", &result);
+    println!("create_constraint_graph: {:?} ", &result);
     result
 }
 
@@ -80,11 +92,11 @@ fn visit<'a>(
     result: &mut Vec<&'a i32>,
     constraint_graph: &&HashMap<&i32, Vec<&'a i32>>,
 ) {
-    // println!(
-    //     "visiting node: {:?}, neighbors: {:?}",
-    //     node,
-    //     constraint_graph.get(node)
-    // );
+    println!(
+        "visiting node: {:?}, neighbors: {:?}",
+        node,
+        constraint_graph.get(node)
+    );
     let Some(neighbors) = constraint_graph.get(node) else {
         visited.insert(node);
         call_stack.remove(node);
@@ -128,8 +140,12 @@ fn topological_sort<'a>(constraint_graph: &HashMap<&'a i32, Vec<&'a i32>>) -> Ve
     result
 }
 
-fn correct_update(update: &[i32], constraint_graph: &[&i32]) -> Vec<i32> {
-    constraint_graph
+fn correct_update(update: &[i32], rules: &[(i32,i32)]) -> Vec<i32> {
+    let rules_filtered = filter_irrelevant_rules(&rules,&update);
+    let constraint_graph = create_constraint_graph(&rules_filtered);
+    let sorted_constraints = topological_sort(&constraint_graph);
+
+    sorted_constraints
         .iter()
         .filter(|item| update.contains(item))
         .map(|&&i| i)
@@ -198,7 +214,7 @@ pub mod tests {
         let binding1 = vec![1, 2, 3, 4, 5, 6, 7];
         let binding2 = vec![1, 2, 3];
         let binding3 = vec![1, 2, 3, 4, 5];
-        let updates = vec![&binding1, &binding2, &binding3];
+        let updates = vec![binding1, binding2, binding3];
         assert_eq!(sum_middles(&updates), 9);
     }
 
@@ -228,7 +244,15 @@ pub mod tests {
         let incorrect_update = vec![3, 2, 4, 1, 5];
         assert!(!is_update_correct(&incorrect_update, &rules));
 
-        let correct_update = correct_update(&incorrect_update, &sorted_graph);
+        let correct_update = correct_update(&incorrect_update, &rules);
         assert!(is_update_correct(&correct_update, &rules));
+    }
+
+    #[test]
+    fn test_filter_irrelevant_rules(){
+        let rules_unfiltered = vec![(1, 2), (1, 3), (2, 4), (4, 5), (1, 5), (2, 3), (3, 4)];
+        let update = vec![1,2,3];
+        let rules = filter_irrelevant_rules(&rules_unfiltered, &update);
+        assert_eq!(rules, vec![(1, 2), (1, 3), (2, 3)])
     }
 }
