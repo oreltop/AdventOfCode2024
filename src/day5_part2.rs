@@ -1,8 +1,7 @@
-use itertools::{Itertools, Update};
 use std::collections::{HashMap, HashSet};
 use std::fs;
 
-const FILE_NAME: &'static str = "input_day5.txt";
+const FILE_NAME: &str = "input_day5.txt";
 
 pub fn main() {
     println!("this is main");
@@ -11,8 +10,8 @@ pub fn main() {
     let (updates, rules) = parse_string(&input);
     let incorrect_updates: Vec<_> = updates
         .iter()
-        .filter(|&update| !is_update_correct(&update, &rules))
-        .map(|update| correct_update(&update, &rules))
+        .filter(|update| !is_update_correct(update, &rules))
+        .map(|update| correct_update(update, &rules))
         .collect();
     let result = sum_middles(&incorrect_updates);
     println!("{}", result);
@@ -72,7 +71,7 @@ fn get_middle(update: &[i32]) -> i32 {
     update[update.len() / 2]
 }
 
-fn sum_middles(updates: &Vec<Vec<i32>>) -> i32 {
+fn sum_middles(updates: &[Vec<i32>]) -> i32 {
     updates.iter().map(|u| get_middle(u)).sum()
 }
 
@@ -81,7 +80,6 @@ fn create_constraint_graph(rules: &[(i32, i32)]) -> HashMap<&i32, Vec<&i32>> {
     for (first, later) in rules {
         result.entry(first).or_insert(vec![]).push(later);
     }
-    println!("create_constraint_graph: {:?} ", &result);
     result
 }
 
@@ -92,11 +90,6 @@ fn visit<'a>(
     result: &mut Vec<&'a i32>,
     constraint_graph: &&HashMap<&i32, Vec<&'a i32>>,
 ) {
-    println!(
-        "visiting node: {:?}, neighbors: {:?}",
-        node,
-        constraint_graph.get(node)
-    );
     let Some(neighbors) = constraint_graph.get(node) else {
         visited.insert(node);
         call_stack.remove(node);
@@ -125,7 +118,7 @@ fn topological_sort<'a>(constraint_graph: &HashMap<&'a i32, Vec<&'a i32>>) -> Ve
     let mut visited = HashSet::new();
     let mut result = Vec::new();
 
-    for (node, _) in constraint_graph {
+    for node in constraint_graph.keys() {
         if !visited.contains(node) {
             visit(
                 node,
@@ -141,7 +134,7 @@ fn topological_sort<'a>(constraint_graph: &HashMap<&'a i32, Vec<&'a i32>>) -> Ve
 }
 
 fn correct_update(update: &[i32], rules: &[(i32,i32)]) -> Vec<i32> {
-    let rules_filtered = filter_irrelevant_rules(&rules,&update);
+    let rules_filtered = filter_irrelevant_rules(rules,update);
     let constraint_graph = create_constraint_graph(&rules_filtered);
     let sorted_constraints = topological_sort(&constraint_graph);
 
@@ -238,8 +231,6 @@ pub mod tests {
     #[test]
     fn fix_incorrect_update() {
         let rules = vec![(1, 2), (1, 3), (2, 4), (4, 5), (1, 5), (2, 3), (3, 4)];
-        let graph = create_constraint_graph(&rules);
-        let sorted_graph = topological_sort(&graph);
 
         let incorrect_update = vec![3, 2, 4, 1, 5];
         assert!(!is_update_correct(&incorrect_update, &rules));

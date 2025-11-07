@@ -1,6 +1,6 @@
 use std::fs;
 
-const FILE_NAME: &'static str = "input_day1.txt";
+const FILE_NAME: &str = "input_day1.txt";
 
 pub fn main() {
     println!("this is main");
