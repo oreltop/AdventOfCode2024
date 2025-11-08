@@ -45,6 +45,17 @@ struct Guard {
 }
 
 impl Guard {
+    fn walk(&mut self) {
+        match self.direction {
+            Up => self.position.y +=1,
+            Right => self.position.x +=1,
+            Down => self.position.y -=1,
+            Left => self.position.x -=1
+        }
+    }
+}
+
+impl Guard {
     fn rotate(&mut self) {
         let new_direction = match self.direction {
             Up => Right,
