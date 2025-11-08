@@ -157,8 +157,23 @@ pub mod tests {
             }
         );
         assert_eq!(world.guard.position, Position { x: 0, y: 3 });
-        assert_eq!(world.guard.direction, Direction::Up);
+        assert_eq!(world.guard.direction, Up);
         assert!(!world.map[1][3].is_empty());
         assert!(world.map[0][3].is_empty());
+    }
+
+    fn test_guard_rotate() {
+        let guard = Guard {
+            position: Position { x: 0, y: 0 },
+            direction: Up,
+        };
+        guard.rotate();
+        assert_eq!(guard.direction, Right);
+        guard.rotate();
+        assert_eq!(guard.direction, Down);
+        guard.rotate();
+        assert_eq!(guard.direction, Left);
+        guard.rotate();
+        assert_eq!(guard.direction, Right);
     }
 }
