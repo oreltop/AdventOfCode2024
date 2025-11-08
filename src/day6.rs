@@ -44,6 +44,18 @@ struct Guard {
     direction: Direction,
 }
 
+impl Guard {
+    fn rotate(&mut self) {
+        let new_direction = match self.direction {
+            Up => Right,
+            Right => Down,
+            Down => Left,
+            Left => Up
+        };
+        self.direction = new_direction;
+    }
+}
+
 struct World {
     size: Size,
     map: Vec<Vec<Cell>>,
@@ -162,8 +174,9 @@ pub mod tests {
         assert!(world.map[0][3].is_empty());
     }
 
+    #[test]
     fn test_guard_rotate() {
-        let guard = Guard {
+        let mut guard = Guard {
             position: Position { x: 0, y: 0 },
             direction: Up,
         };
@@ -174,6 +187,18 @@ pub mod tests {
         guard.rotate();
         assert_eq!(guard.direction, Left);
         guard.rotate();
-        assert_eq!(guard.direction, Right);
+        assert_eq!(guard.direction, Up);
     }
+
+    // #[test]
+    // fn test_guard_walk(){
+    //     let mut guard = Guard{position: Position{x:2,y:2}, direction: Up};
+    //     guard.walk();
+    //     assert_eq!(guard.position, Position{x:2,y:3});
+    //     guard.rotate();
+    //     guard.walk();
+    //     guard.walk();
+    //     assert_eq!(guard.position, Position{x:4,y:3});
+    //
+    // }
 }
