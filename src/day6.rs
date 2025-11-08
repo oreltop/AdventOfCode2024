@@ -212,4 +212,16 @@ pub mod tests {
         assert_eq!(guard.position, Position{x:4,y:3});
 
     }
+
+    fn test_next_position(){
+        let mut guard = Guard{position: Position{x:2,y:2}, direction: Up};
+        let next_pos = guard.next_position();
+        assert_eq!(next_pos, Position{x:2, y:3});
+        assert_eq!(guard.position, Position{x:2,y:2});
+        guard.rotate();
+        let next_pos = guard.next_position();
+        assert_eq!(next_pos, Position{x:3, y:2});
+        assert_eq!(guard.position, Position{x:2,y:2});
+
+    }
 }
