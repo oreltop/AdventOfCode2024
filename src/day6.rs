@@ -190,15 +190,15 @@ pub mod tests {
         assert_eq!(guard.direction, Up);
     }
 
-    // #[test]
-    // fn test_guard_walk(){
-    //     let mut guard = Guard{position: Position{x:2,y:2}, direction: Up};
-    //     guard.walk();
-    //     assert_eq!(guard.position, Position{x:2,y:3});
-    //     guard.rotate();
-    //     guard.walk();
-    //     guard.walk();
-    //     assert_eq!(guard.position, Position{x:4,y:3});
-    //
-    // }
+    #[test]
+    fn test_guard_walk(){
+        let mut guard = Guard{position: Position{x:2,y:2}, direction: Up};
+        guard.walk();
+        assert_eq!(guard.position, Position{x:2,y:3});
+        guard.rotate();
+        guard.walk();
+        guard.walk();
+        assert_eq!(guard.position, Position{x:4,y:3});
+
+    }
 }
