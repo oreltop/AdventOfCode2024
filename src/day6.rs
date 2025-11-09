@@ -234,7 +234,7 @@ pub mod tests {
         assert_eq!(guard.position, Position { x: 2, y: 2 });
     }
     #[test]
-    fn next_frame_empty() {
+    fn next_frame_walk() {
         let input = r"..>.";
         let mut world = WorldBuilder::build(input);
         assert_eq!(world.guard.position, Position { x: 2, y: 0 });
@@ -243,6 +243,20 @@ pub mod tests {
         world.next_frame();
 
         assert_eq!(world.guard.position, Position { x: 3, y: 0 });
+        assert_eq!(world.frame, 1);
+    }
+    #[test]
+    fn next_frame_rotate() {
+        let input = r"..>#";
+        let mut world = WorldBuilder::build(input);
+        assert_eq!(world.guard.position, Position { x: 2, y: 0 });
+        assert_eq!(world.guard.direction, Right);
+        assert_eq!(world.frame, 0);
+
+        world.next_frame();
+
+        assert_eq!(world.guard.position, Position { x: 2, y: 0 });
+        assert_eq!(world.guard.direction, Down);
         assert_eq!(world.frame, 1);
     }
 }
