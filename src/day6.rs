@@ -88,6 +88,17 @@ struct World {
 }
 
 impl World {
+    fn run(&mut self, timeout: usize) {
+        let mut step = 0;
+
+        while self.state!=State::Done && step<timeout {
+            self.next_frame();
+            step +=1;
+        }
+    }
+}
+
+impl World {
     fn is_done(&self) -> bool {
         self.state == State::Done
     }
@@ -107,18 +118,17 @@ impl World {
         if self.state == State::Done {
             return;
         }
-        match self.get_cell(&self.guard.next_position()){
-            Err(_) => self.state=State::Done,
+        match self.get_cell(&self.guard.next_position()) {
+            Err(_) => self.state = State::Done,
             Ok(pos) => {
-                if pos.is_empty(){
+                if pos.is_empty() {
                     self.guard.walk()
-                } else { self.guard.rotate() }
+                } else {
+                    self.guard.rotate()
+                }
             }
         }
-
     }
-
-
 }
 
 struct WorldBuilder();
@@ -293,11 +303,11 @@ pub mod tests {
     }
 
     #[test]
-    fn run_simulation(){
+    fn run_simulation() {
         let input = r">...";
-        let world = WorldBuilder::build(input);
-        world.run();
+        let mut world = WorldBuilder::build(input);
+        world.run(5);
         assert_eq!(world.state, State::Done);
-        assert_eq!(world.guard.position, Position{x:3, y:0})
+        assert_eq!(world.guard.position, Position { x: 3, y: 0 })
     }
 }
