@@ -308,6 +308,7 @@ pub mod tests {
         let mut world = WorldBuilder::build(input);
         world.run(5);
         assert_eq!(world.state, State::Done);
-        assert_eq!(world.guard.position, Position { x: 3, y: 0 })
+        assert_eq!(world.guard.position, Position { x: 3, y: 0 });
+        assert_eq!(world.visited_cells,4);
     }
 }
