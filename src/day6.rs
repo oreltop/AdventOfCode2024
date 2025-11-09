@@ -218,4 +218,17 @@ pub mod tests {
         assert_eq!(next_pos, Position { x: 3, y: 2 });
         assert_eq!(guard.position, Position { x: 2, y: 2 });
     }
+    #[test]
+    fn next_frame_empty(){
+        let input = r"
+    ..>.";
+        let world = WorldBuilder::build(input);
+        assert_eq!(world.guard.position,Position{x:0,y:2});
+        assert_eq!(world.frame,0);
+
+        world.next_frame();
+
+        assert_eq!(world.guard.position,Position{x:0,y:3});
+        assert_eq!(world.frame,1);
+    }
 }
