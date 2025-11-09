@@ -330,4 +330,25 @@ pub mod tests {
         assert_eq!(world.guard.position, Position { x: 3, y: 0 });
         assert_eq!(world.count_visited_cells(), 4);
     }
+    #[test]
+    fn run_simulation2() {
+        let input = r">.#.";
+        let mut world = WorldBuilder::build(input);
+        world.run(5);
+        assert_eq!(world.state, State::Done);
+        assert_eq!(world.guard.position, Position { x: 1, y: 0 });
+        assert_eq!(world.count_visited_cells(), 2);
+    }
+    #[test]
+    fn run_simulation3() {
+        let input = r"
+>.#.
+....
+.#..";
+        let mut world = WorldBuilder::build(input);
+        world.run(5);
+        assert_eq!(world.state, State::Done);
+        assert_eq!(world.guard.position, Position { x: 0, y: 1 });
+        assert_eq!(world.count_visited_cells(), 4);
+    }
 }
