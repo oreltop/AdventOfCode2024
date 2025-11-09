@@ -16,7 +16,7 @@ struct Size {
     rows: usize,
     columns: usize,
 }
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 struct Position {
     x: usize,
     y: usize,
@@ -42,6 +42,19 @@ impl Cell {
 struct Guard {
     position: Position,
     direction: Direction,
+}
+
+impl Guard {
+    fn next_position(&self) -> Position {
+        let mut next_position = self.position.clone();
+        match self.direction {
+            Up => next_position.y +=1,
+            Right => next_position.x +=1,
+            Down => next_position.y -=1,
+            Left => next_position.x -=1
+        }
+        next_position
+    }
 }
 
 impl Guard {
@@ -212,7 +225,7 @@ pub mod tests {
         assert_eq!(guard.position, Position{x:4,y:3});
 
     }
-
+    #[test]
     fn test_next_position(){
         let mut guard = Guard{position: Position{x:2,y:2}, direction: Up};
         let next_pos = guard.next_position();
