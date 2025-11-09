@@ -26,7 +26,8 @@ struct Position {
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 enum Cell {
-    Empty,
+    NotVisited,
+    Visited,
     Obstruction,
     InitialGuardPosition(Direction),
 }
@@ -34,8 +35,17 @@ enum Cell {
 impl Cell {
     fn is_empty(&self) -> bool {
         match self {
-            Cell::Empty => true,
+            Cell::NotVisited => true,
+            Cell::Visited => true,
             Cell::InitialGuardPosition(_) => true,
+            Cell::Obstruction => false,
+        }
+    }
+    fn is_visited(&self) -> bool {
+        match self {
+            Cell::Visited => true,
+            Cell::InitialGuardPosition(_) => true,
+            Cell::NotVisited => false,
             Cell::Obstruction => false,
         }
     }
@@ -91,14 +101,22 @@ impl World {
     fn run(&mut self, timeout: usize) {
         let mut step = 0;
 
-        while self.state!=State::Done && step<timeout {
+        while self.state != State::Done && step < timeout {
             self.next_frame();
-            step +=1;
+            step += 1;
         }
     }
-}
 
-impl World {
+    fn visit(&mut self, position: &Position) {
+        self.map[position.y][position.x] = Cell::Visited;
+    }
+    fn count_visited_cells(&self) -> usize {
+        self.map
+            .iter()
+            .map(|row| row.iter().filter(|&cell| cell.is_visited()).count())
+            .sum()
+    }
+
     fn is_done(&self) -> bool {
         self.state == State::Done
     }
@@ -122,6 +140,7 @@ impl World {
             Err(_) => self.state = State::Done,
             Ok(pos) => {
                 if pos.is_empty() {
+                    self.visit(&self.guard.next_position());
                     self.guard.walk()
                 } else {
                     self.guard.rotate()
@@ -156,7 +175,7 @@ impl WorldBuilder {
     fn build_line(line: &str) -> Vec<Cell> {
         line.chars()
             .map(|c| match c {
-                '.' => Cell::Empty,
+                '.' => Cell::NotVisited,
                 '^' => Cell::InitialGuardPosition(Up),
                 '>' => Cell::InitialGuardPosition(Right),
                 '<' => Cell::InitialGuardPosition(Left),
@@ -309,6 +328,6 @@ pub mod tests {
         world.run(5);
         assert_eq!(world.state, State::Done);
         assert_eq!(world.guard.position, Position { x: 3, y: 0 });
-        assert_eq!(world.visited_cells,4);
+        assert_eq!(world.count_visited_cells(), 4);
     }
 }
