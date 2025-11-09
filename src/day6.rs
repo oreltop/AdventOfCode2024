@@ -90,7 +90,7 @@ impl World {
 
     fn get_cell(&self, position: &Position) -> Cell {
         println!("world: {:?},\npos:{:?}", self,position);
-        self.map[position.x][position.y].clone()
+        self.map[position.y][position.x].clone()
     }
 }
 
@@ -136,17 +136,17 @@ impl WorldBuilder {
             .collect()
     }
     fn build_guard(map: &[Vec<Cell>]) -> Guard {
-        let (x, y) = map
+        let (y, x) = map
             .iter()
             .enumerate()
-            .find_map(|(x, row)| {
+            .find_map(|(y, row)| {
                 row.iter()
-                    .enumerate()
-                    .find(|(_, cell)| matches!(cell, Cell::InitialGuardPosition(_)))
-                    .map(|(y, _)| (x, y))
+                   .enumerate()
+                   .find(|(_, cell)| matches!(cell, Cell::InitialGuardPosition(_)))
+                   .map(|(x, _)| (y, x))
             })
             .unwrap();
-        let Cell::InitialGuardPosition(direction) = map[x][y] else {
+        let Cell::InitialGuardPosition(direction) = map[y][x] else {
             panic!("this shouldn't happen")
         };
 
@@ -242,7 +242,7 @@ pub mod tests {
 
         world.next_frame();
 
-        assert_eq!(world.guard.position, Position { x: 2, y: 0 });
+        assert_eq!(world.guard.position, Position { x: 3, y: 0 });
         assert_eq!(world.frame, 1);
     }
 }
