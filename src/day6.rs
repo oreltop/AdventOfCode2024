@@ -1,4 +1,5 @@
 use crate::day6::Direction::{Down, Left, Right, Up};
+use std::cmp::PartialEq;
 use std::fs;
 
 const FILE_NAME: &str = "input_day1.txt";
@@ -73,30 +74,51 @@ impl Guard {
     }
 }
 
-#[derive(Debug)]
-enum State { NotDone, Done}
+#[derive(Debug, PartialOrd, PartialEq)]
+enum State {
+    NotDone,
+    Done,
+}
 #[derive(Debug)]
 struct World {
     size: Size,
     map: Vec<Vec<Cell>>,
-    frame: usize,
     guard: Guard,
-    state: State
+    state: State,
 }
 
 impl World {
-    fn next_frame(&mut self) {
-        match self.get_cell(&self.guard.next_position()).is_empty() {
-            true => self.guard.walk(),
-            false => self.guard.rotate(),
+    fn is_done(&self) -> bool {
+        self.state == State::Done
+    }
+}
+
+impl World {
+    fn get_cell(&self, position: &Position) -> Result<Cell, String> {
+        if position.y >= self.map.len() {
+            return Err("Row index out of bounds".into());
         }
-        self.frame += 1;
+        if position.x >= self.map[position.y].len() {
+            return Err("Column index out of bounds".into());
+        }
+        Ok(self.map[position.y][position.x])
+    }
+    fn next_frame(&mut self) {
+        if self.state == State::Done {
+            return;
+        }
+        match self.get_cell(&self.guard.next_position()){
+            Err(_) => self.state=State::Done,
+            Ok(pos) => {
+                if pos.is_empty(){
+                    self.guard.walk()
+                } else { self.guard.rotate() }
+            }
+        }
+
     }
 
-    fn get_cell(&self, position: &Position) -> Cell {
-        println!("world: {:?},\npos:{:?}", self, position);
-        self.map[position.y][position.x].clone()
-    }
+
 }
 
 struct WorldBuilder();
@@ -108,9 +130,8 @@ impl WorldBuilder {
         World {
             size,
             map,
-            frame: 0,
             guard,
-            state: State::NotDone
+            state: State::NotDone,
         }
     }
 
@@ -244,12 +265,10 @@ pub mod tests {
         let input = r"..>.";
         let mut world = WorldBuilder::build(input);
         assert_eq!(world.guard.position, Position { x: 2, y: 0 });
-        assert_eq!(world.frame, 0);
 
         world.next_frame();
 
         assert_eq!(world.guard.position, Position { x: 3, y: 0 });
-        assert_eq!(world.frame, 1);
     }
     #[test]
     fn next_frame_rotate() {
@@ -257,13 +276,11 @@ pub mod tests {
         let mut world = WorldBuilder::build(input);
         assert_eq!(world.guard.position, Position { x: 2, y: 0 });
         assert_eq!(world.guard.direction, Right);
-        assert_eq!(world.frame, 0);
 
         world.next_frame();
 
         assert_eq!(world.guard.position, Position { x: 2, y: 0 });
         assert_eq!(world.guard.direction, Down);
-        assert_eq!(world.frame, 1);
     }
 
     #[test]
@@ -273,5 +290,14 @@ pub mod tests {
         assert!(!world.is_done());
         world.next_frame();
         assert!(world.is_done());
+    }
+
+    #[test]
+    fn run_simulation(){
+        let input = r">...";
+        let world = WorldBuilder::build(input);
+        world.run();
+        assert_eq!(world.state, State::Done);
+        assert_eq!(world.guard.position, Position{x:3, y:0})
     }
 }
