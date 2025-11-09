@@ -184,7 +184,7 @@ pub mod tests {
                 columns: 4
             }
         );
-        assert_eq!(world.guard.position, Position { x: 3, y: 1 });
+        assert_eq!(world.guard.position, Position { x: 3, y: 0 });
         assert_eq!(world.guard.direction, Up);
         assert!(!world.map[1][3].is_empty());
         assert!(world.map[0][3].is_empty());
@@ -237,12 +237,12 @@ pub mod tests {
     fn next_frame_empty() {
         let input = r"..>.";
         let mut world = WorldBuilder::build(input);
-        assert_eq!(world.guard.position, Position { x: 0, y: 2 });
+        assert_eq!(world.guard.position, Position { x: 2, y: 0 });
         assert_eq!(world.frame, 0);
 
         world.next_frame();
 
-        assert_eq!(world.guard.position, Position { x: 0, y: 3 });
+        assert_eq!(world.guard.position, Position { x: 2, y: 0 });
         assert_eq!(world.frame, 1);
     }
 }
