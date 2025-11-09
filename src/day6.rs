@@ -16,13 +16,14 @@ struct Size {
     rows: usize,
     columns: usize,
 }
+
 #[derive(Debug, PartialEq, Copy, Clone)]
 struct Position {
     x: usize,
     y: usize,
 }
-#[derive(Debug, PartialEq, Copy, Clone)]
 
+#[derive(Debug, PartialEq, Copy, Clone)]
 enum Cell {
     Empty,
     Obstruction,
@@ -71,25 +72,29 @@ impl Guard {
         self.direction = new_direction;
     }
 }
+
+#[derive(Debug)]
+enum State { NotDone, Done}
 #[derive(Debug)]
 struct World {
     size: Size,
     map: Vec<Vec<Cell>>,
     frame: usize,
     guard: Guard,
+    state: State
 }
 
 impl World {
     fn next_frame(&mut self) {
-        match self.get_cell(  &self.guard.next_position()).is_empty(){
+        match self.get_cell(&self.guard.next_position()).is_empty() {
             true => self.guard.walk(),
-            false => self.guard.rotate()
+            false => self.guard.rotate(),
         }
         self.frame += 1;
     }
 
     fn get_cell(&self, position: &Position) -> Cell {
-        println!("world: {:?},\npos:{:?}", self,position);
+        println!("world: {:?},\npos:{:?}", self, position);
         self.map[position.y][position.x].clone()
     }
 }
@@ -105,6 +110,7 @@ impl WorldBuilder {
             map,
             frame: 0,
             guard,
+            state: State::NotDone
         }
     }
 
@@ -141,9 +147,9 @@ impl WorldBuilder {
             .enumerate()
             .find_map(|(y, row)| {
                 row.iter()
-                   .enumerate()
-                   .find(|(_, cell)| matches!(cell, Cell::InitialGuardPosition(_)))
-                   .map(|(x, _)| (y, x))
+                    .enumerate()
+                    .find(|(_, cell)| matches!(cell, Cell::InitialGuardPosition(_)))
+                    .map(|(x, _)| (y, x))
             })
             .unwrap();
         let Cell::InitialGuardPosition(direction) = map[y][x] else {
@@ -258,5 +264,14 @@ pub mod tests {
         assert_eq!(world.guard.position, Position { x: 2, y: 0 });
         assert_eq!(world.guard.direction, Down);
         assert_eq!(world.frame, 1);
+    }
+
+    #[test]
+    fn test_done() {
+        let input = r"...>";
+        let mut world = WorldBuilder::build(input);
+        assert!(!world.is_done());
+        world.next_frame();
+        assert!(world.is_done());
     }
 }
