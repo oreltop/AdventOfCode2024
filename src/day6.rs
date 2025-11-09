@@ -48,33 +48,24 @@ impl Guard {
     fn next_position(&self) -> Position {
         let mut next_position = self.position.clone();
         match self.direction {
-            Up => next_position.y +=1,
-            Right => next_position.x +=1,
-            Down => next_position.y -=1,
-            Left => next_position.x -=1
+            Up => next_position.y += 1,
+            Right => next_position.x += 1,
+            Down => next_position.y -= 1,
+            Left => next_position.x -= 1,
         }
         next_position
     }
-}
 
-impl Guard {
     fn walk(&mut self) {
-        match self.direction {
-            Up => self.position.y +=1,
-            Right => self.position.x +=1,
-            Down => self.position.y -=1,
-            Left => self.position.x -=1
-        }
+        self.position = self.next_position();
     }
-}
 
-impl Guard {
     fn rotate(&mut self) {
         let new_direction = match self.direction {
             Up => Right,
             Right => Down,
             Down => Left,
-            Left => Up
+            Left => Up,
         };
         self.direction = new_direction;
     }
@@ -85,16 +76,6 @@ struct World {
     map: Vec<Vec<Cell>>,
     frame: usize,
     guard: Guard,
-}
-impl World {
-    fn from(input: &str) -> World {
-        let input_lines: Vec<&str> = input.trim().lines().collect();
-        let size = (input_lines.len(), input_lines[0].len());
-        // let map: = input_lines.iter().map(
-        //     // |line| line.ma
-        // )
-        todo!()
-    }
 }
 
 struct WorldBuilder();
@@ -145,7 +126,7 @@ impl WorldBuilder {
             .find_map(|(x, row)| {
                 row.iter()
                     .enumerate()
-                    .find(|(y, cell)| matches!(cell, Cell::InitialGuardPosition(_)))
+                    .find(|(_, cell)| matches!(cell, Cell::InitialGuardPosition(_)))
                     .map(|(y, _)| (x, y))
             })
             .unwrap();
@@ -169,10 +150,6 @@ pub fn main() {
     // println!("input parsed: {:?}", &parsed);
 }
 
-fn parse_string(input: &str) -> Vec<i32> {
-    let mut column1: Vec<i32> = Vec::new();
-    column1
-}
 
 #[cfg(test)]
 pub mod tests {
@@ -215,26 +192,30 @@ pub mod tests {
     }
 
     #[test]
-    fn test_guard_walk(){
-        let mut guard = Guard{position: Position{x:2,y:2}, direction: Up};
+    fn test_guard_walk() {
+        let mut guard = Guard {
+            position: Position { x: 2, y: 2 },
+            direction: Up,
+        };
         guard.walk();
-        assert_eq!(guard.position, Position{x:2,y:3});
+        assert_eq!(guard.position, Position { x: 2, y: 3 });
         guard.rotate();
         guard.walk();
         guard.walk();
-        assert_eq!(guard.position, Position{x:4,y:3});
-
+        assert_eq!(guard.position, Position { x: 4, y: 3 });
     }
     #[test]
-    fn test_next_position(){
-        let mut guard = Guard{position: Position{x:2,y:2}, direction: Up};
+    fn test_next_position() {
+        let mut guard = Guard {
+            position: Position { x: 2, y: 2 },
+            direction: Up,
+        };
         let next_pos = guard.next_position();
-        assert_eq!(next_pos, Position{x:2, y:3});
-        assert_eq!(guard.position, Position{x:2,y:2});
+        assert_eq!(next_pos, Position { x: 2, y: 3 });
+        assert_eq!(guard.position, Position { x: 2, y: 2 });
         guard.rotate();
         let next_pos = guard.next_position();
-        assert_eq!(next_pos, Position{x:3, y:2});
-        assert_eq!(guard.position, Position{x:2,y:2});
-
+        assert_eq!(next_pos, Position { x: 3, y: 2 });
+        assert_eq!(guard.position, Position { x: 2, y: 2 });
     }
 }
