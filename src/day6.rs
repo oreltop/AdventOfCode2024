@@ -133,6 +133,8 @@ impl World {
         Ok(self.map[position.y][position.x])
     }
     fn next_frame(&mut self) {
+        println!("world: {:?}", self);
+
         if self.state == State::Done {
             return;
         }
