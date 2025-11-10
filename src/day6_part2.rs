@@ -319,7 +319,7 @@ pub mod tests {
         assert_eq!(world.guard.position, Position { x: 3, y: 0 });
     }
     #[test]
-    fn run_simulation2() {
+    fn run_simulation_2() {
         let input = r">.#.";
         let mut world = WorldBuilder::build(input);
         world.run(5);
@@ -327,7 +327,7 @@ pub mod tests {
         assert_eq!(world.guard.position, Position { x: 1, y: 0 });
     }
     #[test]
-    fn run_simulation3() {
+    fn run_simulation_3() {
         let input = r"
 >.#.
 ....
@@ -339,7 +339,25 @@ pub mod tests {
     }
 
     #[test]
-    fn official_simulation() {
+    fn simulation_loop() {
+        let input = r"
+....#.....
+.........#
+..........
+..#.......
+.......#..
+..........
+.#.O^.....
+........#.
+#.........
+......#...";
+        let mut world = WorldBuilder::build(input);
+        world.run(1000);
+        assert_eq!(world.state, State::Loop)
+
+    }
+    #[test]
+    fn simulation_loop_2() {
         let input = r"
 ....#.....
 .........#
@@ -350,8 +368,10 @@ pub mod tests {
 .#..^.....
 ........#.
 #.........
-......#...";
+......#O..";
         let mut world = WorldBuilder::build(input);
         world.run(1000);
+        assert_eq!(world.state, State::Loop)
+
     }
 }
