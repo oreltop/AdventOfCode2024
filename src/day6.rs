@@ -370,4 +370,22 @@ pub mod tests {
         assert_eq!(world.guard.position, Position { x: 0, y: 1 });
         assert_eq!(world.count_visited_cells(), 4);
     }
+
+    #[test]
+    fn official_simulation(){
+        let input = r"
+....#.....
+.........#
+..........
+..#.......
+.......#..
+..........
+.#..^.....
+........#.
+#.........
+......#...";
+        let mut world = WorldBuilder::build(input);
+        world.run(1000);
+        assert_eq!(world.count_visited_cells(),41);
+    }
 }
