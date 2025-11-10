@@ -20,12 +20,6 @@ enum Direction {
     Left,
 }
 
-#[derive(Debug, PartialEq)]
-struct Size {
-    rows: usize,
-    columns: usize,
-}
-
 #[derive(Debug, PartialEq, Copy, Clone)]
 struct Position {
     x: usize,
@@ -46,14 +40,6 @@ impl Cell {
             Cell::NotVisited => true,
             Cell::Visited(_) => true,
             Cell::InitialGuardPosition(_) => true,
-            Cell::Obstruction => false,
-        }
-    }
-    fn is_visited(&self) -> bool {
-        match self {
-            Cell::Visited(_) => true,
-            Cell::InitialGuardPosition(_) => true,
-            Cell::NotVisited => false,
             Cell::Obstruction => false,
         }
     }
@@ -367,6 +353,5 @@ pub mod tests {
 ......#...";
         let mut world = WorldBuilder::build(input);
         world.run(1000);
-
     }
 }
