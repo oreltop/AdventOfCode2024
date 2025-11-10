@@ -1,4 +1,4 @@
-use crate::day6::Direction::{Down, Left, Right, Up};
+use Direction::{Down, Left, Right, Up};
 use std::cmp::PartialEq;
 use std::fs;
 
