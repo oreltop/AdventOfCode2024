@@ -58,19 +58,29 @@ struct Guard {
 }
 
 impl Guard {
-    fn next_position(&self) -> Position {
+    fn next_position(&self) -> Result<Position, String> {
         let mut next_position = self.position.clone();
         match self.direction {
             Up => next_position.y += 1,
             Right => next_position.x += 1,
-            Down => next_position.y -= 1,
-            Left => next_position.x -= 1,
+            Down => {
+                if next_position.y == 0 {
+                    return Err("Invalid position!".into());
+                }
+                next_position.y -= 1
+            }
+            Left => {
+                if next_position.x == 0 {
+                    return Err("Invalid position!".into());
+                }
+                next_position.x -= 1
+            }
         }
-        next_position
+        Ok(next_position)
     }
 
     fn walk(&mut self) {
-        self.position = self.next_position();
+        self.position = self.next_position().unwrap();
     }
 
     fn rotate(&mut self) {
@@ -138,11 +148,16 @@ impl World {
         if self.state == State::Done {
             return;
         }
-        match self.get_cell(&self.guard.next_position()) {
+
+        let Ok(next_position) = &self.guard.next_position() else {
+            self.state = State::Done;
+            return;
+        };
+        match self.get_cell(next_position) {
             Err(_) => self.state = State::Done,
             Ok(pos) => {
                 if pos.is_empty() {
-                    self.visit(&self.guard.next_position());
+                    self.visit(&self.guard.next_position().unwrap());
                     self.guard.walk()
                 } else {
                     self.guard.rotate()
@@ -284,11 +299,11 @@ pub mod tests {
             direction: Up,
         };
         let next_pos = guard.next_position();
-        assert_eq!(next_pos, Position { x: 2, y: 3 });
+        assert_eq!(next_pos, Ok(Position { x: 2, y: 3 }));
         assert_eq!(guard.position, Position { x: 2, y: 2 });
         guard.rotate();
         let next_pos = guard.next_position();
-        assert_eq!(next_pos, Position { x: 3, y: 2 });
+        assert_eq!(next_pos, Ok(Position { x: 3, y: 2 }));
         assert_eq!(guard.position, Position { x: 2, y: 2 });
     }
     #[test]
