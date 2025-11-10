@@ -10,7 +10,7 @@ pub fn main() {
     let file_path = format!("artifacts/input_files/{}", FILE_NAME);
     let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
     let mut world = WorldBuilder::build(&input);
-    world.run(10_000);
+    println!("{}",world.find_possible_loops())
 }
 
 #[derive(Debug, PartialEq, Copy, Clone)]
@@ -118,7 +118,7 @@ impl World {
     fn will_create_loop(&self, position: Position) -> bool {
         let mut simulation = self.clone();
         simulation.insert_cell(&position, Cell::Obstruction);
-        simulation.run(10_000);
+        simulation.run(100_000);
         if !simulation.is_done() {
             panic!("timed out")
         }
