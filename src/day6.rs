@@ -109,11 +109,13 @@ struct World {
 
 impl World {
     fn run(&mut self, timeout: usize) {
-        let mut step = 0;
+        let mut frame = 0;
 
-        while self.state != State::Done && step < timeout {
+        while self.state != State::Done && frame < timeout {
             self.next_frame();
-            step += 1;
+            frame += 1;
+            println!("state: {:?}",self.state)
+
         }
     }
 
@@ -134,6 +136,7 @@ impl World {
 
 impl World {
     fn get_cell(&self, position: &Position) -> Result<Cell, String> {
+        println!("getting position: {:?}", position);
         if position.y >= self.map.len() {
             return Err("Row index out of bounds".into());
         }
@@ -150,11 +153,14 @@ impl World {
         }
 
         let Ok(next_position) = &self.guard.next_position() else {
+            println!("invalid position!");
             self.state = State::Done;
             return;
         };
         match self.get_cell(next_position) {
-            Err(_) => self.state = State::Done,
+            Err(e) => {
+                println!("error: {}",e);
+                self.state = State::Done}
             Ok(pos) => {
                 if pos.is_empty() {
                     self.visit(&self.guard.next_position().unwrap());
@@ -169,7 +175,8 @@ impl World {
 
 struct WorldBuilder();
 impl WorldBuilder {
-    fn build(input: &str) -> World {
+    fn build(input_raw: &str) -> World {
+        let input = input_raw.trim();
         let size = Self::get_size(input);
         let map = Self::build_map(input);
         let guard = Self::build_guard(&map);
@@ -205,6 +212,7 @@ impl WorldBuilder {
     fn build_map(input: &str) -> Vec<Vec<Cell>> {
         input
             .lines()
+            .rev()
             .map(|line| WorldBuilder::build_line(line))
             .collect()
     }
@@ -257,7 +265,7 @@ pub mod tests {
                 columns: 4
             }
         );
-        assert_eq!(world.guard.position, Position { x: 3, y: 0 });
+        assert_eq!(world.guard.position, Position { x: 3, y: 2 });
         assert_eq!(world.guard.direction, Up);
         assert!(!world.map[1][3].is_empty());
         assert!(world.map[0][3].is_empty());
@@ -363,7 +371,7 @@ pub mod tests {
 ....
 .#..";
         let mut world = WorldBuilder::build(input);
-        world.run(5);
+        world.run(10);
         assert_eq!(world.state, State::Done);
         assert_eq!(world.guard.position, Position { x: 0, y: 1 });
         assert_eq!(world.count_visited_cells(), 4);
