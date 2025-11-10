@@ -4,6 +4,14 @@ use std::fs;
 
 const FILE_NAME: &str = "input_day6.txt";
 
+pub fn main() {
+    println!("this is main");
+    let file_path = format!("artifacts/input_files/{}", FILE_NAME);
+    let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
+    let mut world = WorldBuilder::build(&input);
+    world.run(10_000);
+}
+
 #[derive(Debug, PartialEq, Copy, Clone)]
 enum Direction {
     Up,
@@ -27,7 +35,7 @@ struct Position {
 #[derive(Debug, PartialEq, Copy, Clone)]
 enum Cell {
     NotVisited,
-    Visited,
+    Visited(usize),
     Obstruction,
     InitialGuardPosition(Direction),
 }
@@ -36,17 +44,25 @@ impl Cell {
     fn is_empty(&self) -> bool {
         match self {
             Cell::NotVisited => true,
-            Cell::Visited => true,
+            Cell::Visited(_) => true,
             Cell::InitialGuardPosition(_) => true,
             Cell::Obstruction => false,
         }
     }
     fn is_visited(&self) -> bool {
         match self {
-            Cell::Visited => true,
+            Cell::Visited(_) => true,
             Cell::InitialGuardPosition(_) => true,
             Cell::NotVisited => false,
             Cell::Obstruction => false,
+        }
+    }
+    fn visit(&self) -> Cell {
+        match self {
+            Cell::InitialGuardPosition(_) => self.clone(),
+            Cell::Visited(i) => Cell::Visited(i + 1),
+            Cell::NotVisited => Cell::Visited(1),
+            Cell::Obstruction => panic!("can't visit obstruction!"),
         }
     }
 }
@@ -93,12 +109,13 @@ impl Guard {
         self.direction = new_direction;
     }
 }
-
 #[derive(Debug, PartialOrd, PartialEq)]
 enum State {
     NotDone,
-    Done,
+    Loop,
+    GuardExited,
 }
+
 #[derive(Debug)]
 struct World {
     size: Size,
@@ -111,28 +128,24 @@ impl World {
     fn run(&mut self, timeout: usize) {
         let mut frame = 0;
 
-        while self.state != State::Done && frame < timeout {
+        while !self.is_done() && frame < timeout {
             self.next_frame();
             frame += 1;
         }
     }
 
     fn visit(&mut self, position: &Position) {
-        self.map[position.y][position.x] = Cell::Visited;
-    }
-    fn count_visited_cells(&self) -> usize {
-        self.map
-            .iter()
-            .map(|row| row.iter().filter(|&cell| cell.is_visited()).count())
-            .sum()
+        self.map[position.y][position.x] = self.get_cell(position).unwrap().visit();
     }
 
     fn is_done(&self) -> bool {
-        self.state == State::Done
+        match self.state {
+            State::Loop => true,
+            State::GuardExited => true,
+            State::NotDone => false,
+        }
     }
-}
 
-impl World {
     fn get_cell(&self, position: &Position) -> Result<Cell, String> {
         if position.y >= self.map.len() {
             return Err("Row index out of bounds".into());
@@ -145,16 +158,18 @@ impl World {
     fn next_frame(&mut self) {
         // println!("world: {:?}", self);
 
-        if self.state == State::Done {
+        if self.is_done() {
             return;
         }
 
         let Ok(next_position) = &self.guard.next_position() else {
-            self.state = State::Done;
+            self.state = State::GuardExited;
             return;
         };
+
         match self.get_cell(next_position) {
-            Err(_) => self.state = State::Done,
+            Err(_) => self.state = State::GuardExited,
+            Ok(Cell::Visited(i)) if i > 4 => self.state = State::Loop,
             Ok(pos) => {
                 if pos.is_empty() {
                     self.visit(&self.guard.next_position().unwrap());
@@ -166,8 +181,8 @@ impl World {
         }
     }
 }
-
 struct WorldBuilder();
+
 impl WorldBuilder {
     fn build(input_raw: &str) -> World {
         let input = input_raw.trim();
@@ -198,17 +213,13 @@ impl WorldBuilder {
                 '>' => Cell::InitialGuardPosition(Right),
                 '<' => Cell::InitialGuardPosition(Left),
                 'V' => Cell::InitialGuardPosition(Down),
-                '#' => Cell::Obstruction,
+                '#' | 'O' => Cell::Obstruction,
                 _ => panic!("invalid character {c}!"),
             })
             .collect()
     }
     fn build_map(input: &str) -> Vec<Vec<Cell>> {
-        input
-            .lines()
-            .rev()
-            .map( WorldBuilder::build_line)
-            .collect()
+        input.lines().rev().map(WorldBuilder::build_line).collect()
     }
     fn build_guard(map: &[Vec<Cell>]) -> Guard {
         let (y, x) = map
@@ -230,15 +241,6 @@ impl WorldBuilder {
             direction,
         }
     }
-}
-
-pub fn main() {
-    println!("this is main");
-    let file_path = format!("artifacts/input_files/{}", FILE_NAME);
-    let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
-    let mut world = WorldBuilder::build(&input);
-    world.run(10_000);
-    println!("{}", world.count_visited_cells());
 }
 
 #[cfg(test)]
@@ -345,18 +347,16 @@ pub mod tests {
         let input = r">...";
         let mut world = WorldBuilder::build(input);
         world.run(5);
-        assert_eq!(world.state, State::Done);
+        assert_eq!(world.state, State::GuardExited);
         assert_eq!(world.guard.position, Position { x: 3, y: 0 });
-        assert_eq!(world.count_visited_cells(), 4);
     }
     #[test]
     fn run_simulation2() {
         let input = r">.#.";
         let mut world = WorldBuilder::build(input);
         world.run(5);
-        assert_eq!(world.state, State::Done);
+        assert_eq!(world.state, State::GuardExited);
         assert_eq!(world.guard.position, Position { x: 1, y: 0 });
-        assert_eq!(world.count_visited_cells(), 2);
     }
     #[test]
     fn run_simulation3() {
@@ -366,13 +366,12 @@ pub mod tests {
 .#..";
         let mut world = WorldBuilder::build(input);
         world.run(10);
-        assert_eq!(world.state, State::Done);
+        assert_eq!(world.state, State::GuardExited);
         assert_eq!(world.guard.position, Position { x: 0, y: 1 });
-        assert_eq!(world.count_visited_cells(), 4);
     }
 
     #[test]
-    fn official_simulation(){
+    fn official_simulation() {
         let input = r"
 ....#.....
 .........#
@@ -386,6 +385,6 @@ pub mod tests {
 ......#...";
         let mut world = WorldBuilder::build(input);
         world.run(1000);
-        assert_eq!(world.count_visited_cells(),41);
+
     }
 }
