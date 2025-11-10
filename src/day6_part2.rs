@@ -118,7 +118,6 @@ enum State {
 
 #[derive(Debug)]
 struct World {
-    size: Size,
     map: Vec<Vec<Cell>>,
     guard: Guard,
     state: State,
@@ -186,22 +185,12 @@ struct WorldBuilder();
 impl WorldBuilder {
     fn build(input_raw: &str) -> World {
         let input = input_raw.trim();
-        let size = Self::get_size(input);
         let map = Self::build_map(input);
         let guard = Self::build_guard(&map);
         World {
-            size,
             map,
             guard,
             state: State::NotDone,
-        }
-    }
-
-    fn get_size(input: &str) -> Size {
-        let input_lines: Vec<&str> = input.lines().collect();
-        Size {
-            rows: input_lines.len(),
-            columns: input_lines[0].len(),
         }
     }
 
@@ -254,13 +243,6 @@ pub mod tests {
 ....
 ";
         let world = WorldBuilder::build(input.trim());
-        assert_eq!(
-            world.size,
-            Size {
-                rows: 3,
-                columns: 4
-            }
-        );
         assert_eq!(world.guard.position, Position { x: 3, y: 2 });
         assert_eq!(world.guard.direction, Up);
         assert!(!world.map[1][3].is_empty());
