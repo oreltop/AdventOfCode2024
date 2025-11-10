@@ -59,7 +59,7 @@ struct Guard {
 
 impl Guard {
     fn next_position(&self) -> Result<Position, String> {
-        let mut next_position = self.position.clone();
+        let mut next_position = self.position;
         match self.direction {
             Up => next_position.y += 1,
             Right => next_position.x += 1,
@@ -114,8 +114,6 @@ impl World {
         while self.state != State::Done && frame < timeout {
             self.next_frame();
             frame += 1;
-            println!("state: {:?}",self.state)
-
         }
     }
 
@@ -136,7 +134,6 @@ impl World {
 
 impl World {
     fn get_cell(&self, position: &Position) -> Result<Cell, String> {
-        println!("getting position: {:?}", position);
         if position.y >= self.map.len() {
             return Err("Row index out of bounds".into());
         }
@@ -146,21 +143,18 @@ impl World {
         Ok(self.map[position.y][position.x])
     }
     fn next_frame(&mut self) {
-        println!("world: {:?}", self);
+        // println!("world: {:?}", self);
 
         if self.state == State::Done {
             return;
         }
 
         let Ok(next_position) = &self.guard.next_position() else {
-            println!("invalid position!");
             self.state = State::Done;
             return;
         };
         match self.get_cell(next_position) {
-            Err(e) => {
-                println!("error: {}",e);
-                self.state = State::Done}
+            Err(_) => self.state = State::Done,
             Ok(pos) => {
                 if pos.is_empty() {
                     self.visit(&self.guard.next_position().unwrap());
@@ -213,7 +207,7 @@ impl WorldBuilder {
         input
             .lines()
             .rev()
-            .map(|line| WorldBuilder::build_line(line))
+            .map( WorldBuilder::build_line)
             .collect()
     }
     fn build_guard(map: &[Vec<Cell>]) -> Guard {
