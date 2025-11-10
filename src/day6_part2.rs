@@ -374,4 +374,20 @@ pub mod tests {
         assert_eq!(world.state, State::Loop)
 
     }
+    #[test]
+    fn find_possible_loops() {
+        let input = r"
+....#.....
+.........#
+..........
+..#.......
+.......#..
+..........
+.#..^.....
+........#.
+#.........
+......#...";
+        let mut world = WorldBuilder::build(input);
+        assert_eq!(world.find_possible_loops(),6);
+    }
 }
