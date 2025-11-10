@@ -1,3 +1,4 @@
+use crate::day6_part2::State::Loop;
 use Direction::{Down, Left, Right, Up};
 use std::cmp::PartialEq;
 use std::fs;
@@ -53,7 +54,7 @@ impl Cell {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Guard {
     position: Position,
     direction: Direction,
@@ -95,14 +96,14 @@ impl Guard {
         self.direction = new_direction;
     }
 }
-#[derive(Debug, PartialOrd, PartialEq)]
+#[derive(Debug, PartialOrd, PartialEq, Clone)]
 enum State {
     NotDone,
     Loop,
     GuardExited,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct World {
     map: Vec<Vec<Cell>>,
     guard: Guard,
@@ -110,6 +111,34 @@ struct World {
 }
 
 impl World {
+    fn get_size(&self) -> (usize,usize){
+      (self.map.len(), self.map[0].len())
+    }
+
+    fn will_create_loop(&self, position: Position) -> bool {
+        let mut simulation = self.clone();
+        simulation.insert_cell(&position, Cell::Obstruction);
+        simulation.run(10_000);
+        if !simulation.is_done() {
+            panic!("timed out")
+        }
+        simulation.state == Loop
+    }
+
+    fn find_possible_loops(&self) -> usize {
+        let (rows, columns) = self.get_size();
+        let mut count = 0;
+        for y in 0..rows{
+            for x in 0..columns{
+                if self.will_create_loop(Position {x,y}){
+                    count +=1;
+                };
+            }
+        }
+
+        count
+    }
+
     fn run(&mut self, timeout: usize) {
         let mut frame = 0;
 
@@ -120,7 +149,7 @@ impl World {
     }
 
     fn visit(&mut self, position: &Position) {
-        self.map[position.y][position.x] = self.get_cell(position).unwrap().visit();
+        self.insert_cell(position, self.get_cell(position).unwrap().visit());
     }
 
     fn is_done(&self) -> bool {
@@ -165,6 +194,10 @@ impl World {
             }
         }
     }
+
+    fn insert_cell(&mut self, position: &Position, cell: Cell) {
+        self.map[position.y][position.x] = cell;
+    }
 }
 struct WorldBuilder();
 
@@ -181,7 +214,7 @@ impl WorldBuilder {
     }
 
     fn build_line(line: &str) -> Vec<Cell> {
-        line.chars()
+        line.trim().chars()
             .map(|c| match c {
                 '.' => Cell::NotVisited,
                 '^' => Cell::InitialGuardPosition(Up),
@@ -329,9 +362,9 @@ pub mod tests {
     #[test]
     fn run_simulation_3() {
         let input = r"
->.#.
-....
-.#..";
+        >.#.
+        ....
+        .#..";
         let mut world = WorldBuilder::build(input);
         world.run(10);
         assert_eq!(world.state, State::GuardExited);
@@ -341,53 +374,102 @@ pub mod tests {
     #[test]
     fn simulation_loop() {
         let input = r"
-....#.....
-.........#
-..........
-..#.......
-.......#..
-..........
-.#.O^.....
-........#.
-#.........
-......#...";
+        ....#.....
+        .........#
+        ..........
+        ..#.......
+        .......#..
+        ..........
+        .#.O^.....
+        ........#.
+        #.........
+        ......#...";
         let mut world = WorldBuilder::build(input);
         world.run(1000);
         assert_eq!(world.state, State::Loop)
-
     }
     #[test]
     fn simulation_loop_2() {
         let input = r"
-....#.....
-.........#
-..........
-..#.......
-.......#..
-..........
-.#..^.....
-........#.
-#.........
-......#O..";
+        ....#.....
+        .........#
+        ..........
+        ..#.......
+        .......#..
+        ..........
+        .#..^.....
+        ........#.
+        #.........
+        ......#O..";
         let mut world = WorldBuilder::build(input);
         world.run(1000);
         assert_eq!(world.state, State::Loop)
-
+    }
+        #[test]
+        fn find_possible_loops() {
+            let input = r"
+        ....#.....
+        .........#
+        ..........
+        ..#.......
+        .......#..
+        ..........
+        .#..^.....
+        ........#.
+        #.........
+        ......#...";
+            let mut world = WorldBuilder::build(input);
+            assert_eq!(world.find_possible_loops(), 6);
+        }
+    #[test]
+    fn consider_obstruction_true() {
+        let input = r"
+        ....#.....
+        .........#
+        ..........
+        ..#.......
+        .......#..
+        ..........
+        .#..^.....
+        ........#.
+        #.........
+        ......#...";
+        let mut world = WorldBuilder::build(input);
+        let position = Position { x: 7, y: 0 };
+        assert_eq!(world.will_create_loop(position), true);
     }
     #[test]
-    fn find_possible_loops() {
+    fn consider_obstruction_true_2() {
         let input = r"
-....#.....
-.........#
-..........
-..#.......
-.......#..
-..........
-.#..^.....
-........#.
-#.........
-......#...";
+        ....#.....
+        .........#
+        ..........
+        ..#.......
+        .......#..
+        ..........
+        .#..^.....
+        ........#.
+        #.........
+        ......#...";
         let mut world = WorldBuilder::build(input);
-        assert_eq!(world.find_possible_loops(),6);
+        let position = Position { x: 3, y: 3 };
+        assert_eq!(world.will_create_loop(position), true);
+    }
+    #[test]
+    fn consider_obstruction_false() {
+        let input = r"
+        ....#.....
+        .........#
+        ..........
+        ..#.......
+        .......#..
+        ..........
+        .#..^.....
+        ........#.
+        #.........
+        ......#...";
+        let mut world = WorldBuilder::build(input);
+        let position = Position { x: 3, y: 4 };
+        assert_eq!(world.will_create_loop(position), false);
     }
 }
