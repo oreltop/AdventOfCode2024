@@ -116,8 +116,8 @@ pub mod tests {
     }
     #[test]
     fn make_a_simple_calculation() {
-        let parts = vec![1, 2, 3];
-        let operations = vec![Addition, Multiplication];
-        assert_eq!(calculate_result(&parts, &operations), 9);
+        let parts = vec![1, 2, 3, 4];
+        let operations = vec![Addition, Multiplication, Concatenation];
+        assert_eq!(calculate_result(&parts, &operations), 94);
     }
 }
