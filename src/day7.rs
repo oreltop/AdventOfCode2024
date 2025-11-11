@@ -9,10 +9,14 @@ pub fn main() {
     println!("this is main");
     let file_path = format!("artifacts/input_files/{}", FILE_NAME);
     let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
-    let per = Permutator::new();
-    // println!("input: {:?}", input);
-    // let parsed = parse_string(&input);
-    // println!("input parsed: {:?}", &parsed);
+    let input_parsed = parse_string(&input);
+    let mut permutator = Permutator::new();
+    let result: i64 = input_parsed
+        .iter()
+        .filter(|&(result, parts)| could_possibly_be_true(*result, &parts, &mut permutator))
+        .map(|(result, _)| result)
+        .sum();
+    println!("{:?}",result);
 }
 
 #[derive(Debug, Clone, PartialEq)]
@@ -31,7 +35,10 @@ impl Permutator {
         }
     }
     fn all_permutation(&mut self, length: usize) -> Vec<Vec<Operation>> {
-        self.cache.entry(length).or_insert(Self::calculate_permutations(length)).to_owned()
+        self.cache
+            .entry(length)
+            .or_insert(Self::calculate_permutations(length))
+            .to_owned()
     }
 
     fn calculate_permutations(length: usize) -> Vec<Vec<Operation>> {
@@ -44,20 +51,24 @@ impl Permutator {
 
 fn calculate_result(parts: &[i64], operations: &[Operation]) -> i64 {
     let mut operations_iter = operations.iter();
-    parts.iter().copied().reduce(
-        |a, b| match operations_iter.next() {
-            None => { panic!("this shouldn't happen!") }
-            Some(Addition) => { a + b }
-            Some(Multiplication) => { a * b }
-        }
-    ).unwrap()
+    parts
+        .iter()
+        .copied()
+        .reduce(|a, b| match operations_iter.next() {
+            None => {
+                panic!("this shouldn't happen!")
+            }
+            Some(Addition) => a + b,
+            Some(Multiplication) => a * b,
+        })
+        .unwrap()
 }
 
-fn could_possibly_be_true(result: i64, parts: &[i64], mut permutator: Permutator) -> bool {
+fn could_possibly_be_true(result: i64, parts: &[i64], mut permutator: &mut Permutator) -> bool {
     let permutations = permutator.all_permutation(parts.len());
-    permutations.iter().any(|operations|calculate_result(parts,operations)==result)
-
-
+    permutations
+        .iter()
+        .any(|operations| calculate_result(parts, operations) == result)
 }
 
 fn parse_string(input: &str) -> Vec<(i64, Vec<i64>)> {
@@ -83,8 +94,8 @@ pub mod tests {
     fn test_simple_addition_two_numbers() {
         let result = 6;
         let parts = vec![2, 3];
-        let permutator = Permutator::new();
-        assert!(could_possibly_be_true(result, &parts, permutator));
+        let mut permutator = Permutator::new();
+        assert!(could_possibly_be_true(result, &parts, &mut permutator));
     }
     #[test]
     fn all_permutations_length_3() {
