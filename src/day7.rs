@@ -22,7 +22,7 @@ enum Operation {
 }
 
 struct Permutator {
-    cache: HashMap<usize, Vec<Operation>>,
+    cache: HashMap<usize, Vec<Vec<Operation>>>,
 }
 impl Permutator {
     fn new() -> Permutator {
@@ -30,12 +30,15 @@ impl Permutator {
             cache: HashMap::new(),
         }
     }
-    fn all_permutation(&self, length: usize) -> Vec<Vec<Operation>> {
+    fn all_permutation(&mut self, length: usize) -> Vec<Vec<Operation>> {
+        self.cache.entry(length).or_insert(Self::calculate_permutations(length)).to_owned()
+    }
+
+    fn calculate_permutations(length: usize) -> Vec<Vec<Operation>> {
         let possibilities_iters =
             itertools::repeat_n(vec![Addition, Multiplication].into_iter(), length);
 
         possibilities_iters.multi_cartesian_product().collect()
-
     }
 }
 
@@ -44,15 +47,17 @@ fn calculate_result(parts: &[i64], operations: &[Operation]) -> i64 {
     parts.iter().copied().reduce(
         |a, b| match operations_iter.next() {
             None => { panic!("this shouldn't happen!") }
-            Some(Addition) => { a + b },
+            Some(Addition) => { a + b }
             Some(Multiplication) => { a * b }
         }
     ).unwrap()
-
 }
 
-fn could_possibly_be_true(result: i64, parts: Vec<i64>) -> bool {
-    todo!()
+fn could_possibly_be_true(result: i64, parts: &[i64], mut permutator: Permutator) -> bool {
+    let permutations = permutator.all_permutation(parts.len());
+    permutations.iter().any(|operations|calculate_result(parts,operations)==result)
+
+
 }
 
 fn parse_string(input: &str) -> Vec<(i64, Vec<i64>)> {
@@ -78,7 +83,8 @@ pub mod tests {
     fn test_simple_addition_two_numbers() {
         let result = 6;
         let parts = vec![2, 3];
-        assert!(could_possibly_be_true(result, parts));
+        let permutator = Permutator::new();
+        assert!(could_possibly_be_true(result, &parts, permutator));
     }
     #[test]
     fn all_permutations_length_3() {
@@ -94,8 +100,8 @@ pub mod tests {
         assert!(permutations.contains(&vec![Multiplication, Multiplication, Multiplication]));
     }
     #[test]
-    fn make_a_simple_calculation(){
-        let parts = vec![1,2,3];
+    fn make_a_simple_calculation() {
+        let parts = vec![1, 2, 3];
         let operations = vec![Addition, Multiplication];
         assert_eq!(calculate_result(&parts, &operations), 9);
     }
