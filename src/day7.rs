@@ -15,8 +15,7 @@ pub fn main() {
     // println!("input parsed: {:?}", &parsed);
 }
 
-#[derive(Debug, Clone)]
-#[derive(PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 enum Operation {
     Addition,
     Multiplication,
@@ -32,13 +31,11 @@ impl Permutator {
         }
     }
     fn all_permutation(&self, length: usize) -> Vec<Vec<Operation>> {
-        let possibilities = vec![Addition, Multiplication];
-        // let result: Vec<Vec<&Operation>> = possibilities
-        //     .iter()
-        //     .multi_cartesian_product(possibilities.iter())
-        //     .collect();
+        let possibilities_iters =
+            itertools::repeat_n(vec![Addition, Multiplication].into_iter(), length);
 
-        todo!()
+        possibilities_iters.multi_cartesian_product().collect()
+
     }
 }
 
@@ -72,17 +69,16 @@ pub mod tests {
     //     assert!(could_possibly_be_true(result, parts));
     // }
     #[test]
-    fn all_permutations_length_3(){
-        let permutations=Permutator::new().all_permutation(3);
-        assert_eq!(permutations.len(), 9);
-        assert!(permutations.contains(&vec![Addition,Addition,Addition]));
-        assert!(permutations.contains(&vec![Multiplication,Addition,Addition]));
-        assert!(permutations.contains(&vec![Addition,Multiplication,Addition]));
-        assert!(permutations.contains(&vec![Addition,Addition,Multiplication]));
-        assert!(permutations.contains(&vec![Multiplication,Addition,Multiplication]));
-        assert!(permutations.contains(&vec![Addition,Multiplication,Multiplication]));
-        assert!(permutations.contains(&vec![Multiplication,Multiplication,Addition]));
-        assert!(permutations.contains(&vec![Multiplication,Multiplication,Multiplication]));
-
+    fn all_permutations_length_3() {
+        let permutations = Permutator::new().all_permutation(3);
+        assert_eq!(permutations.len(), 8);
+        assert!(permutations.contains(&vec![Addition, Addition, Addition]));
+        assert!(permutations.contains(&vec![Multiplication, Addition, Addition]));
+        assert!(permutations.contains(&vec![Addition, Multiplication, Addition]));
+        assert!(permutations.contains(&vec![Addition, Addition, Multiplication]));
+        assert!(permutations.contains(&vec![Multiplication, Addition, Multiplication]));
+        assert!(permutations.contains(&vec![Addition, Multiplication, Multiplication]));
+        assert!(permutations.contains(&vec![Multiplication, Multiplication, Addition]));
+        assert!(permutations.contains(&vec![Multiplication, Multiplication, Multiplication]));
     }
 }
