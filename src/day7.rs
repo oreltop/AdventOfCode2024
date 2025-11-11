@@ -39,6 +39,18 @@ impl Permutator {
     }
 }
 
+fn calculate_result(parts: &[i64], operations: &[Operation]) -> i64 {
+    let mut operations_iter = operations.iter();
+    parts.iter().copied().reduce(
+        |a, b| match operations_iter.next() {
+            None => { panic!("this shouldn't happen!") }
+            Some(Addition) => { a + b },
+            Some(Multiplication) => { a * b }
+        }
+    ).unwrap()
+
+}
+
 fn could_possibly_be_true(result: i64, parts: Vec<i64>) -> bool {
     todo!()
 }
@@ -62,12 +74,12 @@ fn parse_string(input: &str) -> Vec<(i64, Vec<i64>)> {
 pub mod tests {
     use super::*;
 
-    // #[test]
-    // fn test_simple_addition_two_numbers() {
-    //     let result = 6;
-    //     let parts = vec![2, 3];
-    //     assert!(could_possibly_be_true(result, parts));
-    // }
+    #[test]
+    fn test_simple_addition_two_numbers() {
+        let result = 6;
+        let parts = vec![2, 3];
+        assert!(could_possibly_be_true(result, parts));
+    }
     #[test]
     fn all_permutations_length_3() {
         let permutations = Permutator::new().all_permutation(3);
@@ -80,5 +92,11 @@ pub mod tests {
         assert!(permutations.contains(&vec![Addition, Multiplication, Multiplication]));
         assert!(permutations.contains(&vec![Multiplication, Multiplication, Addition]));
         assert!(permutations.contains(&vec![Multiplication, Multiplication, Multiplication]));
+    }
+    #[test]
+    fn make_a_simple_calculation(){
+        let parts = vec![1,2,3];
+        let operations = vec![Addition, Multiplication];
+        assert_eq!(calculate_result(&parts, &operations), 9);
     }
 }
