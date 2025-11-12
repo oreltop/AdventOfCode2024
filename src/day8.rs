@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fs;
 
 const FILE_NAME: &str = "input_day8.txt";
@@ -12,7 +12,7 @@ pub fn main() {
     println!("input parsed: {:?}", &parsed);
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Hash, Eq)]
 struct Point(i32, i32);
 
 fn parse_string(input: &str) -> HashMap<char, Vec<Point>> {
@@ -34,10 +34,14 @@ fn parse_string(input: &str) -> HashMap<char, Vec<Point>> {
         })
 }
 
+fn calculate_possible_antinodes(antennas: HashMap<char, &[Point]>) -> HashSet<Point> {
+    todo!()
+}
+
 #[cfg(test)]
 pub mod tests {
-    use super::*;
     use itertools::Itertools;
+    use super::*;
     #[test]
     fn test_parse_string() {
         let input = r"
@@ -58,13 +62,33 @@ pub mod tests {
         println!("{:?}", parsed);
 
         let values_0 = parsed.get(&'0').unwrap();
-        let result_0 = vec![Point(4, 7), Point(7, 8), Point(5, 9), Point(8, 10)];
-        assert!(result_0.iter().all(|p| values_0.iter().contains(p)));
-        assert_eq!(values_0.len(), result_0.len());
+        let answer_0 = vec![Point(4, 7), Point(7, 8), Point(5, 9), Point(8, 10)];
+        assert!(answer_0.iter().all(|p| values_0.iter().contains(p)));
+        assert_eq!(values_0.len(), answer_0.len());
 
         let values_A = parsed.get(&'A').unwrap();
-        let result_A = vec![Point(9, 2), Point(8, 3), Point(6, 6)];
-        assert!(result_A.iter().all(|p| values_A.iter().contains(p)));
-        assert_eq!(values_A.len(), result_A.len());
+        let answer_A = vec![Point(9, 2), Point(8, 3), Point(6, 6)];
+        assert!(answer_A.iter().all(|p| values_A.iter().contains(p)));
+        assert_eq!(values_A.len(), answer_A.len());
+    }
+
+    #[test]
+    fn test_calculate_possible_antinodes() {
+        let mut antennas: HashMap<char, &[Point]> = HashMap::new();
+        let a_antennas = vec![Point(1, 1), Point(2, 2)];
+        let b_antennas = vec![Point(1, 2), Point(3, 4), Point(4, 5)];
+        antennas.insert('a', &a_antennas);
+        antennas.insert('b', &b_antennas);
+        let possible_antinodes = calculate_possible_antinodes(antennas);
+        let answers = HashSet::from([
+            Point(0, 0),
+            Point(3, 3),
+            Point(4, 6),
+            Point(1, 1),
+            Point(2, 2),
+            Point(5, 7),
+            Point(7, 9),
+        ]);
+        assert_eq!(possible_antinodes, answers);
     }
 }
