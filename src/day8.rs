@@ -1,5 +1,7 @@
+use itertools::Itertools;
 use std::collections::{HashMap, HashSet};
 use std::fs;
+use std::ops::{Add, Sub};
 
 const FILE_NAME: &str = "input_day8.txt";
 
@@ -14,6 +16,20 @@ pub fn main() {
 
 #[derive(PartialEq, Debug, Hash, Eq)]
 struct Point(i32, i32);
+impl Add for &Point {
+    type Output = Point;
+
+    fn add(self, other: Self) -> Self::Output {
+        Point(self.0 + other.0, self.1 + other.1)
+    }
+}
+impl Sub for &Point {
+    type Output = Point;
+
+    fn sub(self, other: Self) -> Self::Output {
+        Point(self.0 - other.0, self.1 - other.1)
+    }
+}
 
 fn parse_string(input: &str) -> HashMap<char, Vec<Point>> {
     input
@@ -35,13 +51,23 @@ fn parse_string(input: &str) -> HashMap<char, Vec<Point>> {
 }
 
 fn calculate_possible_antinodes(antennas: HashMap<char, &[Point]>) -> HashSet<Point> {
-    todo!()
+    let pairs: Vec<_> = antennas
+        .iter()
+        .flat_map(|(_, points)| points.iter().cartesian_product(points.iter()))
+        .collect();
+    let mut result = HashSet::new();
+    for point_pair in pairs {
+        let distance = point_pair.0 - point_pair.1;
+        result.insert(point_pair.0 + &distance);
+        result.insert(point_pair.1 - &distance);
+    }
+    result
 }
 
 #[cfg(test)]
 pub mod tests {
-    use itertools::Itertools;
     use super::*;
+    use itertools::Itertools;
     #[test]
     fn test_parse_string() {
         let input = r"
@@ -81,13 +107,18 @@ pub mod tests {
         antennas.insert('b', &b_antennas);
         let possible_antinodes = calculate_possible_antinodes(antennas);
         let answers = HashSet::from([
+            Point(-2, -1),
+            Point(-1, 0),
             Point(0, 0),
-            Point(3, 3),
-            Point(4, 6),
             Point(1, 1),
+            Point(1, 2),
             Point(2, 2),
-            Point(5, 7),
-            Point(7, 9),
+            Point(3, 3),
+            Point(2, 3),
+            Point(3, 4),
+            Point(4, 5),
+            Point(5, 6),
+            Point(7, 8),
         ]);
         assert_eq!(possible_antinodes, answers);
     }
