@@ -122,4 +122,37 @@ pub mod tests {
         ]);
         assert_eq!(possible_antinodes, answers);
     }
+    #[test]
+    fn test_find_antinodes() {
+        let input = r"
+        ............
+        ........0...
+        .....0......
+        .......0....
+        ....0.......
+        ......A.....
+        .K........K.
+        ............
+        ........A...
+        .........A..
+        ............
+        ............";
+
+        let antennas = parse_string(input);
+        let size = get_size(&input);
+        let antinodes = find_antinodes();
+        let answers = HashSet::from([
+            Point(0, 0),
+            Point(1, 1),
+            Point(1, 2),
+            Point(2, 2),
+            Point(3, 3),
+            Point(2, 3),
+            Point(3, 4),
+            Point(4, 5),
+            Point(5, 6),
+            Point(7, 8),
+        ]);
+        assert_eq!(antinodes, answers);
+    }
 }
