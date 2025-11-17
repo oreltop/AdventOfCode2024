@@ -55,32 +55,35 @@ fn get_size(input: &str) -> (usize, usize) {
     (lines.len(), lines[0].trim().len())
 }
 
-// fn find_antinodes(antennas: HashMap<char, Vec<Point>>, size: &(usize, usize)) -> HashSet<Point> {
-//     let possible_antinodes = calculate_possible_antinodes(&antennas);
-//     let size: (i32, i32) = (size.0 as i32, size.1 as i32);
-//     possible_antinodes
-//         .iter()
-//         .filter(|&point| point.0 > 0 && point.1 > 0 && point.0 < size.0 && point.1 < size.1)
-//         .copied()
-//         .collect()
-// }
-
-fn calculate_possible_antinodes(antennas: &Vec<Point>) -> HashSet<Point> {
-    let pairs: Vec<_> = antennas
-        .iter()
-        .flat_map(|(points)| points.iter().cartesian_product(points.iter()))
-        .collect();
+fn calculate_antinodes_for_frequency(
+    antennas: &Vec<Point>,
+    size: &(usize, usize),
+) -> HashSet<Point> {
     let mut result = HashSet::new();
+    let size: (i32, i32) = (size.0 as i32, size.1 as i32);
+
+    let pairs = antennas.iter().cartesian_product(antennas);
     for point_pair in pairs {
         let distance = point_pair.0 - point_pair.1;
-        for point in [point_pair.0 + &distance, point_pair.1 - &distance] {
-          if ! point in antennas
-        }
+        let possible_antinodes = [point_pair.0 + &distance, point_pair.1 - &distance];
+        let antinodes = possible_antinodes
+            .iter()
+            .filter(|p| !antennas.contains(p))
+            .filter(|&point| point.0 >= 0 && point.1 >= 0 && point.0 < size.0 && point.1 < size.1);
+        result.extend(antinodes);
     }
     result
 }
 
-
+fn find_all_antinodes(
+    antennas: &HashMap<char, Vec<Point>>,
+    size: &(usize, usize),
+) -> HashSet<Point> {
+    antennas
+        .iter()
+        .flat_map(|(_, points)| calculate_antinodes_for_frequency(points, size))
+        .collect()
+}
 
 #[cfg(test)]
 pub mod tests {
@@ -178,8 +181,6 @@ pub mod tests {
     //     assert_eq!(antinodes, answers);
     // }
 
-
-
     #[test]
     fn test_calculate_antinodes() {
         let mut antennas: HashMap<char, Vec<Point>> = HashMap::new();
@@ -187,7 +188,8 @@ pub mod tests {
         let b_antennas = vec![Point(1, 2), Point(3, 4), Point(4, 5)];
         antennas.insert('a', a_antennas);
         antennas.insert('b', b_antennas);
-        let antinodes = calculate_antinodes(&antennas);
+        let size = (8, 8);
+        let antinodes = find_all_antinodes(&antennas, &size);
         let answers = HashSet::from([
             // Point(-2, -1),
             // Point(-1, 0),
@@ -195,14 +197,8 @@ pub mod tests {
             Point(3, 3),
             Point(2, 3),
             Point(5, 6),
-            Point(7, 8),
+            // Point(7, 8),
         ]);
         assert_eq!(antinodes, answers);
     }
-
-
-
-
 }
-
-
