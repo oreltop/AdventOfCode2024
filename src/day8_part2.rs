@@ -42,7 +42,6 @@ struct ResonantHarmonic {
     vector: (i32, i32),
     grid_size: (usize, usize),
     current: Point,
-    next: Point,
 }
 impl ResonantHarmonic {
     fn new(init_point: Point, vector: (i32, i32), grid_size: (usize, usize)) -> ResonantHarmonic {
@@ -51,7 +50,6 @@ impl ResonantHarmonic {
             vector,
             grid_size,
             current: init_point,
-            next: init_point
         }
     }
 }
@@ -61,19 +59,13 @@ impl Iterator for ResonantHarmonic {
 
     fn next(&mut self) -> Option<Self::Item> {
 
+         let result = match self.current.on_grid(&self.grid_size) {
+             true => Some(self.current.clone()),
+             false => None
+         };
+        self.current = Point(self.current.0 + self.vector.0, self.current.1 + self.vector.1);
 
-
-        //
-        // let x = self.current.0 + self.vector.0;
-        // let y = self.current.1 + self.vector.1;
-        //
-        // if x >= 0 && x < self.grid_size.0 && y >= 0 && y < self.grid_size.1 {
-        //     self.current = Point(x, y);
-        //     Some(self.current)
-        // } else {
-        //     None
-        // }
-        todo!()
+        result
     }
 }
 
