@@ -1,4 +1,4 @@
-use itertools::{Itertools, all};
+use itertools::Itertools;
 use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::ops::{Add, Sub};
@@ -9,9 +9,7 @@ pub fn main() {
     println!("this is main");
     let file_path = format!("artifacts/input_files/{}", FILE_NAME);
     let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
-    println!("input: {:?}", input);
-    let parsed = parse_string(&input);
-    println!("input parsed: {:?}", &parsed);
+    let result = count_antinodes(&input);
 }
 
 #[derive(PartialEq, Debug, Hash, Eq, Copy, Clone)]
@@ -41,7 +39,7 @@ fn parse_string(input: &str) -> HashMap<char, Vec<Point>> {
             line.trim()
                 .chars()
                 .enumerate()
-                .filter(|(x, c)| c != &'.')
+                .filter(|(_x, c)| c != &'.')
                 .map(move |(x, c)| (c, Point(x as i32, y as i32)))
         })
         .fold(HashMap::new(), |mut antennas, (c, point)| {
