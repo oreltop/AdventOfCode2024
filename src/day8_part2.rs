@@ -98,7 +98,6 @@ fn calculate_antinodes_for_frequency(
     size: &(usize, usize),
 ) -> HashSet<Point> {
     let mut result = HashSet::new();
-    let size: (i32, i32) = (size.0 as i32, size.1 as i32);
 
     let pairs = antennas.iter().cartesian_product(antennas);
     for point_pair in pairs {
@@ -107,7 +106,7 @@ fn calculate_antinodes_for_frequency(
         let antinodes = possible_antinodes
             .iter()
             .filter(|p| !antennas.contains(p))
-            .filter(|&point| point.0 >= 0 && point.1 >= 0 && point.0 < size.0 && point.1 < size.1);
+            .filter(|&point| point.on_grid(size));
         result.extend(antinodes);
     }
     result
