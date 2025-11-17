@@ -10,6 +10,7 @@ pub fn main() {
     let file_path = format!("artifacts/input_files/{}", FILE_NAME);
     let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
     let result = count_antinodes(&input);
+    println!("{}", &result);
 }
 
 #[derive(PartialEq, Debug, Hash, Eq, Copy, Clone)]
