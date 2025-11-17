@@ -85,6 +85,12 @@ fn find_all_antinodes(
         .collect()
 }
 
+fn count_antinodes(input: &str) -> usize {
+    let size = get_size(input);
+    let antennas = parse_string(input);
+    find_all_antinodes(&antennas, &size).len()
+}
+
 #[cfg(test)]
 pub mod tests {
     use super::*;
@@ -128,16 +134,11 @@ pub mod tests {
         antennas.insert('b', b_antennas);
         let size = (8, 8);
         let antinodes = find_all_antinodes(&antennas, &size);
-        let answers = HashSet::from([
-            Point(0, 0),
-            Point(3, 3),
-            Point(2, 3),
-            Point(5, 6),
-        ]);
+        let answers = HashSet::from([Point(0, 0), Point(3, 3), Point(2, 3), Point(5, 6)]);
         assert_eq!(antinodes, answers);
     }
-
-    fn test_count_antinodes(){
+    #[test]
+    fn test_count_antinodes() {
         let input = r"
         ............
         ........0...
@@ -152,6 +153,5 @@ pub mod tests {
         ............
         ............";
         assert_eq!(count_antinodes(input), 14);
-
     }
 }
