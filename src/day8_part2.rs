@@ -30,6 +30,53 @@ impl Sub for &Point {
     }
 }
 
+impl Point {
+    fn on_grid(&self, grid_size: &(usize, usize)) -> bool{
+        let grid_size = (grid_size.0 as i32, grid_size.1 as i32);
+        self.0>=0 && self.0<grid_size.0 && self.1>=0 && self.1<grid_size.1
+    }
+}
+
+struct ResonantHarmonic {
+    p0: Point,
+    vector: (i32, i32),
+    grid_size: (usize, usize),
+    current: Point,
+    next: Point,
+}
+impl ResonantHarmonic {
+    fn new(init_point: Point, vector: (i32, i32), grid_size: (usize, usize)) -> ResonantHarmonic {
+        ResonantHarmonic {
+            p0: init_point,
+            vector,
+            grid_size,
+            current: init_point,
+            next: init_point
+        }
+    }
+}
+
+impl Iterator for ResonantHarmonic {
+    type Item = Point;
+
+    fn next(&mut self) -> Option<Self::Item> {
+
+
+
+        //
+        // let x = self.current.0 + self.vector.0;
+        // let y = self.current.1 + self.vector.1;
+        //
+        // if x >= 0 && x < self.grid_size.0 && y >= 0 && y < self.grid_size.1 {
+        //     self.current = Point(x, y);
+        //     Some(self.current)
+        // } else {
+        //     None
+        // }
+        todo!()
+    }
+}
+
 fn parse_string(input: &str) -> HashMap<char, Vec<Point>> {
     input
         .trim()
@@ -160,5 +207,12 @@ pub mod tests {
         ............
         ............";
         assert_eq!(count_antinodes(input), 34);
+    }
+
+    #[test]
+    fn resonant_harmonic(){
+        let harmonic_series: Vec<_> = ResonantHarmonic::new(Point(0,0), (2,1), (8,8)).collect();
+        let answer = [Point(0,0), Point(2,1), Point(4,2), Point(6,3)];
+        assert_eq!(harmonic_series, answer)
     }
 }
