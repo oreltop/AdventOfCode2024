@@ -130,10 +130,18 @@ pub mod tests {
         let a_antennas = vec![Point(1, 1), Point(2, 2)];
         let b_antennas = vec![Point(1, 2), Point(3, 4), Point(4, 5)];
         antennas.insert('a', a_antennas);
-        antennas.insert('b', b_antennas);
         let size = (8, 8);
         let antinodes = find_all_antinodes(&antennas, &size);
-        let answers = HashSet::from([Point(0, 0), Point(3, 3), Point(2, 3), Point(5, 6)]);
+        let answers = HashSet::from([
+            Point(0, 0),
+            Point(1, 1),
+            Point(2, 2),
+            Point(3, 3),
+            Point(4, 4),
+            Point(5, 5),
+            Point(6, 6),
+            Point(7, 7),
+        ]);
         assert_eq!(antinodes, answers);
     }
     #[test]
@@ -151,6 +159,6 @@ pub mod tests {
         .........A..
         ............
         ............";
-        assert_eq!(count_antinodes(input), 14);
+        assert_eq!(count_antinodes(input), 34);
     }
 }
