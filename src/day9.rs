@@ -20,7 +20,14 @@ fn parse_string(input: &str) -> Vec<i32> {
 pub mod tests {
     use super::*;
     #[test]
-    fn test_parse_string() {
-        println!("{}", "this is test dummy")
+    fn test_unite_free_space() {
+        let s = "0..111....22222";
+        let answer = String::from("022111222......");
+        assert_eq!(unite_free_space(s), answer);
+
+        let s2 = "00...111...2...333.44.5555.6666.777.888899";
+        let answer2 = String::from("0099811188827773336446555566..............");
+        assert_eq!(unite_free_space(s2), answer2);
+
     }
 }
