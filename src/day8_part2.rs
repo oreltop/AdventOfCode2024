@@ -76,7 +76,6 @@ impl Iterator for ResonantHarmonic {
             self.current.1 + self.vector.1,
         );
         self.timeout -= 1;
-        println!("{:?}", self);
         if self.timeout == 0 {
             panic!("timeout reached!")
         }
@@ -118,7 +117,6 @@ fn calculate_antinodes_for_frequency(
     let pairs = antennas.iter().cartesian_product(antennas);
     for point_pair in pairs {
         let distance = point_pair.0 - point_pair.1;
-        println!("point pair: {:?}, distance: {:?}", point_pair, distance);
         result.extend(ResonantHarmonic::new(point_pair.0, &distance, size));
     }
     result
@@ -161,7 +159,6 @@ pub mod tests {
         ............";
 
         let parsed = parse_string(input);
-        println!("{:?}", parsed);
 
         let values_0 = parsed.get(&'0').unwrap();
         let answer_0 = vec![Point(4, 7), Point(7, 8), Point(5, 9), Point(8, 10)];
