@@ -23,7 +23,7 @@ impl Add for &Point {
     }
 }
 impl Sub for &Point {
-    type Output = (i32,i32);
+    type Output = (i32, i32);
 
     fn sub(self, other: Self) -> Self::Output {
         (self.0 - other.0, self.1 - other.1)
@@ -31,9 +31,9 @@ impl Sub for &Point {
 }
 
 impl Point {
-    fn on_grid(&self, grid_size: &(usize, usize)) -> bool{
+    fn on_grid(&self, grid_size: &(usize, usize)) -> bool {
         let grid_size = (grid_size.0 as i32, grid_size.1 as i32);
-        self.0>=0 && self.0<grid_size.0 && self.1>=0 && self.1<grid_size.1
+        self.0 >= 0 && self.0 < grid_size.0 && self.1 >= 0 && self.1 < grid_size.1
     }
 }
 
@@ -42,15 +42,19 @@ struct ResonantHarmonic {
     vector: (i32, i32),
     grid_size: (usize, usize),
     current: Point,
-    timeout: usize
+    timeout: usize,
 }
 impl ResonantHarmonic {
-    fn new(init_point: &Point, vector: &(i32, i32), grid_size: &(usize, usize)) -> ResonantHarmonic {
+    fn new(
+        init_point: &Point,
+        vector: &(i32, i32),
+        grid_size: &(usize, usize),
+    ) -> ResonantHarmonic {
         ResonantHarmonic {
             vector: *vector,
             grid_size: *grid_size,
             current: *init_point,
-            timeout: 100
+            timeout: 100,
         }
     }
 }
@@ -59,16 +63,23 @@ impl Iterator for ResonantHarmonic {
     type Item = Point;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.vector == (0,0){ return None}
+        if self.vector == (0, 0) {
+            return None;
+        }
 
-         let result = match self.current.on_grid(&self.grid_size) {
-             true => Some(self.current),
-             false => None
-         };
-        self.current = Point(self.current.0 + self.vector.0, self.current.1 + self.vector.1);
-        self.timeout -=1;
+        let result = match self.current.on_grid(&self.grid_size) {
+            true => Some(self.current),
+            false => None,
+        };
+        self.current = Point(
+            self.current.0 + self.vector.0,
+            self.current.1 + self.vector.1,
+        );
+        self.timeout -= 1;
         println!("{:?}", self);
-        if self.timeout == 0 {panic!("timeout reached!")}
+        if self.timeout == 0 {
+            panic!("timeout reached!")
+        }
 
         result
     }
@@ -201,9 +212,10 @@ pub mod tests {
     }
 
     #[test]
-    fn resonant_harmonic(){
-        let harmonic_series: Vec<_> = ResonantHarmonic::new(&Point(0,0), &(2, 1), &(8, 8)).collect();
-        let answer = [Point(0,0), Point(2,1), Point(4,2), Point(6,3)];
+    fn resonant_harmonic() {
+        let harmonic_series: Vec<_> =
+            ResonantHarmonic::new(&Point(0, 0), &(2, 1), &(8, 8)).collect();
+        let answer = [Point(0, 0), Point(2, 1), Point(4, 2), Point(6, 3)];
         assert_eq!(harmonic_series, answer)
     }
 }
