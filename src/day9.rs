@@ -30,6 +30,11 @@ fn is_free_space(c: char) -> bool {
     c == '.'
 }
 
+fn check_sum(s: &str) -> usize{
+
+    todo!()
+}
+
 #[cfg(test)]
 pub mod tests {
     use super::*;
@@ -42,5 +47,11 @@ pub mod tests {
         let s2 = "00...111...2...333.44.5555.6666.777.888899";
         let answer2 = String::from("0099811188827773336446555566..............");
         assert_eq!(unite_free_space(s2), answer2);
+    }
+
+    #[test]
+    fn test_check_sum() {
+        let s = String::from("0099811188827773336446555566..............");
+        assert_eq!(check_sum(&s), 1928);
     }
 }
