@@ -7,14 +7,33 @@ pub fn main() {
     let file_path = format!("artifacts/input_files/{}", FILE_NAME);
     let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
     println!("input: {:?}", input);
-    let parsed = parse_string(&input);
-    println!("input parsed: {:?}", &parsed);
+
 }
 
-fn parse_string(input: &str) -> Vec<i32> {
-    let mut column1: Vec<i32> = Vec::new();
-    column1
+fn unite_free_space(s: &str) -> String{
+    let mut free_space_index = 0;
+    let mut block_index = s.len()-1;
+    let mut chars: Vec<_> = s.chars().collect();
+    while free_space_index!= block_index {
+        match is_free_space(chars[block_index]){
+            true => block_index -= 1,
+            false => {
+                if is_free_space(chars[free_space_index]){
+                    chars.swap(block_index, free_space_index);
+                    free_space_index -=1;
+                } else {
+                    free_space_index += 1;
+                }
+            }
+        }
+    }
+    chars.into_iter().collect()
 }
+
+fn is_free_space(c: char) -> bool{
+    c == '.'
+}
+
 
 #[cfg(test)]
 pub mod tests {
