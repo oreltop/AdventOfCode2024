@@ -39,7 +39,6 @@ impl Point {
 
 #[derive(Debug)]
 struct ResonantHarmonic {
-    p0: Point,
     vector: (i32, i32),
     grid_size: (usize, usize),
     current: Point,
@@ -47,13 +46,10 @@ struct ResonantHarmonic {
 }
 impl ResonantHarmonic {
     fn new(init_point: &Point, vector: &(i32, i32), grid_size: &(usize, usize)) -> ResonantHarmonic {
-        let p0 = init_point.clone();
-
         ResonantHarmonic {
-            p0,
-            vector: vector.clone(),
-            grid_size: grid_size.clone(),
-            current: p0,
+            vector: *vector,
+            grid_size: *grid_size,
+            current: *init_point,
             timeout: 100
         }
     }
