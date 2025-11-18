@@ -42,6 +42,7 @@ struct ResonantHarmonic {
     vector: (i32, i32),
     grid_size: (usize, usize),
     current: Point,
+    timeout: usize
 }
 impl ResonantHarmonic {
     fn new(init_point: Point, vector: (i32, i32), grid_size: (usize, usize)) -> ResonantHarmonic {
@@ -50,6 +51,7 @@ impl ResonantHarmonic {
             vector,
             grid_size,
             current: init_point,
+            timeout: 100
         }
     }
 }
@@ -64,6 +66,8 @@ impl Iterator for ResonantHarmonic {
              false => None
          };
         self.current = Point(self.current.0 + self.vector.0, self.current.1 + self.vector.1);
+        self.timeout -=1;
+        if self.timeout == 0 {panic!("timeout reached!")}
 
         result
     }
