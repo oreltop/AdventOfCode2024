@@ -15,13 +15,6 @@ pub fn main() {
 
 #[derive(PartialEq, Debug, Hash, Eq, Copy, Clone)]
 struct Point(i32, i32);
-impl Add for &Point {
-    type Output = Point;
-
-    fn add(self, other: Self) -> Self::Output {
-        Point(self.0 + other.0, self.1 + other.1)
-    }
-}
 impl Sub for &Point {
     type Output = (i32, i32);
 
