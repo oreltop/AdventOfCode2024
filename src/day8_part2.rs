@@ -23,10 +23,10 @@ impl Add for &Point {
     }
 }
 impl Sub for &Point {
-    type Output = Point;
+    type Output = (i32,i32);
 
     fn sub(self, other: Self) -> Self::Output {
-        Point(self.0 - other.0, self.1 - other.1)
+        (self.0 - other.0, self.1 - other.1)
     }
 }
 
@@ -37,6 +37,7 @@ impl Point {
     }
 }
 
+#[derive(Debug)]
 struct ResonantHarmonic {
     p0: Point,
     vector: (i32, i32),
@@ -45,12 +46,14 @@ struct ResonantHarmonic {
     timeout: usize
 }
 impl ResonantHarmonic {
-    fn new(init_point: Point, vector: (i32, i32), grid_size: (usize, usize)) -> ResonantHarmonic {
+    fn new(init_point: &Point, vector: &(i32, i32), grid_size: &(usize, usize)) -> ResonantHarmonic {
+        let p0 = init_point.clone();
+
         ResonantHarmonic {
-            p0: init_point,
-            vector,
-            grid_size,
-            current: init_point,
+            p0,
+            vector: vector.clone(),
+            grid_size: grid_size.clone(),
+            current: p0,
             timeout: 100
         }
     }
@@ -60,6 +63,7 @@ impl Iterator for ResonantHarmonic {
     type Item = Point;
 
     fn next(&mut self) -> Option<Self::Item> {
+        if self.vector == (0,0){ return None}
 
          let result = match self.current.on_grid(&self.grid_size) {
              true => Some(self.current.clone()),
@@ -67,6 +71,7 @@ impl Iterator for ResonantHarmonic {
          };
         self.current = Point(self.current.0 + self.vector.0, self.current.1 + self.vector.1);
         self.timeout -=1;
+        println!("{:?}", self);
         if self.timeout == 0 {panic!("timeout reached!")}
 
         result
@@ -106,12 +111,8 @@ fn calculate_antinodes_for_frequency(
     let pairs = antennas.iter().cartesian_product(antennas);
     for point_pair in pairs {
         let distance = point_pair.0 - point_pair.1;
-        let possible_antinodes = [point_pair.0 + &distance, point_pair.1 - &distance];
-        let antinodes = possible_antinodes
-            .iter()
-            .filter(|p| !antennas.contains(p))
-            .filter(|&point| point.on_grid(size));
-        result.extend(antinodes);
+        println!("point pair: {:?}, distance: {:?}", point_pair, distance);
+        result.extend(ResonantHarmonic::new(point_pair.0, &distance, size));
     }
     result
 }
@@ -206,7 +207,7 @@ pub mod tests {
 
     #[test]
     fn resonant_harmonic(){
-        let harmonic_series: Vec<_> = ResonantHarmonic::new(Point(0,0), (2,1), (8,8)).collect();
+        let harmonic_series: Vec<_> = ResonantHarmonic::new(&Point(0,0), &(2, 1), &(8, 8)).collect();
         let answer = [Point(0,0), Point(2,1), Point(4,2), Point(6,3)];
         assert_eq!(harmonic_series, answer)
     }
