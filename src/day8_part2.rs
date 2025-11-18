@@ -62,7 +62,7 @@ impl Iterator for ResonantHarmonic {
         if self.vector == (0,0){ return None}
 
          let result = match self.current.on_grid(&self.grid_size) {
-             true => Some(self.current.clone()),
+             true => Some(self.current),
              false => None
          };
         self.current = Point(self.current.0 + self.vector.0, self.current.1 + self.vector.1);
@@ -149,7 +149,7 @@ pub mod tests {
         ............
         ............";
 
-        let mut parsed = parse_string(input);
+        let parsed = parse_string(input);
         println!("{:?}", parsed);
 
         let values_0 = parsed.get(&'0').unwrap();
@@ -157,17 +157,16 @@ pub mod tests {
         assert!(answer_0.iter().all(|p| values_0.iter().contains(p)));
         assert_eq!(values_0.len(), answer_0.len());
 
-        let values_A = parsed.get(&'A').unwrap();
-        let answer_A = vec![Point(9, 2), Point(8, 3), Point(6, 6)];
-        assert!(answer_A.iter().all(|p| values_A.iter().contains(p)));
-        assert_eq!(values_A.len(), answer_A.len());
+        let values_a = parsed.get(&'A').unwrap();
+        let answer_a = vec![Point(9, 2), Point(8, 3), Point(6, 6)];
+        assert!(answer_a.iter().all(|p| values_a.iter().contains(p)));
+        assert_eq!(values_a.len(), answer_a.len());
     }
 
     #[test]
     fn test_calculate_antinodes() {
         let mut antennas: HashMap<char, Vec<Point>> = HashMap::new();
         let a_antennas = vec![Point(1, 1), Point(2, 2)];
-        let b_antennas = vec![Point(1, 2), Point(3, 4), Point(4, 5)];
         antennas.insert('a', a_antennas);
         let size = (8, 8);
         let antinodes = find_all_antinodes(&antennas, &size);
