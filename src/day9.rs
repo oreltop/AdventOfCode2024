@@ -12,7 +12,7 @@ pub fn main() {
     let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
     println!("input: {:?}", input);
 }
-
+// 
 // fn unite_free_space(s: &str) -> String {
 //     let mut free_space_index = 0;
 //     let mut block_index = s.len().saturating_sub(1);
@@ -29,10 +29,29 @@ pub fn main() {
 //     }
 //     chars.into_iter().collect()
 // }
-//
-// fn is_free_space(c: char) -> bool {
-//     c == '.'
-// }
+
+
+fn unite_free_space(disk: &Vec<i32>) -> Vec<i32> {
+    let mut free_space_index = 0;
+    let mut block_index = disk.len().saturating_sub(1);
+    let mut disk = disk.clone();
+    while free_space_index < block_index {
+        if is_free_space(disk[block_index]) {
+            block_index -= 1;
+        } else if is_free_space(disk[free_space_index]) {
+            disk.swap(free_space_index, block_index);
+            block_index -= 1;
+        } else {
+            free_space_index += 1;
+        }
+    }
+    disk
+}
+
+
+fn is_free_space(item: i32) -> bool {
+    item == EMPTY_SPACE
+}
 //
 // fn check_sum(s: &str) -> usize{
 //
@@ -76,11 +95,11 @@ pub mod tests {
     fn test_unite_free_space() {
         let result = parse_for_testing("0..111....22222");
         let answer = parse_for_testing("022111222......");
-        assert_eq!(unite_free_space(result), answer);
+        assert_eq!(unite_free_space(&result), answer);
 
         let result2 = parse_for_testing("00...111...2...333.44.5555.6666.777.888899");
         let answer2 = parse_for_testing("0099811188827773336446555566..............");
-        assert_eq!(unite_free_space(result2), answer2);
+        assert_eq!(unite_free_space(&result2), answer2);
     }
     //
     // #[test]
