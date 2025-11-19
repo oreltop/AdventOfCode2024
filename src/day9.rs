@@ -72,20 +72,30 @@ pub mod tests {
         assert_eq!(parse_string(string), parsed);
     }
 
-    // #[test]
-    // fn test_unite_free_space() {
-    //     let s = "0..111....22222";
-    //     let answer = String::from("022111222......");
-    //     assert_eq!(unite_free_space(s), answer);
-    //
-    //     let s2 = "00...111...2...333.44.5555.6666.777.888899";
-    //     let answer2 = String::from("0099811188827773336446555566..............");
-    //     assert_eq!(unite_free_space(s2), answer2);
-    // }
+    #[test]
+    fn test_unite_free_space() {
+        let result = parse_for_testing("0..111....22222");
+        let answer = parse_for_testing("022111222......");
+        assert_eq!(unite_free_space(result), answer);
+
+        let result2 = parse_for_testing("00...111...2...333.44.5555.6666.777.888899");
+        let answer2 = parse_for_testing("0099811188827773336446555566..............");
+        assert_eq!(unite_free_space(result2), answer2);
+    }
     //
     // #[test]
     // fn test_check_sum() {
     //     let s = String::from("0099811188827773336446555566..............");
     //     assert_eq!(check_sum(&s), 1928);
     // }
+    fn parse_for_testing(s: &str) -> Vec<i32>{
+        let mut result = Vec::new();
+        for c in s.chars(){
+            match c=='.' {
+                true => result.push(-1),
+                false => result.push(c.to_digit(10).unwrap() as i32)
+            }
+        }
+        result
+    }
 }
