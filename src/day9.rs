@@ -13,10 +13,10 @@ pub fn main() {
     println!("input: {:?}", input);
 }
 
-fn unite_free_space(disk: &Vec<i32>) -> Vec<i32> {
+fn unite_free_space(disk: &[i32]) -> Vec<i32> {
     let mut free_space_index = 0;
     let mut block_index = disk.len().saturating_sub(1);
-    let mut disk = disk.clone();
+    let mut disk = disk.to_owned();
     while free_space_index < block_index {
         if is_free_space(disk[block_index]) {
             block_index -= 1;
@@ -47,7 +47,6 @@ fn check_sum(disk: &[i32]) -> usize {
 fn parse_string(s: &str) -> Vec<i32> {
     let pairs: Vec<(i32, i32)> = s
         .chars()
-        .into_iter()
         .map(|c| c.to_digit(10).unwrap() as i32)
         .chain(once(0)) // to avoid the last item being dropped if odd
         .tuples()
@@ -57,7 +56,7 @@ fn parse_string(s: &str) -> Vec<i32> {
         .iter()
         .enumerate()
         .flat_map(|(index, (block_size, free_space))| {
-            vec![
+            [
                 vec![index as i32; *block_size as usize],
                 vec![EMPTY_SPACE; *free_space as usize],
             ]
