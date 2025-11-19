@@ -13,6 +13,15 @@ enum DiskSpace {
     Block { size: usize, id: usize },
 }
 
+impl DiskSpace{
+    fn size(&self) -> usize{
+        match self {
+            FreeSpace {size} => *size,
+            Block {size, .. } => *size
+        }
+    }
+}
+
 pub fn main() {
     println!("this is main");
     let file_path = format!("artifacts/input_files/{}", FILE_NAME);
@@ -69,6 +78,7 @@ fn parse_string(s: &str) -> Vec<DiskSpace> {
                 FreeSpace {size: *free_space as usize}
             ]
         })
+        .filter(|disk| {disk.size()>0})
         .collect()
 
 }
