@@ -34,8 +34,13 @@ fn is_free_space(item: i32) -> bool {
     item == EMPTY_SPACE
 }
 
-fn check_sum(s: &str) -> usize {
-    todo!()
+fn check_sum(disk: &[i32]) -> usize {
+    disk.iter().enumerate().map(|(index, content)| {
+        match is_free_space(*content) {
+            true => 0,
+            false => index * (*content as usize)
+        }
+    }).sum()
 }
 
 fn parse_string(s: &str) -> Vec<i32> {
@@ -84,7 +89,7 @@ pub mod tests {
 
     #[test]
     fn test_check_sum() {
-        let s = String::from("0099811188827773336446555566..............");
+        let s = parse_for_testing("0099811188827773336446555566..............");
         assert_eq!(check_sum(&s), 1928);
     }
     fn parse_for_testing(s: &str) -> Vec<i32> {
