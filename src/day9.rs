@@ -52,7 +52,7 @@ fn parse_string(s: &str) -> Vec<i32> {
         .iter()
         .enumerate()
         .flat_map(|(index, (block_size, free_space))| {
-            [
+            vec![
                 vec![index as i32; *block_size as usize],
                 vec![EMPTY_SPACE; *free_space as usize],
             ]
@@ -68,7 +68,7 @@ pub mod tests {
     #[test]
     fn test_parse_string() {
         let string = "143023";
-        let parsed = vec![0, -1 - 1 - 1 - 1, 1, 1, 1, 2, 2, -1 - 1 - 1];
+        let parsed = vec![0, -1, -1, -1, -1, 1, 1, 1, 2, 2, -1, -1, -1];
         assert_eq!(parse_string(string), parsed);
     }
 
