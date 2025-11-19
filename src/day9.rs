@@ -35,12 +35,13 @@ fn is_free_space(item: i32) -> bool {
 }
 
 fn check_sum(disk: &[i32]) -> usize {
-    disk.iter().enumerate().map(|(index, content)| {
-        match is_free_space(*content) {
+    disk.iter()
+        .enumerate()
+        .map(|(index, content)| match is_free_space(*content) {
             true => 0,
-            false => index * (*content as usize)
-        }
-    }).sum()
+            false => index * (*content as usize),
+        })
+        .sum()
 }
 
 fn parse_string(s: &str) -> Vec<i32> {
@@ -93,13 +94,11 @@ pub mod tests {
         assert_eq!(check_sum(&s), 1928);
     }
     fn parse_for_testing(s: &str) -> Vec<i32> {
-        let mut result = Vec::new();
-        for c in s.chars() {
-            match c == '.' {
-                true => result.push(-1),
-                false => result.push(c.to_digit(10).unwrap() as i32),
-            }
-        }
-        result
+        s.chars()
+            .map(|c| match c == '.' {
+                true => -1,
+                false => c.to_digit(10).unwrap() as i32,
+            })
+            .collect()
     }
 }
