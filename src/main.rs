@@ -1,4 +1,3 @@
-mod day9;
 mod day9_part2;
 
 fn main() {

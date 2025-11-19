@@ -6,6 +6,8 @@ use crate::day9_part2::DiskSpace::{Block, FreeSpace};
 const FILE_NAME: &str = "input_day9.txt";
 const EMPTY_SPACE: i32 = -1;
 
+#[derive(Debug)]
+#[derive(PartialEq)]
 enum DiskSpace {
     FreeSpace { size: usize },
     Block { size: usize, id: usize },
