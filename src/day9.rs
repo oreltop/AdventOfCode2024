@@ -9,8 +9,10 @@ const EMPTY_SPACE: i32 = -1;
 pub fn main() {
     println!("this is main");
     let file_path = format!("artifacts/input_files/{}", FILE_NAME);
-    let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
-    println!("input: {:?}", input);
+    let input_raw = fs::read_to_string(file_path).expect("Should have been able to read the file");
+    let input = parse_string(&input_raw);
+    let disk_sorted = unite_free_space(&input);
+    print!("{}", check_sum(&disk_sorted));
 }
 
 fn unite_free_space(disk: &[i32]) -> Vec<i32> {
@@ -51,7 +53,6 @@ fn parse_string(s: &str) -> Vec<i32> {
         .chain(once(0)) // to avoid the last item being dropped if odd
         .tuples()
         .collect();
-    println!("{:?}", pairs);
     pairs
         .iter()
         .enumerate()
