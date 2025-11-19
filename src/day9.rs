@@ -12,24 +12,6 @@ pub fn main() {
     let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
     println!("input: {:?}", input);
 }
-// 
-// fn unite_free_space(s: &str) -> String {
-//     let mut free_space_index = 0;
-//     let mut block_index = s.len().saturating_sub(1);
-//     let mut chars: Vec<_> = s.chars().collect();
-//     while free_space_index < block_index {
-//         if is_free_space(chars[block_index]) {
-//             block_index -= 1;
-//         } else if is_free_space(chars[free_space_index]) {
-//             chars.swap(free_space_index, block_index);
-//             block_index -= 1;
-//         } else {
-//             free_space_index += 1;
-//         }
-//     }
-//     chars.into_iter().collect()
-// }
-
 
 fn unite_free_space(disk: &Vec<i32>) -> Vec<i32> {
     let mut free_space_index = 0;
@@ -48,15 +30,13 @@ fn unite_free_space(disk: &Vec<i32>) -> Vec<i32> {
     disk
 }
 
-
 fn is_free_space(item: i32) -> bool {
     item == EMPTY_SPACE
 }
-//
-// fn check_sum(s: &str) -> usize{
-//
-//     todo!()
-// }
+
+fn check_sum(s: &str) -> usize {
+    todo!()
+}
 
 fn parse_string(s: &str) -> Vec<i32> {
     let pairs: Vec<(i32, i32)> = s
@@ -101,18 +81,18 @@ pub mod tests {
         let answer2 = parse_for_testing("0099811188827773336446555566..............");
         assert_eq!(unite_free_space(&result2), answer2);
     }
-    //
-    // #[test]
-    // fn test_check_sum() {
-    //     let s = String::from("0099811188827773336446555566..............");
-    //     assert_eq!(check_sum(&s), 1928);
-    // }
-    fn parse_for_testing(s: &str) -> Vec<i32>{
+
+    #[test]
+    fn test_check_sum() {
+        let s = String::from("0099811188827773336446555566..............");
+        assert_eq!(check_sum(&s), 1928);
+    }
+    fn parse_for_testing(s: &str) -> Vec<i32> {
         let mut result = Vec::new();
-        for c in s.chars(){
-            match c=='.' {
+        for c in s.chars() {
+            match c == '.' {
                 true => result.push(-1),
-                false => result.push(c.to_digit(10).unwrap() as i32)
+                false => result.push(c.to_digit(10).unwrap() as i32),
             }
         }
         result
