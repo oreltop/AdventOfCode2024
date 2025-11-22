@@ -1,13 +1,13 @@
 use crate::day9_part2::DiskSpace::{Block, FreeSpace};
 use itertools::{Itertools, concat};
 use std::cmp::Ordering;
+use std::fmt::Display;
 use std::fs;
 use std::iter::once;
 
 const FILE_NAME: &str = "input_day9.txt";
-const EMPTY_SPACE: i32 = -1;
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 enum DiskSpace {
     FreeSpace { size: usize },
     Block { size: usize, id: usize },
@@ -25,6 +25,13 @@ impl DiskSpace {
         match self {
             FreeSpace { .. } => true,
             Block { .. } => false,
+        }
+    }
+
+    fn to_string(&self) -> String {
+        match self {
+            FreeSpace { size } => ".".repeat(self.size()),
+            Block { size, id } => format! {"{}", id}.repeat(self.size()),
         }
     }
 }
@@ -45,7 +52,63 @@ pub fn main() {
 }
 
 fn unite_free_space(disk: &[DiskSpace]) -> Vec<DiskSpace> {
-    todo!()
+    let mut disk = disk.to_vec();
+
+    let mut free_space_index = 0;
+    let mut block_index = disk.len().saturating_sub(1);
+
+    while block_index > 0 {
+        if free_space_index == block_index {
+            free_space_index = 0;
+            block_index -= 1;
+        } else if disk[block_index].is_empty() {
+            block_index -= 1;
+        } else if !disk[free_space_index].is_empty() || disk[free_space_index] < disk[block_index] {
+            free_space_index += 1
+        } else {
+            move_block(&mut disk, block_index, free_space_index);
+            free_space_index = 0;
+            block_index -= 1;
+        }
+    }
+    disk
+}
+
+fn format_disk(disk: &[DiskSpace]) -> String {
+    disk.iter().map(|space| space.to_string()).collect()
+}
+
+fn move_block(disk: &mut Vec<DiskSpace>, from: usize, to: usize) {
+    println!("moving {:?}", disk[from]);
+    println!("before: {}", format_disk(&disk));
+    if !disk[to].is_empty() {
+        return;
+    }
+    match disk[from].size().cmp(&disk[to].size()) {
+        Ordering::Less => {
+            let block = disk.remove(from);
+            disk.insert(from, FreeSpace { size: block.size() });
+            let free_space = disk.remove(to);
+            disk.insert(
+                to,
+                FreeSpace {
+                    size: free_space.size() - block.size(),
+                },
+            );
+            disk.insert(to, block);
+            println!("after: {}", format_disk(&disk));
+        }
+        Ordering::Equal => {
+            disk.swap(from, to);
+            println!("after: {}", format_disk(&disk));
+        }
+        Ordering::Greater => {
+            println!(
+                "How can this be?! from: {:?}, to: {:?}",
+                disk[from], disk[to]
+            )
+        }
+    }
 }
 
 // fn check_sum(disk: &[i32]) -> usize {
@@ -123,7 +186,7 @@ pub mod tests {
             Block { size: 2, id: 9 },
         ];
 
-        let result = vec![
+        let answer = vec![
             Block { size: 2, id: 0 },
             Block { size: 2, id: 9 },
             Block { size: 1, id: 2 },
@@ -142,7 +205,12 @@ pub mod tests {
             FreeSpace { size: 2 },
         ];
 
-        assert_eq!(unite_free_space(&input), result);
+        let result = format_disk(&unite_free_space(&input));
+
+        println!("\nResult: {}", result);
+        println!("Should be: {}", format_disk(&answer));
+
+        assert_eq!(result, format_disk(&answer));
     }
     //
     // #[test]
