@@ -59,21 +59,17 @@ pub fn main() {
 fn unite_free_space(disk: &[DiskSpace]) -> Vec<DiskSpace> {
     let mut disk = disk.to_vec();
 
-    let mut free_space_index = 0;
-    let mut block_index = disk.len().saturating_sub(1);
-
-    while block_index > 0 {
-        if free_space_index == block_index {
-            free_space_index = 0;
-            block_index -= 1;
-        } else if disk[block_index].is_empty() {
-            block_index -= 1;
-        } else if !disk[free_space_index].is_empty() || disk[free_space_index] < disk[block_index] {
-            free_space_index += 1
-        } else {
-            move_block(&mut disk, block_index, free_space_index);
-            free_space_index = 0;
-            block_index -= 1;
+    for block_idx in (0..disk.len()).rev() {
+        if disk[block_idx].is_empty() {
+            continue;
+        }
+        let empty_slot = (0..block_idx).find(|empty_slot| {
+            let source = &disk[block_idx];
+            let target = &disk[*empty_slot];
+            target.is_empty() && target.size() >= source.size()
+        });
+        if let Some(target) = empty_slot {
+            move_block(&mut disk, block_idx, target)
         }
     }
     disk
