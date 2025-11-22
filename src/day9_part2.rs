@@ -1,7 +1,7 @@
 use crate::day9_part2::DiskSpace::{Block, FreeSpace};
-use itertools::{Itertools, concat};
+use itertools::Itertools;
 use std::cmp::Ordering;
-use std::fmt::Display;
+use std::fmt::{Display, Formatter};
 use std::fs;
 use std::iter::once;
 
@@ -27,11 +27,16 @@ impl DiskSpace {
             Block { .. } => false,
         }
     }
-
-    fn to_string(&self) -> String {
+}
+impl Display for DiskSpace {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            FreeSpace { size } => ".".repeat(self.size()),
-            Block { size, id } => format! {"{}", id}.repeat(self.size()),
+            DiskSpace::FreeSpace { size } => {
+                write!(f, "{}", ".".repeat(*size))
+            }
+            DiskSpace::Block { size, id } => {
+                write!(f, "{}", format!("{}", id).repeat(*size))
+            }
         }
     }
 }
@@ -79,8 +84,6 @@ fn format_disk(disk: &[DiskSpace]) -> String {
 }
 
 fn move_block(disk: &mut Vec<DiskSpace>, from: usize, to: usize) {
-    println!("moving {:?}", disk[from]);
-    println!("before: {}", format_disk(&disk));
     if !disk[to].is_empty() {
         return;
     }
@@ -96,30 +99,13 @@ fn move_block(disk: &mut Vec<DiskSpace>, from: usize, to: usize) {
                 },
             );
             disk.insert(to, block);
-            println!("after: {}", format_disk(&disk));
         }
         Ordering::Equal => {
             disk.swap(from, to);
-            println!("after: {}", format_disk(&disk));
         }
-        Ordering::Greater => {
-            println!(
-                "How can this be?! from: {:?}, to: {:?}",
-                disk[from], disk[to]
-            )
-        }
+        Ordering::Greater => {}
     }
 }
-
-// fn check_sum(disk: &[i32]) -> usize {
-//     disk.iter()
-//         .enumerate()
-//         .map(|(index, content)| match is_free_space(*content) {
-//             true => 0,
-//             false => index * (*content as usize),
-//         })
-//         .sum()
-// }
 
 fn parse_string(s: &str) -> Vec<DiskSpace> {
     let pairs: Vec<(i32, i32)> = s
@@ -212,10 +198,4 @@ pub mod tests {
 
         assert_eq!(result, format_disk(&answer));
     }
-    //
-    // #[test]
-    // fn test_check_sum() {
-    //     let s = parse_for_testing("0099811188827773336446555566..............");
-    //     assert_eq!(check_sum(&s), 1928);
-    // }
 }
