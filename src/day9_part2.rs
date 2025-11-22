@@ -79,25 +79,25 @@ fn format_disk(disk: &[DiskSpace]) -> String {
     disk.iter().map(|space| space.to_string()).collect()
 }
 
-fn move_block(disk: &mut Vec<DiskSpace>, from: usize, to: usize) {
-    if !disk[to].is_empty() {
+fn move_block(disk: &mut Vec<DiskSpace>, source: usize, target: usize) {
+    if !disk[target].is_empty() {
         return;
     }
-    match disk[from].size().cmp(&disk[to].size()) {
+    match disk[source].size().cmp(&disk[target].size()) {
         Ordering::Less => {
-            let block = disk.remove(from);
-            disk.insert(from, FreeSpace { size: block.size() });
-            let free_space = disk.remove(to);
+            let block = disk.remove(source);
+            disk.insert(source, FreeSpace { size: block.size() });
+            let free_space = disk.remove(target);
             disk.insert(
-                to,
+                target,
                 FreeSpace {
                     size: free_space.size() - block.size(),
                 },
             );
-            disk.insert(to, block);
+            disk.insert(target, block);
         }
         Ordering::Equal => {
-            disk.swap(from, to);
+            disk.swap(source, target);
         }
         Ordering::Greater => {}
     }
