@@ -103,6 +103,17 @@ fn move_block(disk: &mut Vec<DiskSpace>, source: usize, target: usize) {
     }
 }
 
+fn check_sum(disk: &[DiskSpace]) -> usize {
+    todo!();
+    // disk.iter()
+    //     .map(|(index, content)| match is_free_space(*content) {
+    //         true => 0,
+    //         false => index * (*content as usize),
+    //     })
+    //     .sum()
+}
+
+
 fn parse_string(s: &str) -> Vec<DiskSpace> {
     let pairs: Vec<(i32, i32)> = s
         .chars()
@@ -194,4 +205,25 @@ pub mod tests {
 
         assert_eq!(result, format_disk(&answer));
     }
+
+    #[test]
+    fn test_check_sum(){
+        let input = vec![
+            Block { size: 3, id: 0 },
+            Block { size: 2, id: 9 },
+            Block { size: 3, id: 8 },
+            Block { size: 1, id: 2 },
+            Block { size: 3, id: 7 },
+            Block { size: 3, id: 3 },
+            Block { size: 1, id: 6 },
+            Block { size: 2, id: 4 },
+            Block { size: 2, id: 6 },
+            Block { size: 4, id: 5 },
+            Block { size: 2, id: 6 },
+            FreeSpace { size: 14 },
+        ];
+        assert_eq!(check_sum(&input), 1928);
+
+    }
+
 }
