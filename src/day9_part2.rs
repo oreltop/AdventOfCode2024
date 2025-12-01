@@ -59,11 +59,11 @@ pub fn main() {
     let file_path = format!("artifacts/input_files/{}", FILE_NAME);
     let input_raw = fs::read_to_string(file_path).expect("Should have been able to read the file");
     let input = parse_string(&input_raw);
-    let disk_sorted = unite_free_space(&input);
+    let disk_sorted = order_disk(&input);
     print!("{}", check_sum(&disk_sorted));
 }
 
-fn unite_free_space(disk: &[DiskSpace]) -> Vec<DiskSpace> {
+fn order_disk(disk: &[DiskSpace]) -> Vec<DiskSpace> {
     let mut disk = disk.to_vec();
 
     for block_idx in (0..disk.len()).rev() {
@@ -204,7 +204,7 @@ pub mod tests {
             FreeSpace { size: 2 },
         ];
 
-        let result = format_disk(&unite_free_space(&input));
+        let result = format_disk(&order_disk(&input));
 
         println!("\nResult: {}", result);
         println!("Should be: {}", format_disk(&answer));
