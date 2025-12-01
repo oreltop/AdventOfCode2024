@@ -3,6 +3,7 @@ use itertools::Itertools;
 use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
 use std::iter::once;
+use std::ops::Mul;
 use std::{fs, mem};
 
 const FILE_NAME: &str = "input_day9.txt";
@@ -25,6 +26,13 @@ impl DiskSpace {
         match self {
             FreeSpace { .. } => true,
             Block { .. } => false,
+        }
+    }
+
+    fn check_sum(&self) -> usize {
+        match self {
+            FreeSpace { .. } => 0,
+            Block { size, id } => (0..*size).map(|i| i * id).sum(),
         }
     }
 }
@@ -104,15 +112,15 @@ fn move_block(disk: &mut Vec<DiskSpace>, source: usize, target: usize) {
 }
 
 fn check_sum(disk: &[DiskSpace]) -> usize {
-    todo!();
-    // disk.iter()
-    //     .map(|(index, content)| match is_free_space(*content) {
-    //         true => 0,
-    //         false => index * (*content as usize),
-    //     })
-    //     .sum()
-}
+    let mut index: usize = 1;
+    let mut result: usize = 0;
 
+    for space in disk {
+        result += index * space.size() + space.check_sum();
+        index += space.size();
+    }
+    result
+}
 
 fn parse_string(s: &str) -> Vec<DiskSpace> {
     let pairs: Vec<(i32, i32)> = s
@@ -207,23 +215,38 @@ pub mod tests {
     }
 
     #[test]
-    fn test_check_sum(){
-        let input = vec![
-            Block { size: 3, id: 0 },
-            Block { size: 2, id: 9 },
-            Block { size: 3, id: 8 },
-            Block { size: 1, id: 2 },
-            Block { size: 3, id: 7 },
-            Block { size: 3, id: 3 },
-            Block { size: 1, id: 6 },
-            Block { size: 2, id: 4 },
-            Block { size: 2, id: 6 },
-            Block { size: 4, id: 5 },
-            Block { size: 2, id: 6 },
-            FreeSpace { size: 14 },
-        ];
-        assert_eq!(check_sum(&input), 1928);
+    fn diskspace_check_sum(){
+        let free = FreeSpace {size: 9};
+        assert_eq!(free.check_sum(), 0);
+        let block = Block {id: 0, size: 1};
+        assert_eq!(block.check_sum(), 0);
+        let block = Block {id:2, size:2};
+        assert_eq!(block.check_sum(), 6);
+
 
     }
 
+    #[test]
+    fn test_check_sum() {
+        let input = vec![
+            Block { size: 2, id: 0 },
+            Block { size: 2, id: 9 },
+            Block { size: 1, id: 2 },
+            Block { size: 3, id: 1 },
+            Block { size: 3, id: 7 },
+            FreeSpace { size: 1 },
+            Block { size: 2, id: 4 },
+            FreeSpace { size: 1 },
+            Block { size: 3, id: 3 },
+            FreeSpace { size: 4 },
+            Block { size: 4, id: 5 },
+            FreeSpace { size: 1 },
+            Block { size: 4, id: 6 },
+            FreeSpace { size: 5 },
+            Block { size: 4, id: 8 },
+            FreeSpace { size: 2 },
+        ];
+
+        assert_eq!(check_sum(&input), 2858);
+    }
 }
