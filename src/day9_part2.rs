@@ -82,6 +82,15 @@ fn order_disk(disk: &[DiskSpace]) -> Vec<DiskSpace> {
     disk
 }
 
+fn combine_free_space(disk: &mut Vec<DiskSpace>, index: usize){
+    let next_space = disk.get(index +1);
+    if disk[index].is_empty() && next_space.is_some() && next_space.unwrap().is_empty(){
+
+        let combined_size = disk.remove(index +1).size() + disk[index].size();
+        let _ = mem::replace(&mut disk[index], FreeSpace { size: combined_size });
+    }
+}
+
 fn move_block(disk: &mut Vec<DiskSpace>, source: usize, target: usize) {
     if !disk[target].is_empty() {
         return;
@@ -91,12 +100,14 @@ fn move_block(disk: &mut Vec<DiskSpace>, source: usize, target: usize) {
     match block_size.cmp(&disk[target].size()) {
         Ordering::Less => {
             let block = mem::replace(&mut disk[source], FreeSpace { size: block_size });
+            combine_free_space(disk, source);
             let _ = mem::replace(
                 &mut disk[target],
                 FreeSpace {
                     size: free_size - block_size,
                 },
             );
+            combine_free_space(disk, target);
             disk.insert(target, block);
         }
         Ordering::Equal => {
