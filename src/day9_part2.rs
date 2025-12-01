@@ -3,7 +3,6 @@ use itertools::Itertools;
 use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
 use std::iter::once;
-use std::ops::Mul;
 use std::{fs, mem};
 
 const FILE_NAME: &str = "input_day9.txt";
@@ -29,20 +28,20 @@ impl DiskSpace {
         }
     }
 
-    fn check_sum(&self) -> usize {
+    fn check_sum(&self, index: usize) -> usize {
         match self {
             FreeSpace { .. } => 0,
-            Block { size, id } => (0..*size).map(|i| i * id).sum(),
+            Block { size, id } => (0..*size).map(|i| (i + index) * id).sum(),
         }
     }
 }
 impl Display for DiskSpace {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            DiskSpace::FreeSpace { size } => {
+            FreeSpace { size } => {
                 write!(f, "{}", ".".repeat(*size))
             }
-            DiskSpace::Block { size, id } => {
+            Block { size, id } => {
                 write!(f, "{}", format!("{}", id).repeat(*size))
             }
         }
@@ -112,12 +111,13 @@ fn move_block(disk: &mut Vec<DiskSpace>, source: usize, target: usize) {
 }
 
 fn check_sum(disk: &[DiskSpace]) -> usize {
-    let mut index: usize = 1;
+    let mut index: usize = 0;
     let mut result: usize = 0;
 
     for space in disk {
-        result += index * space.size() + space.check_sum();
+        result += space.check_sum(index);
         index += space.size();
+        println!("{:?}", index);
     }
     result
 }
@@ -217,11 +217,11 @@ pub mod tests {
     #[test]
     fn diskspace_check_sum(){
         let free = FreeSpace {size: 9};
-        assert_eq!(free.check_sum(), 0);
+        assert_eq!(free.check_sum(15), 0);
         let block = Block {id: 0, size: 1};
-        assert_eq!(block.check_sum(), 0);
+        assert_eq!(block.check_sum(15), 0);
         let block = Block {id:2, size:2};
-        assert_eq!(block.check_sum(), 6);
+        assert_eq!(block.check_sum(1), 6);
 
 
     }
