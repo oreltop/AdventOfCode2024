@@ -2,8 +2,8 @@ use crate::day9_part2::DiskSpace::{Block, FreeSpace};
 use itertools::Itertools;
 use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
-use std::fs;
 use std::iter::once;
+use std::{fs, mem};
 
 const FILE_NAME: &str = "input_day9.txt";
 
@@ -83,15 +83,15 @@ fn move_block(disk: &mut Vec<DiskSpace>, source: usize, target: usize) {
     if !disk[target].is_empty() {
         return;
     }
-    match disk[source].size().cmp(&disk[target].size()) {
+    let block_size = disk[source].size();
+    let free_size = disk[target].size();
+    match block_size.cmp(&disk[target].size()) {
         Ordering::Less => {
-            let block = disk.remove(source);
-            disk.insert(source, FreeSpace { size: block.size() });
-            let free_space = disk.remove(target);
-            disk.insert(
-                target,
+            let block = mem::replace(&mut disk[source], FreeSpace { size: block_size });
+            let _ = mem::replace(
+                &mut disk[target],
                 FreeSpace {
-                    size: free_space.size() - block.size(),
+                    size: free_size - block_size,
                 },
             );
             disk.insert(target, block);
