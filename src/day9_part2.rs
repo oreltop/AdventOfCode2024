@@ -58,9 +58,9 @@ pub fn main() {
     println!("this is main");
     let file_path = format!("artifacts/input_files/{}", FILE_NAME);
     let input_raw = fs::read_to_string(file_path).expect("Should have been able to read the file");
-    // let input = parse_string(&input_raw);
-    // let disk_sorted = unite_free_space(&input);
-    // print!("{}", check_sum(&disk_sorted));
+    let input = parse_string(&input_raw);
+    let disk_sorted = unite_free_space(&input);
+    print!("{}", check_sum(&disk_sorted));
 }
 
 fn unite_free_space(disk: &[DiskSpace]) -> Vec<DiskSpace> {
@@ -80,10 +80,6 @@ fn unite_free_space(disk: &[DiskSpace]) -> Vec<DiskSpace> {
         }
     }
     disk
-}
-
-fn format_disk(disk: &[DiskSpace]) -> String {
-    disk.iter().map(|space| space.to_string()).collect()
 }
 
 fn move_block(disk: &mut Vec<DiskSpace>, source: usize, target: usize) {
@@ -117,7 +113,6 @@ fn check_sum(disk: &[DiskSpace]) -> usize {
     for space in disk {
         result += space.check_sum(index);
         index += space.size();
-        println!("{:?}", index);
     }
     result
 }
@@ -151,6 +146,9 @@ fn parse_string(s: &str) -> Vec<DiskSpace> {
 pub mod tests {
     use super::*;
 
+    fn format_disk(disk: &[DiskSpace]) -> String {
+        disk.iter().map(|space| space.to_string()).collect()
+    }
     #[test]
     fn test_parse_string() {
         let string = "143023";
@@ -215,15 +213,13 @@ pub mod tests {
     }
 
     #[test]
-    fn diskspace_check_sum(){
-        let free = FreeSpace {size: 9};
+    fn diskspace_check_sum() {
+        let free = FreeSpace { size: 9 };
         assert_eq!(free.check_sum(15), 0);
-        let block = Block {id: 0, size: 1};
+        let block = Block { id: 0, size: 1 };
         assert_eq!(block.check_sum(15), 0);
-        let block = Block {id:2, size:2};
+        let block = Block { id: 2, size: 2 };
         assert_eq!(block.check_sum(1), 6);
-
-
     }
 
     #[test]
