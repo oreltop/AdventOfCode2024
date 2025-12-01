@@ -107,14 +107,14 @@ fn move_block(disk: &mut Vec<DiskSpace>, source: usize, target: usize) {
 }
 
 fn check_sum(disk: &[DiskSpace]) -> usize {
-    let mut index: usize = 0;
-    let mut result: usize = 0;
-
-    for space in disk {
-        result += space.check_sum(index);
-        index += space.size();
-    }
-    result
+    let mut index = 0;
+    disk.iter()
+        .map(|space| {
+            let checksum = space.check_sum(index);
+            index += space.size();
+            checksum
+        })
+        .sum()
 }
 
 fn parse_string(s: &str) -> Vec<DiskSpace> {
