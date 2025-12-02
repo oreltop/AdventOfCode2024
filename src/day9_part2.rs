@@ -60,62 +60,86 @@ pub fn main() {
     let input_raw = fs::read_to_string(file_path).expect("Should have been able to read the file");
     let input = parse_string(&input_raw);
     let disk_sorted = order_disk(&input);
+    let disk_sorted = order_disk(&disk_sorted);
+    let disk_sorted = order_disk(&disk_sorted);
+    let disk_sorted = order_disk(&disk_sorted);
+    let disk_sorted = order_disk(&disk_sorted);
+    let disk_sorted = order_disk(&disk_sorted);
+    let disk_sorted = order_disk(&disk_sorted);
+    let disk_sorted = order_disk(&disk_sorted);
+    let disk_sorted = order_disk(&disk_sorted);
     print!("{}", check_sum(&disk_sorted));
 }
 
 fn order_disk(disk: &[DiskSpace]) -> Vec<DiskSpace> {
-    let mut disk = disk.to_vec();
-
-    for block_idx in (0..disk.len()).rev() {
-        if disk[block_idx].is_empty() {
-            continue;
-        }
-        let empty_slot = (0..block_idx).find(|empty_slot| {
-            let source = &disk[block_idx];
-            let target = &disk[*empty_slot];
-            target.is_empty() && target.size() >= source.size()
-        });
-        if let Some(target) = empty_slot {
-            move_block(&mut disk, block_idx, target)
-        }
-    }
-    disk
+    todo!()
 }
 
-fn combine_free_space(disk: &mut Vec<DiskSpace>, index: usize){
-    let next_space = disk.get(index +1);
-    if disk[index].is_empty() && next_space.is_some() && next_space.unwrap().is_empty(){
+// fn order_disk(disk: &[DiskSpace]) -> Vec<DiskSpace> {
+//     let mut disk = disk.to_vec();
+//
+//     for block_idx in (0..disk.len()).rev() {
+//         if disk[block_idx].is_empty() {
+//             continue;
+//         }
+//         let empty_slot = (0..block_idx).find(|empty_slot| {
+//             let source = &disk[block_idx];
+//             let target = &disk[*empty_slot];
+//             target.is_empty() && target.size() >= source.size()
+//         });
+//         if let Some(target) = empty_slot {
+//             move_block(&mut disk, block_idx, target)
+//         }
+//     }
+//     disk
+// }
 
-        let combined_size = disk.remove(index +1).size() + disk[index].size();
-        let _ = mem::replace(&mut disk[index], FreeSpace { size: combined_size });
+fn combine_free_space(disk: &mut Vec<DiskSpace>, index: usize) {
+    let next_space = disk.get(index + 1);
+    if disk[index].is_empty() && next_space.is_some() && next_space.unwrap().is_empty() {
+        let combined_size = disk.remove(index + 1).size() + disk[index].size();
+        let _ = mem::replace(
+            &mut disk[index],
+            FreeSpace {
+                size: combined_size,
+            },
+        );
     }
 }
 
 fn move_block(disk: &mut Vec<DiskSpace>, source: usize, target: usize) {
-    if !disk[target].is_empty() {
-        return;
-    }
-    let block_size = disk[source].size();
-    let free_size = disk[target].size();
-    match block_size.cmp(&disk[target].size()) {
-        Ordering::Less => {
-            let block = mem::replace(&mut disk[source], FreeSpace { size: block_size });
-            combine_free_space(disk, source);
-            let _ = mem::replace(
-                &mut disk[target],
-                FreeSpace {
-                    size: free_size - block_size,
-                },
-            );
-            combine_free_space(disk, target);
-            disk.insert(target, block);
-        }
-        Ordering::Equal => {
-            disk.swap(source, target);
-        }
-        Ordering::Greater => {}
-    }
+    todo!()
 }
+// }fn move_block(disk: &mut Vec<DiskSpace>, source: usize, target: usize) {
+//     if !disk[target].is_empty() {
+//         return;
+//     }
+//     let block_size = disk[source].size();
+//     let free_size = disk[target].size();
+//     match block_size.cmp(&disk[target].size()) {
+//         Ordering::Less => {
+//             let block = mem::replace(&mut disk[source], FreeSpace { size: block_size });
+//
+//             let _ = mem::replace(
+//                 &mut disk[target],
+//                 FreeSpace {
+//                     size: free_size - block_size,
+//                 },
+//             );
+//
+//             disk.insert(target, block);
+//             combine_free_space(disk, source);
+//             combine_free_space(disk, source-1);
+//             combine_free_space(disk, target+1);
+//             combine_free_space(disk, target);
+//
+//         }
+//         Ordering::Equal => {
+//             disk.swap(source, target);
+//         }
+//         Ordering::Greater => {}
+//     }
+// }
 
 fn check_sum(disk: &[DiskSpace]) -> usize {
     let mut index = 0;
