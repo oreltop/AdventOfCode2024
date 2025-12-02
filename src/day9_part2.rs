@@ -245,7 +245,7 @@ pub mod tests {
     }
 
     #[test]
-    fn test_unite_free_space() {
+    fn test_order_disk() {
         let input = vec![
             Block {
                 size: 2,
