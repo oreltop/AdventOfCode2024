@@ -3,21 +3,48 @@ use itertools::Itertools;
 use std::cmp::Ordering;
 use std::fmt::{Display, Formatter};
 use std::iter::once;
-use std::{fs, mem};
+use std::{fs};
 
 const FILE_NAME: &str = "input_day9.txt";
 
 #[derive(Debug, PartialEq, Clone)]
 enum DiskSpace {
-    FreeSpace { size: usize },
-    Block { size: usize, id: usize },
+    FreeSpace {
+        size: usize,
+        starting_index: usize,
+    },
+    Block {
+        size: usize,
+        id: usize,
+        starting_index: usize,
+    },
 }
 
 impl DiskSpace {
     fn size(&self) -> usize {
         match self {
-            FreeSpace { size } => *size,
+            FreeSpace { size, .. } => *size,
             Block { size, .. } => *size,
+        }
+    }
+    fn starting_index(&self) -> usize {
+        match self {
+            FreeSpace { starting_index, .. } => *starting_index,
+            Block { starting_index, .. } => *starting_index,
+        }
+    }
+    fn ending_index(&self) -> usize {
+        match self {
+            FreeSpace {
+                size,
+                starting_index,
+                ..
+            } => *starting_index + size - 1,
+            Block {
+                size,
+                starting_index,
+                ..
+            } => *starting_index + size - 1,
         }
     }
 
@@ -28,20 +55,20 @@ impl DiskSpace {
         }
     }
 
-    fn check_sum(&self, index: usize) -> usize {
+    fn check_sum(&self) -> usize {
         match self {
             FreeSpace { .. } => 0,
-            Block { size, id } => (0..*size).map(|i| (i + index) * id).sum(),
+            Block { size, id,starting_index } => (0..*size).map(|i| (i + starting_index) * id).sum(),
         }
     }
 }
 impl Display for DiskSpace {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            FreeSpace { size } => {
+            FreeSpace { size, .. } => {
                 write!(f, "{}", ".".repeat(*size))
             }
-            Block { size, id } => {
+            Block { size, id , ..} => {
                 write!(f, "{}", format!("{}", id).repeat(*size))
             }
         }
@@ -60,14 +87,6 @@ pub fn main() {
     let input_raw = fs::read_to_string(file_path).expect("Should have been able to read the file");
     let input = parse_string(&input_raw);
     let disk_sorted = order_disk(&input);
-    let disk_sorted = order_disk(&disk_sorted);
-    let disk_sorted = order_disk(&disk_sorted);
-    let disk_sorted = order_disk(&disk_sorted);
-    let disk_sorted = order_disk(&disk_sorted);
-    let disk_sorted = order_disk(&disk_sorted);
-    let disk_sorted = order_disk(&disk_sorted);
-    let disk_sorted = order_disk(&disk_sorted);
-    let disk_sorted = order_disk(&disk_sorted);
     print!("{}", check_sum(&disk_sorted));
 }
 
@@ -94,18 +113,18 @@ fn order_disk(disk: &[DiskSpace]) -> Vec<DiskSpace> {
 //     disk
 // }
 
-fn combine_free_space(disk: &mut Vec<DiskSpace>, index: usize) {
-    let next_space = disk.get(index + 1);
-    if disk[index].is_empty() && next_space.is_some() && next_space.unwrap().is_empty() {
-        let combined_size = disk.remove(index + 1).size() + disk[index].size();
-        let _ = mem::replace(
-            &mut disk[index],
-            FreeSpace {
-                size: combined_size,
-            },
-        );
-    }
-}
+// fn combine_free_space(disk: &mut Vec<DiskSpace>, index: usize) {
+//     let next_space = disk.get(index + 1);
+//     if disk[index].is_empty() && next_space.is_some() && next_space.unwrap().is_empty() {
+//         let combined_size = disk.remove(index + 1).size() + disk[index].size();
+//         let _ = mem::replace(
+//             &mut disk[index],
+//             FreeSpace {
+//                 size: combined_size,
+//             },
+//         );
+//     }
+// }
 
 fn move_block(disk: &mut Vec<DiskSpace>, source: usize, target: usize) {
     todo!()
@@ -145,7 +164,7 @@ fn check_sum(disk: &[DiskSpace]) -> usize {
     let mut index = 0;
     disk.iter()
         .map(|space| {
-            let checksum = space.check_sum(index);
+            let checksum = space.check_sum();
             index += space.size();
             checksum
         })
@@ -153,28 +172,37 @@ fn check_sum(disk: &[DiskSpace]) -> usize {
 }
 
 fn parse_string(s: &str) -> Vec<DiskSpace> {
+    let mut result = Vec::new();
+    let mut pos: usize = 0;
     let pairs: Vec<(i32, i32)> = s
         .chars()
         .map(|c| c.to_digit(10).unwrap() as i32)
         .chain(once(0)) // to avoid the last item being dropped if odd
         .tuples()
         .collect();
-    pairs
-        .iter()
-        .enumerate()
-        .flat_map(|(index, (block_size, free_space))| {
-            [
-                Block {
-                    size: *block_size as usize,
-                    id: index,
-                },
-                FreeSpace {
-                    size: *free_space as usize,
-                },
-            ]
-        })
-        .filter(|disk| disk.size() > 0)
-        .collect()
+
+    for (id, (block_size, free_space)) in pairs.iter().enumerate() {
+        let block_size = *block_size as usize;
+        let free_size = *free_space as usize;
+
+        if block_size > 0 {
+            result.push(Block {
+                size: block_size,
+                id,
+                starting_index: pos,
+            });
+            pos += block_size;
+        }
+
+        if free_size > 0 {
+            result.push(FreeSpace {
+                size: free_size,
+                starting_index: pos,
+            });
+            pos += free_size;
+        }
+    }
+    result
 }
 
 #[cfg(test)]
@@ -184,15 +212,34 @@ pub mod tests {
     fn format_disk(disk: &[DiskSpace]) -> String {
         disk.iter().map(|space| space.to_string()).collect()
     }
+
     #[test]
     fn test_parse_string() {
         let string = "143023";
         let parsed = vec![
-            Block { size: 1, id: 0 },
-            FreeSpace { size: 4 },
-            Block { size: 3, id: 1 },
-            Block { size: 2, id: 2 },
-            FreeSpace { size: 3 },
+            Block {
+                size: 1,
+                id: 0,
+                starting_index: 0,
+            },
+            FreeSpace {
+                size: 4,
+                starting_index: 1,
+            },
+            Block {
+                size: 3,
+                id: 1,
+                starting_index: 5,
+            },
+            Block {
+                size: 2,
+                id: 2,
+                starting_index: 8,
+            },
+            FreeSpace {
+                size: 3,
+                starting_index: 10,
+            },
         ];
         assert_eq!(parse_string(string), parsed);
     }
@@ -200,43 +247,165 @@ pub mod tests {
     #[test]
     fn test_unite_free_space() {
         let input = vec![
-            Block { size: 2, id: 0 },
-            FreeSpace { size: 3 },
-            Block { size: 3, id: 1 },
-            FreeSpace { size: 3 },
-            Block { size: 1, id: 2 },
-            FreeSpace { size: 3 },
-            Block { size: 3, id: 3 },
-            FreeSpace { size: 1 },
-            Block { size: 2, id: 4 },
-            FreeSpace { size: 1 },
-            Block { size: 4, id: 5 },
-            FreeSpace { size: 1 },
-            Block { size: 4, id: 6 },
-            FreeSpace { size: 1 },
-            Block { size: 3, id: 7 },
-            FreeSpace { size: 1 },
-            Block { size: 4, id: 8 },
-            Block { size: 2, id: 9 },
+            Block {
+                size: 2,
+                id: 0,
+                starting_index: 0,
+            },
+            FreeSpace {
+                size: 3,
+                starting_index: 2,
+            },
+            Block {
+                size: 3,
+                id: 1,
+                starting_index: 5,
+            },
+            FreeSpace {
+                size: 3,
+                starting_index: 8,
+            },
+            Block {
+                size: 1,
+                id: 2,
+                starting_index: 11,
+            },
+            FreeSpace {
+                size: 3,
+                starting_index: 12,
+            },
+            Block {
+                size: 3,
+                id: 3,
+                starting_index: 15,
+            },
+            FreeSpace {
+                size: 1,
+                starting_index: 18,
+            },
+            Block {
+                size: 2,
+                id: 4,
+                starting_index: 19,
+            },
+            FreeSpace {
+                size: 1,
+                starting_index: 21,
+            },
+            Block {
+                size: 4,
+                id: 5,
+                starting_index: 22,
+            },
+            FreeSpace {
+                size: 1,
+                starting_index: 26,
+            },
+            Block {
+                size: 4,
+                id: 6,
+                starting_index: 27,
+            },
+            FreeSpace {
+                size: 1,
+                starting_index: 31,
+            },
+            Block {
+                size: 3,
+                id: 7,
+                starting_index: 32,
+            },
+            FreeSpace {
+                size: 1,
+                starting_index: 35,
+            },
+            Block {
+                size: 4,
+                id: 8,
+                starting_index: 36,
+            },
+            Block {
+                size: 2,
+                id: 9,
+                starting_index: 40,
+            },
         ];
 
         let answer = vec![
-            Block { size: 2, id: 0 },
-            Block { size: 2, id: 9 },
-            Block { size: 1, id: 2 },
-            Block { size: 3, id: 1 },
-            Block { size: 3, id: 7 },
-            FreeSpace { size: 1 },
-            Block { size: 2, id: 4 },
-            FreeSpace { size: 1 },
-            Block { size: 3, id: 3 },
-            FreeSpace { size: 4 },
-            Block { size: 4, id: 5 },
-            FreeSpace { size: 1 },
-            Block { size: 4, id: 6 },
-            FreeSpace { size: 5 },
-            Block { size: 4, id: 8 },
-            FreeSpace { size: 2 },
+            Block {
+                size: 2,
+                id: 0,
+                starting_index: 0,
+            },
+            Block {
+                size: 2,
+                id: 9,
+                starting_index: 2,
+            },
+            Block {
+                size: 1,
+                id: 2,
+                starting_index: 4,
+            },
+            Block {
+                size: 3,
+                id: 1,
+                starting_index: 5,
+            },
+            Block {
+                size: 3,
+                id: 7,
+                starting_index: 8,
+            },
+            FreeSpace {
+                size: 1,
+                starting_index: 11,
+            },
+            Block {
+                size: 2,
+                id: 4,
+                starting_index: 12,
+            },
+            FreeSpace {
+                size: 1,
+                starting_index: 14,
+            },
+            Block {
+                size: 3,
+                id: 3,
+                starting_index: 15,
+            },
+            FreeSpace {
+                size: 4,
+                starting_index: 18,
+            },
+            Block {
+                size: 4,
+                id: 5,
+                starting_index: 22,
+            },
+            FreeSpace {
+                size: 1,
+                starting_index: 26,
+            },
+            Block {
+                size: 4,
+                id: 6,
+                starting_index: 27,
+            },
+            FreeSpace {
+                size: 5,
+                starting_index: 31,
+            },
+            Block {
+                size: 4,
+                id: 8,
+                starting_index: 36,
+            },
+            FreeSpace {
+                size: 2,
+                starting_index: 40,
+            },
         ];
 
         let result = format_disk(&order_disk(&input));
@@ -249,35 +418,106 @@ pub mod tests {
 
     #[test]
     fn diskspace_check_sum() {
-        let free = FreeSpace { size: 9 };
-        assert_eq!(free.check_sum(15), 0);
-        let block = Block { id: 0, size: 1 };
-        assert_eq!(block.check_sum(15), 0);
-        let block = Block { id: 2, size: 2 };
-        assert_eq!(block.check_sum(1), 6);
+        let free = FreeSpace {
+            size: 9,
+            starting_index: 15,
+        };
+        assert_eq!(free.check_sum(), 0);
+
+        let block = Block {
+            id: 0,
+            size: 1,
+            starting_index: 15,
+        };
+        assert_eq!(block.check_sum(), 0);
+        let block = Block {
+            id: 2,
+            size: 2,
+            starting_index: 1,
+        };
+        assert_eq!(block.check_sum(), 6);
     }
 
     #[test]
     fn test_check_sum() {
         let input = vec![
-            Block { size: 2, id: 0 },
-            Block { size: 2, id: 9 },
-            Block { size: 1, id: 2 },
-            Block { size: 3, id: 1 },
-            Block { size: 3, id: 7 },
-            FreeSpace { size: 1 },
-            Block { size: 2, id: 4 },
-            FreeSpace { size: 1 },
-            Block { size: 3, id: 3 },
-            FreeSpace { size: 4 },
-            Block { size: 4, id: 5 },
-            FreeSpace { size: 1 },
-            Block { size: 4, id: 6 },
-            FreeSpace { size: 5 },
-            Block { size: 4, id: 8 },
-            FreeSpace { size: 2 },
+            Block {
+                size: 2,
+                id: 0,
+                starting_index: 0,
+            },
+            Block {
+                size: 2,
+                id: 9,
+                starting_index: 2,
+            },
+            Block {
+                size: 1,
+                id: 2,
+                starting_index: 4,
+            },
+            Block {
+                size: 3,
+                id: 1,
+                starting_index: 5,
+            },
+            Block {
+                size: 3,
+                id: 7,
+                starting_index: 8,
+            },
+            FreeSpace {
+                size: 1,
+                starting_index: 11,
+            },
+            Block {
+                size: 2,
+                id: 4,
+                starting_index: 12,
+            },
+            FreeSpace {
+                size: 1,
+                starting_index: 14,
+            },
+            Block {
+                size: 3,
+                id: 3,
+                starting_index: 15,
+            },
+            FreeSpace {
+                size: 4,
+                starting_index: 18,
+            },
+            Block {
+                size: 4,
+                id: 5,
+                starting_index: 22,
+            },
+            FreeSpace {
+                size: 1,
+                starting_index: 26,
+            },
+            Block {
+                size: 4,
+                id: 6,
+                starting_index: 27,
+            },
+            FreeSpace {
+                size: 5,
+                starting_index: 31,
+            },
+            Block {
+                size: 4,
+                id: 8,
+                starting_index: 36,
+            },
+            FreeSpace {
+                size: 2,
+                starting_index: 40,
+            },
         ];
 
         assert_eq!(check_sum(&input), 2858);
     }
 }
+
