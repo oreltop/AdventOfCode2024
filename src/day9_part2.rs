@@ -10,6 +10,10 @@ struct Disk {
 }
 
 impl Disk {
+    fn order(&self) {
+        todo!()
+    }
+
     fn new(input: &str) -> Disk {
         Disk {
             space: Disk::parse_string(input),
@@ -54,6 +58,27 @@ pub mod tests {
         let string = "143023";
         let expected = vec![0, -1, -1, -1, -1, 1, 1, 1, 2, 2, -1, -1, -1];
         let result = Disk::new(string).space;
+        assert_eq!(expected, result);
+
+        let string = "2333133121414131402";
+        let expected = vec![
+            0, 0, -1, -1, -1, 1, 1, 1, -1, -1, -1, 2, -1, -1, -1, 3, 3, 3, -1, 4, 4, -1, 5, 5, 5,
+            5, -1, 6, 6, 6, 6, -1, 7, 7, 7, -1, 8, 8, 8, 8, 9, 9,
+        ];
+        let result = Disk::new(string).space;
+        assert_eq!(expected, result);
+    }
+
+    #[test]
+    fn test_order_disk() {
+        let string = "2333133121414131402";
+        let expected = vec![
+            0, 0, 9, 9, 2, 1, 1, 1, 7, 7, 7, -1, 4, 4, -1, 3, 3, 3, -1, -1, -1, -1, 5, 5, 5, 5, -1,
+            6, 6, 6, 6, -1, -1, -1, -1, -1, 8, 8, 8, 8, -1, -1,
+        ];
+        let disk = Disk::new(string);
+        disk.order();
+        let result = disk.space;
         assert_eq!(expected, result);
     }
 }
