@@ -13,6 +13,13 @@ impl Disk {
     fn order(&self) {
         todo!()
     }
+    fn find_empty_space(&self, size: usize) -> Option<usize> {
+        self.space
+            .windows(size)
+            .enumerate()
+            .find(|(_, window)| window.iter().all(|&i| i == -1))
+            .map(|(idx, _)| idx)
+    }
 
     fn new(input: &str) -> Disk {
         Disk {
@@ -80,5 +87,14 @@ pub mod tests {
         disk.order();
         let result = disk.space;
         assert_eq!(expected, result);
+    }
+
+    #[test]
+    fn test_find_empty_space() {
+        let string = "2333133121414131402";
+        // 00...111...2...333.44.5555.6666.777.888899
+        let disk = Disk::new(string);
+        let empty_space_index = disk.find_empty_space(3);
+        assert_eq!(empty_space_index, 2);
     }
 }
