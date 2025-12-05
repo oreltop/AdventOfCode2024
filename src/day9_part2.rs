@@ -1,10 +1,10 @@
 const FILE_NAME: &str = "input_day9.txt";
 const EMPTY_SPACE: i32 = -1;
 
-use mem::swap;
 use itertools::Itertools;
-use std::{fs, mem};
+use mem::swap;
 use std::iter::once;
+use std::{fs, mem};
 
 struct Disk {
     space: Vec<i32>,
@@ -22,12 +22,11 @@ impl Disk {
             .map(|(idx, _)| idx)
     }
 
-    fn swap_blocks(&mut self, source: usize, target: usize, size: usize){
-        let  source_slice = &mut self.space[source..source+size];
-        let  target_slice = &mut self.space[target..target+size];
-     todo!();
-        // swap(source_slice,target_slice);
-
+    fn swap_blocks(&mut self, source: usize, target: usize, size: usize) {
+        let entire_range = &mut self.space[target..source+size];
+        let (before_source, source_chunk) = entire_range.split_at_mut(source - target);
+        let (target_chunk, _) = before_source.split_at_mut(size);
+        source_chunk.swap_with_slice(target_chunk);
     }
 
     fn new(input: &str) -> Disk {
@@ -116,7 +115,8 @@ pub mod tests {
         let string = "2333133121414131402";
         // 00...111...2...333.44.5555.6666.777.888899
         let mut disk = Disk::new(string);
-        disk.swap_blocks(5,2,3);
-        assert_eq!(disk.space[2..6],[1,1,1]);
+        disk.swap_blocks(5, 2, 3);
+        assert_eq!(disk.space[2..5], [1, 1, 1]);
+        assert_eq!(disk.space[6..9], [-1, -1, -1]);
     }
 }
