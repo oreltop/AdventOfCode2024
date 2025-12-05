@@ -95,6 +95,10 @@ pub mod tests {
         // 00...111...2...333.44.5555.6666.777.888899
         let disk = Disk::new(string);
         let empty_space_index = disk.find_empty_space(3);
-        assert_eq!(empty_space_index, 2);
+        assert_eq!(empty_space_index, Some(2));
+        let empty_space_index = disk.find_empty_space(1);
+        assert_eq!(empty_space_index, Some(2));
+        let empty_space_index = disk.find_empty_space(4);
+        assert_eq!(empty_space_index, None);
     }
 }
