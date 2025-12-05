@@ -1,8 +1,9 @@
 const FILE_NAME: &str = "input_day9.txt";
 const EMPTY_SPACE: i32 = -1;
 
+use mem::swap;
 use itertools::Itertools;
-use std::fs;
+use std::{fs, mem};
 use std::iter::once;
 
 struct Disk {
@@ -19,6 +20,14 @@ impl Disk {
             .enumerate()
             .find(|(_, window)| window.iter().all(|&i| i == -1))
             .map(|(idx, _)| idx)
+    }
+
+    fn swap_blocks(&mut self, source: usize, target: usize, size: usize){
+        let  source_slice = &mut self.space[source..source+size];
+        let  target_slice = &mut self.space[target..target+size];
+     todo!();
+        // swap(source_slice,target_slice);
+
     }
 
     fn new(input: &str) -> Disk {
@@ -100,5 +109,14 @@ pub mod tests {
         assert_eq!(empty_space_index, Some(2));
         let empty_space_index = disk.find_empty_space(4);
         assert_eq!(empty_space_index, None);
+    }
+
+    #[test]
+    fn test_swap_blocks() {
+        let string = "2333133121414131402";
+        // 00...111...2...333.44.5555.6666.777.888899
+        let mut disk = Disk::new(string);
+        disk.swap_blocks(5,2,3);
+        assert_eq!(disk.space[2..6],[1,1,1]);
     }
 }
