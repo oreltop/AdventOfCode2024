@@ -1,7 +1,7 @@
 const FILE_NAME: &str = "input_day9.txt";
 const EMPTY_SPACE: i32 = -1;
 
-use itertools::Itertools;
+use itertools::{enumerate, Itertools};
 use mem::swap;
 use std::iter::once;
 use std::{fs, mem};
@@ -11,8 +11,22 @@ struct Disk {
 }
 
 impl Disk {
-    fn order(&self) {
-        todo!()
+    fn order(&mut self) {
+        let chunks = self.space.clone().into_iter().enumerate().filter(|(idx, value)| *value!=EMPTY_SPACE).chunk_by(|(idx, value)| *value);
+        for (_, mut chunk) in chunks.into_iter() {
+            if let (Some((block_idx,_)), block_size) = (chunk.next(),chunk.count()+1){
+                let free_space = self.find_empty_space(block_size);
+                match free_space {
+                    None => {}
+                    Some(free_space_idx) => {
+                        if free_space_idx < block_idx {
+                            self.swap_blocks(block_idx, free_space_idx, block_size);
+                        }
+                    }
+                }
+            }
+            dbg!(&self.space);
+        }
     }
     fn find_empty_space(&self, size: usize) -> Option<usize> {
         self.space
@@ -23,7 +37,8 @@ impl Disk {
     }
 
     fn swap_blocks(&mut self, source: usize, target: usize, size: usize) {
-        let entire_range = &mut self.space[target..source+size];
+        let entire_range = &mut self.space[target..source + size];
+        println!("entire_range = {:?}", entire_range);
         let (before_source, source_chunk) = entire_range.split_at_mut(source - target);
         let (target_chunk, _) = before_source.split_at_mut(size);
         source_chunk.swap_with_slice(target_chunk);
@@ -87,11 +102,12 @@ pub mod tests {
     #[test]
     fn test_order_disk() {
         let string = "2333133121414131402";
+        // 00...111...2...333.44.5555.6666.777.888899
         let expected = vec![
             0, 0, 9, 9, 2, 1, 1, 1, 7, 7, 7, -1, 4, 4, -1, 3, 3, 3, -1, -1, -1, -1, 5, 5, 5, 5, -1,
             6, 6, 6, 6, -1, -1, -1, -1, -1, 8, 8, 8, 8, -1, -1,
         ];
-        let disk = Disk::new(string);
+        let mut disk = Disk::new(string);
         disk.order();
         let result = disk.space;
         assert_eq!(expected, result);
@@ -119,4 +135,15 @@ pub mod tests {
         assert_eq!(disk.space[2..5], [1, 1, 1]);
         assert_eq!(disk.space[6..9], [-1, -1, -1]);
     }
+
+    // #[test]
+    // fn check_grpup_by(){
+    //     let string = "2333133121414131402";
+    //     // 00...111...2...333.44.5555.6666.777.888899
+    //     let mut disk = Disk::new(string);
+    //     for (i,g) in &disk.space.iter().chunk_by(|x| *x){
+    //         println!("{:?}, {}", i, g.count());
+    //     }
+    //     assert!(false)
+    // }
 }
