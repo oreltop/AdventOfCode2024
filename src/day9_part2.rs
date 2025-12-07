@@ -1,9 +1,9 @@
 const FILE_NAME: &str = "input_day9.txt";
 const EMPTY_SPACE: i32 = -1;
 
-use itertools::{Itertools};
+use itertools::Itertools;
+use std::fs;
 use std::iter::once;
-use std::{fs};
 
 struct Disk {
     space: Vec<i32>,
@@ -33,7 +33,6 @@ impl Disk {
                     }
                 }
             }
-            dbg!(&self.space);
         }
     }
     fn find_empty_space(&self, size: usize) -> Option<usize> {
@@ -52,9 +51,13 @@ impl Disk {
         source_chunk.swap_with_slice(target_chunk);
     }
 
-    fn checksum(&self) -> usize{
-        // self.space.iter().enumerate().map(|(pos, block_id)| { pos})
-        todo!()
+    fn checksum(&self) -> usize {
+        self.space
+            .iter()
+            .enumerate()
+            .filter(|&(_, &block_id)| {block_id!=EMPTY_SPACE})
+            .map(|(pos, &block_id)| pos * block_id as usize)
+            .sum()
     }
 
     fn new(input: &str) -> Disk {
