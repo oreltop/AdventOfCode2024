@@ -9,6 +9,7 @@ struct Disk {
     space: Vec<i32>,
 }
 
+
 impl Disk {
     fn order(&mut self) {
         let raw_chunks = self
@@ -45,7 +46,6 @@ impl Disk {
 
     fn swap_blocks(&mut self, source: usize, target: usize, size: usize) {
         let entire_range = &mut self.space[target..source + size];
-        println!("entire_range = {:?}", entire_range);
         let (before_source, source_chunk) = entire_range.split_at_mut(source - target);
         let (target_chunk, _) = before_source.split_at_mut(size);
         source_chunk.swap_with_slice(target_chunk);
@@ -91,9 +91,10 @@ pub fn main() {
     println!("this is main");
     let file_path = format!("artifacts/input_files/{}", FILE_NAME);
     let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
-    // println!("input: {:?}", input);
-    // let parsed = parse_string(&input);
-    // println!("input parsed: {:?}", &parsed);
+    let mut disk = Disk::new(&input);
+    disk.order();
+    let result = disk.checksum();
+    println!("{}",result);
 }
 
 #[cfg(test)]
