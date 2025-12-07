@@ -1,10 +1,9 @@
 const FILE_NAME: &str = "input_day9.txt";
 const EMPTY_SPACE: i32 = -1;
 
-use itertools::{enumerate, Itertools};
-use mem::swap;
+use itertools::{Itertools};
 use std::iter::once;
-use std::{fs, mem};
+use std::{fs};
 
 struct Disk {
     space: Vec<i32>,
@@ -12,16 +11,25 @@ struct Disk {
 
 impl Disk {
     fn order(&mut self) {
-        let chunks = self.space.clone().into_iter().enumerate().filter(|(idx, value)| *value!=EMPTY_SPACE).chunk_by(|(idx, value)| *value);
-        for (_, mut chunk) in chunks.into_iter() {
-            if let (Some((block_idx,_)), block_size) = (chunk.next(),chunk.count()+1){
-                let free_space = self.find_empty_space(block_size);
-                match free_space {
-                    None => {}
-                    Some(free_space_idx) => {
-                        if free_space_idx < block_idx {
-                            self.swap_blocks(block_idx, free_space_idx, block_size);
-                        }
+        let raw_chunks = self
+            .space
+            .clone()
+            .into_iter()
+            .enumerate()
+            .filter(|(idx, value)| *value != EMPTY_SPACE)
+            .chunk_by(|(idx, value)| *value);
+        let chunks: Vec<_> = raw_chunks
+            .into_iter()
+            .map(|(key, chunk)| (key, chunk.collect_vec()))
+            .collect();
+        for (_, chunk) in chunks.into_iter().rev() {
+            let ((block_idx, _), block_size) = (chunk[0], chunk.len());
+            let free_space = self.find_empty_space(block_size);
+            match free_space {
+                None => {}
+                Some(free_space_idx) => {
+                    if free_space_idx < block_idx {
+                        self.swap_blocks(block_idx, free_space_idx, block_size);
                     }
                 }
             }
