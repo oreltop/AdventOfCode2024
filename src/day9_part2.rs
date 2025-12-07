@@ -52,6 +52,11 @@ impl Disk {
         source_chunk.swap_with_slice(target_chunk);
     }
 
+    fn checksum(&self) -> usize{
+        // self.space.iter().enumerate().map(|(pos, block_id)| { pos})
+        todo!()
+    }
+
     fn new(input: &str) -> Disk {
         Disk {
             space: Disk::parse_string(input),
@@ -119,6 +124,20 @@ pub mod tests {
         disk.order();
         let result = disk.space;
         assert_eq!(expected, result);
+    }
+    #[test]
+    fn checksum_disk() {
+        let string = "2333133121414131402";
+        // 00...111...2...333.44.5555.6666.777.888899
+        let expected = vec![
+            0, 0, 9, 9, 2, 1, 1, 1, 7, 7, 7, -1, 4, 4, -1, 3, 3, 3, -1, -1, -1, -1, 5, 5, 5, 5, -1,
+            6, 6, 6, 6, -1, -1, -1, -1, -1, 8, 8, 8, 8, -1, -1,
+        ];
+        let mut disk = Disk::new(string);
+        disk.order();
+        let result = disk.checksum();
+        let expected = 2858;
+        assert_eq!(result, expected);
     }
 
     #[test]
