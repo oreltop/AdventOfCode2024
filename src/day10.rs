@@ -22,7 +22,7 @@ fn get_value(x: usize, y: usize) -> Option<u32> {
     Some(get_grid()[y][x])
 }
 
-#[derive(Debug,PartialEq)]
+#[derive(Debug, PartialEq)]
 struct Cell {
     x: usize,
     y: usize,
@@ -38,13 +38,16 @@ impl Cell {
         }
     }
     fn search_neighbors(&self, value: u32) -> Vec<Cell> {
-        // vec![
-        //     Cell::try_new(self.x, self.y),
-        //     Cell::try_new(self.x, self.y),
-        //     Cell::try_new(self.x, self.y),
-        //     Cell::try_new(self.x, self.y),
-        // ]
-        todo!()
+        vec![
+            Cell::try_new(self.x.saturating_sub(1), self.y),
+            Cell::try_new(self.x, self.y.saturating_sub(1)),
+            Cell::try_new(self.x + 1, self.y),
+            Cell::try_new(self.x, self.y + 1),
+        ]
+        .into_iter()
+        .filter_map(|x| x)
+        .filter(|cell| cell.value == value)
+        .collect()
     }
 }
 
@@ -64,16 +67,14 @@ pub mod tests {
     }
 
     #[test]
-    fn test_search_neighbors(){
-        let cell = Cell::try_new(0,0).unwrap();
+    fn test_search_neighbors() {
+        let cell = Cell::try_new(0, 0).unwrap();
         let result = cell.search_neighbors(6);
-        let expected = vec![Cell::try_new(1,0).unwrap()];
-        assert_eq!(result,expected);
-        let cell = Cell::try_new(0,0).unwrap();
+        let expected = vec![Cell::try_new(1, 0).unwrap()];
+        assert_eq!(result, expected);
+        let cell = Cell::try_new(0, 0).unwrap();
         let result = cell.search_neighbors(1);
         let expected = Vec::new();
-        assert_eq!(result,expected);
-
+        assert_eq!(result, expected);
     }
 }
-
