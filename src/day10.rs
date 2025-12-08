@@ -15,19 +15,35 @@ fn get_grid() -> &'static Vec<Vec<u32>> {
             .collect()
     })
 }
-fn get_value(x:usize, y:usize)->u32{
-    get_grid()[y][x]
+fn get_value(x: usize, y: usize) -> Option<u32> {
+    if y > get_grid().len() || x > get_grid()[0].len() {
+        return None;
+    }
+    Some(get_grid()[y][x])
 }
 
-struct Cell{
+struct Cell {
     x: usize,
     y: usize,
-    value: u32
+    value: u32,
 }
 
-impl Cell{
-    fn new(x: usize, y:usize) -> Cell{
-        Cell{x,y, value:get_value(x,y)}
+impl Cell {
+    fn try_new(x: usize, y: usize) -> Option<Cell> {
+        if let Some(value) = get_value(x, y) {
+            Some(Cell { x, y, value })
+        } else {
+            None
+        }
+    }
+    fn search_neighbors(&self, value: u32) -> Vec<Cell> {
+        // vec![
+        //     Cell::try_new(self.x, self.y),
+        //     Cell::try_new(self.x, self.y),
+        //     Cell::try_new(self.x, self.y),
+        //     Cell::try_new(self.x, self.y),
+        // ]
+        todo!()
     }
 }
 
@@ -36,13 +52,13 @@ pub mod tests {
     use super::*;
     #[test]
     fn new_cell() {
-        let cell = Cell::new(0,0);
-        assert_eq!(cell.value,5);
-        let cell = Cell::new(1,0);
-        assert_eq!(cell.value,6);
-        let cell = Cell::new(0,1);
-        assert_eq!(cell.value,4);
-        let cell = Cell::new(1,1);
-        assert_eq!(cell.value,1);
+        let cell = Cell::try_new(0, 0);
+        assert_eq!(cell.unwrap().value, 5);
+        let cell = Cell::try_new(1, 0);
+        assert_eq!(cell.unwrap().value, 6);
+        let cell = Cell::try_new(0, 1);
+        assert_eq!(cell.unwrap().value, 4);
+        let cell = Cell::try_new(1, 1);
+        assert_eq!(cell.unwrap().value, 1);
     }
 }
