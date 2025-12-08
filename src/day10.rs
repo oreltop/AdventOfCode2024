@@ -22,6 +22,7 @@ fn get_value(x: usize, y: usize) -> Option<u32> {
     Some(get_grid()[y][x])
 }
 
+#[derive(Debug,PartialEq)]
 struct Cell {
     x: usize,
     y: usize,
@@ -61,4 +62,14 @@ pub mod tests {
         let cell = Cell::try_new(1, 1);
         assert_eq!(cell.unwrap().value, 1);
     }
+
+    #[test]
+    fn test_search_neighbors(){
+        let cell = Cell::try_new(0,0).unwrap();
+        let result = cell.search_neighbors(6);
+        let expected = vec![Cell::try_new(1,0).unwrap()];
+        assert_eq!(result,expected);
+
+    }
 }
+
