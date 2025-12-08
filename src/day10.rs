@@ -51,6 +51,30 @@ impl Cell {
     }
 }
 
+struct Prob{
+    x: usize,
+    y: usize,
+    status: Status,
+    cells: Vec<Cell>
+}
+enum Status{
+    Running,
+    Completed,
+    Error
+}
+impl Prob{
+    fn new(x: usize, y:usize) -> Prob{
+        todo!()
+    }
+
+    fn solve(&self) -> usize {
+        todo!()
+    }
+
+}
+
+
+
 #[cfg(test)]
 pub mod tests {
     use super::*;
@@ -77,4 +101,27 @@ pub mod tests {
         let expected = Vec::new();
         assert_eq!(result, expected);
     }
+
+    #[test]
+    fn run_prob_no_split(){
+        let prob = Prob::new(12,7);
+        let result = prob.solve();
+        assert_eq!(result, 1);
+    }
+    #[test]
+    fn run_prob_split_once(){
+        let prob = Prob::new(0,10);
+        let result = prob.solve();
+        assert_eq!(result, 1);
+    let prob = Prob::new(34,0);
+        let result = prob.solve();
+        assert_eq!(result, 1);
+    }
+    #[test]
+    fn run_prob_split_multiple(){
+        let prob = Prob::new(16,0);
+        let result = prob.solve();
+        assert_eq!(result, 3);
+    }
+
 }
