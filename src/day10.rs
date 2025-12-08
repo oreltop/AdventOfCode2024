@@ -42,5 +42,7 @@ pub mod tests {
         assert_eq!(cell.value,6);
         let cell = Cell::new(0,1);
         assert_eq!(cell.value,4);
+        let cell = Cell::new(1,1);
+        assert_eq!(cell.value,1);
     }
 }
