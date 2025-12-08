@@ -69,6 +69,10 @@ pub mod tests {
         let result = cell.search_neighbors(6);
         let expected = vec![Cell::try_new(1,0).unwrap()];
         assert_eq!(result,expected);
+        let cell = Cell::try_new(0,0).unwrap();
+        let result = cell.search_neighbors(1);
+        let expected = Vec::new();
+        assert_eq!(result,expected);
 
     }
 }
