@@ -36,7 +36,7 @@ impl Stone {
     }
 
     fn split_number(&self) -> (u32,u32) {
-        let divisor = 10u32.pow(self.count_digits()/2)
+        let divisor = 10u32.pow(self.count_digits()/2);
         todo!()
     }
 
