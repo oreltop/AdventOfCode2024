@@ -23,7 +23,13 @@ impl Stone {
     }
 
     fn change(&self) -> Vec<Stone> {
-        todo!()
+        if self.number == 0 {
+            return vec![Stone::new(1)];
+        }
+        if self.is_even_digits() {
+            return self.split();
+        }
+        vec![Stone::new(self.number * 2024)]
     }
     fn count_digits(&self) -> u32 {
         if self.number == 0 {
@@ -37,9 +43,13 @@ impl Stone {
 
     fn split_number(&self) -> (u32, u32) {
         let divisor = 10u32.pow(self.count_digits() / 2);
-        let left = self.number/divisor;
-        let right = self.number%divisor;
-        (left,right)
+        let left = self.number / divisor;
+        let right = self.number % divisor;
+        (left, right)
+    }
+    fn split(&self) -> Vec<Stone> {
+        let (left, right) = self.split_number();
+        vec![Stone::new(left), Stone::new(right)]
     }
 }
 
