@@ -12,7 +12,7 @@ pub fn main() {
     let mut probes = Probe::generate_probes(get_grid());
     let result: usize = probes
         .iter_mut()
-        .map(|mut probe| {
+        .map(|probe| {
             probe.solve();
             probe.count_trailheads()
         })
@@ -20,7 +20,7 @@ pub fn main() {
     println!("{}", result)
 }
 
-fn init_grid(input:&str){
+fn init_grid(input: &str) {
     GRID.get_or_init(|| {
         input
             .split_whitespace()
@@ -48,11 +48,7 @@ struct Cell {
 
 impl Cell {
     fn try_new(x: usize, y: usize) -> Option<Cell> {
-        if let Some(value) = get_value(x, y) {
-            Some(Cell { x, y, value })
-        } else {
-            None
-        }
+        get_value(x, y).map(|value| Cell { x, y, value })
     }
     fn search_neighbors(&self, value: u32) -> HashSet<Cell> {
         HashSet::from([
@@ -62,7 +58,7 @@ impl Cell {
             Cell::try_new(self.x, self.y + 1),
         ])
         .into_iter()
-        .filter_map(|x| x)
+        .flatten()
         .filter(|cell| cell.value == value)
         .collect()
     }
@@ -81,14 +77,13 @@ enum Status {
 }
 impl Probe {
     fn generate_probes(grid: &[Vec<u32>]) -> Vec<Probe> {
-        grid.iter()
-            .enumerate()
-            .flat_map(|(y, row)| {
-                row.iter()
+        (0..grid.len())
+            .flat_map(|y| {
+                grid[y]
+                    .iter()
                     .enumerate()
                     .filter(|(_, value)| **value == 0)
-                    .map(|(x, _)| Probe::new(x, y))
-                    .collect::<Vec<_>>()
+                    .map(move |(x, _)| Probe::new(x, y))
             })
             .collect()
     }
@@ -122,7 +117,7 @@ impl Probe {
 
     fn count_trailheads(&self) -> usize {
         match self.status {
-            Status::Ended => self.cells.iter().count(),
+            Status::Ended => self.cells.len(),
             _ => panic!("status isn't ended!"),
         }
     }
