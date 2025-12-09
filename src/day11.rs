@@ -7,18 +7,20 @@ pub fn main() {
     println!("this is main");
     let file_path = format!("artifacts/input_files/{}", FILE_NAME);
     let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
-    println!("input: {:?}", input);
-    let parsed = parse_string(&input);
-    println!("input parsed: {:?}", &parsed);
+    let line = parse_string(&input);
+    let result = blink_n_times(line, 25);
+    println!("{}", result.len());
+
+
 }
 
 #[derive(PartialEq, Debug)]
 struct Stone {
-    number: u32,
+    number: u64,
 }
 
 impl Stone {
-    fn new(number: u32) -> Stone {
+    fn new(number: u64) -> Stone {
         Stone { number }
     }
 
@@ -31,18 +33,18 @@ impl Stone {
         }
         vec![Stone::new(self.number * 2024)]
     }
-    fn count_digits(&self) -> u32 {
+    fn count_digits(&self) -> u64 {
         if self.number == 0 {
             return 1;
         }
-        (self.number as f64).log10().floor() as u32 + 1
+        (self.number as f64).log10().floor() as u64 + 1
     }
     fn is_even_digits(&self) -> bool {
         self.count_digits() % 2 == 0
     }
 
-    fn split_number(&self) -> (u32, u32) {
-        let divisor = 10u32.pow(self.count_digits() / 2);
+    fn split_number(&self) -> (u64, u64) {
+        let divisor = 10u64.pow((self.count_digits() / 2) as u32);
         let left = self.number / divisor;
         let right = self.number % divisor;
         (left, right)
