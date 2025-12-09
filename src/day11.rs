@@ -25,6 +25,14 @@ impl Stone {
     fn change(&self) -> Vec<Stone> {
         todo!()
     }
+    fn is_even_digits(&self) -> bool {
+        if self.number == 0 {
+            return false;
+        }
+        let digit_count = (self.number as f64).log10().floor() as u32 + 1;
+        digit_count %2 == 0
+
+    }
 }
 
 fn parse_string(input: &str) -> Vec<Stone> {
@@ -42,6 +50,20 @@ pub mod tests {
         let stone = Stone::new(0);
         let result = stone.change();
         let expected = vec![Stone::new(1)];
+        assert_eq!(result, expected);
+    }
+    #[test]
+    fn change_stone_split() {
+        let stone = Stone::new(1000);
+        let result = stone.change();
+        let expected = vec![Stone::new(10), Stone::new(0)];
+        assert_eq!(result, expected);
+    }
+    #[test]
+    fn change_stone_multiply() {
+        let stone = Stone::new(2);
+        let result = stone.change();
+        let expected = vec![Stone::new(4048)];
         assert_eq!(result, expected);
     }
 }
