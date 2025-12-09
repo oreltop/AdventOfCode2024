@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::sync::OnceLock;
 const INPUT: &str = include_str!("../artifacts/input_files/input_day10.txt");
 static GRID: OnceLock<Vec<Vec<u32>>> = OnceLock::new();
@@ -22,7 +23,7 @@ fn get_value(x: usize, y: usize) -> Option<u32> {
     Some(get_grid()[y][x])
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 struct Cell {
     x: usize,
     y: usize,
@@ -37,13 +38,13 @@ impl Cell {
             None
         }
     }
-    fn search_neighbors(&self, value: u32) -> Vec<Cell> {
-        vec![
+    fn search_neighbors(&self, value: u32) -> HashSet<Cell> {
+        HashSet::from([
             Cell::try_new(self.x.saturating_sub(1), self.y),
             Cell::try_new(self.x, self.y.saturating_sub(1)),
             Cell::try_new(self.x + 1, self.y),
             Cell::try_new(self.x, self.y + 1),
-        ]
+        ])
         .into_iter()
         .filter_map(|x| x)
         .filter(|cell| cell.value == value)
@@ -53,7 +54,7 @@ impl Cell {
 
 struct Prob {
     status: Status,
-    cells: Vec<Cell>,
+    cells: HashSet<Cell>,
 }
 enum Status {
     Pending,
@@ -70,19 +71,21 @@ impl Prob {
         };
         Prob {
             status,
-            cells: vec![init_cell],
+            cells: HashSet::from([init_cell]),
         }
     }
 
-    fn solve(&mut self){
+    fn solve(&mut self) {
         self.status = Status::Running;
-        for step in 0..=9 {
+        for step in 1..=9 {
+            dbg!(&self.cells);
             self.cells = self.search_all_neighbors(step)
         }
+        dbg!(&self.cells);
         self.status = Status::Ended;
     }
 
-    fn search_all_neighbors(&self, value: u32) -> Vec<Cell> {
+    fn search_all_neighbors(&self, value: u32) -> HashSet<Cell> {
         self.cells
             .iter()
             .flat_map(|cell| cell.search_neighbors(value))
@@ -91,8 +94,10 @@ impl Prob {
 
     fn count_trailheads(&self) -> usize {
         match self.status {
-            Status::Ended => {self.cells.iter().count()}
-            _ => {panic!("status isn't ended!")}
+            Status::Ended => self.cells.iter().count(),
+            _ => {
+                panic!("status isn't ended!")
+            }
         }
     }
 }
@@ -116,11 +121,11 @@ pub mod tests {
     fn test_search_neighbors() {
         let cell = Cell::try_new(0, 0).unwrap();
         let result = cell.search_neighbors(6);
-        let expected = vec![Cell::try_new(1, 0).unwrap()];
+        let expected = HashSet::from([Cell::try_new(1, 0).unwrap()]);
         assert_eq!(result, expected);
         let cell = Cell::try_new(0, 0).unwrap();
         let result = cell.search_neighbors(1);
-        let expected = Vec::new();
+        let expected = HashSet::new();
         assert_eq!(result, expected);
     }
 
