@@ -25,14 +25,21 @@ impl Stone {
     fn change(&self) -> Vec<Stone> {
         todo!()
     }
-    fn is_even_digits(&self) -> bool {
+    fn count_digits(&self) -> u32{
         if self.number == 0 {
-            return false;
+            return 1;
         }
-        let digit_count = (self.number as f64).log10().floor() as u32 + 1;
-        digit_count %2 == 0
-
+        (self.number as f64).log10().floor() as u32 + 1
     }
+    fn is_even_digits(&self) -> bool {
+        self.count_digits() %2 ==0
+    }
+
+    fn split_number(&self) -> (u32,u32) {
+        let divisor = 10u32.pow(self.count_digits()/2)
+        todo!()
+    }
+
 }
 
 fn parse_string(input: &str) -> Vec<Stone> {
@@ -64,6 +71,22 @@ pub mod tests {
         let stone = Stone::new(2);
         let result = stone.change();
         let expected = vec![Stone::new(4048)];
+        assert_eq!(result, expected);
+    }
+    #[test]
+    fn test_count_digits() {
+        let stone = Stone::new(1);
+        let result = stone.count_digits();
+        let expected = 1;
+        assert_eq!(result, expected);
+        let stone = Stone::new(12);
+        let result = stone.count_digits();        let expected = 2;
+        assert_eq!(result, expected);
+        let stone = Stone::new(1234);
+        let result = stone.count_digits();        let expected = 4;
+        assert_eq!(result, expected);
+        let stone = Stone::new(1234567);
+        let result = stone.count_digits();        let expected = 7;
         assert_eq!(result, expected);
     }
 }
