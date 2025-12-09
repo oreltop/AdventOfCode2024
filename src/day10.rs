@@ -51,29 +51,33 @@ impl Cell {
     }
 }
 
-struct Prob{
-    x: usize,
-    y: usize,
+struct Prob {
     status: Status,
-    cells: Vec<Cell>
+    cells: Vec<Cell>,
 }
-enum Status{
+enum Status {
+    Pending,
     Running,
     Completed,
-    Error
+    Error,
 }
-impl Prob{
-    fn new(x: usize, y:usize) -> Prob{
-        todo!()
+impl Prob {
+    fn new(x: usize, y: usize) -> Prob {
+        let init_cell = Cell::try_new(x, y).unwrap();
+        let status = match init_cell.value {
+            0 => Status::Pending,
+            _ => Status::Error,
+        };
+        Prob {
+            status,
+            cells: vec![init_cell],
+        }
     }
 
     fn solve(&self) -> usize {
         todo!()
     }
-
 }
-
-
 
 #[cfg(test)]
 pub mod tests {
@@ -103,25 +107,24 @@ pub mod tests {
     }
 
     #[test]
-    fn run_prob_no_split(){
-        let prob = Prob::new(12,7);
+    fn run_prob_no_split() {
+        let prob = Prob::new(12, 7);
         let result = prob.solve();
         assert_eq!(result, 1);
     }
     #[test]
-    fn run_prob_split_once(){
-        let prob = Prob::new(0,10);
+    fn run_prob_split_once() {
+        let prob = Prob::new(0, 10);
         let result = prob.solve();
         assert_eq!(result, 1);
-    let prob = Prob::new(34,0);
+        let prob = Prob::new(34, 0);
         let result = prob.solve();
         assert_eq!(result, 1);
     }
     #[test]
-    fn run_prob_split_multiple(){
-        let prob = Prob::new(16,0);
+    fn run_prob_split_multiple() {
+        let prob = Prob::new(16, 0);
         let result = prob.solve();
         assert_eq!(result, 3);
     }
-
 }
