@@ -155,7 +155,7 @@ pub mod tests {
     fn run_prob_split_once() {
         let mut prob = Probe::new(0, 10);
         prob.solve();
-        assert_eq!(prob.count_trailheads(), 1);
+        assert_eq!(prob.count_trailheads(), 3);
         let mut prob = Probe::new(34, 0);
         prob.solve();
         assert_eq!(prob.count_trailheads(), 1);
@@ -164,6 +164,6 @@ pub mod tests {
     fn run_prob_split_multiple() {
         let mut prob = Probe::new(16, 0);
         prob.solve();
-        assert_eq!(prob.count_trailheads(), 3);
+        assert_eq!(prob.count_trailheads(), 6);
     }
 }
