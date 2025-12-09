@@ -58,7 +58,7 @@ struct Prob {
 enum Status {
     Pending,
     Running,
-    Completed,
+    Ended,
     Error,
 }
 impl Prob {
@@ -74,8 +74,26 @@ impl Prob {
         }
     }
 
-    fn solve(&self) -> usize {
-        todo!()
+    fn solve(&mut self){
+        self.status = Status::Running;
+        for step in 0..=9 {
+            self.cells = self.search_all_neighbors(step)
+        }
+        self.status = Status::Ended;
+    }
+
+    fn search_all_neighbors(&self, value: u32) -> Vec<Cell> {
+        self.cells
+            .iter()
+            .flat_map(|cell| cell.search_neighbors(value))
+            .collect()
+    }
+
+    fn count_trailheads(&self) -> usize {
+        match self.status {
+            Status::Ended => {self.cells.iter().count()}
+            _ => {panic!("status isn't ended!")}
+        }
     }
 }
 
@@ -108,23 +126,23 @@ pub mod tests {
 
     #[test]
     fn run_prob_no_split() {
-        let prob = Prob::new(12, 7);
-        let result = prob.solve();
-        assert_eq!(result, 1);
+        let mut prob = Prob::new(12, 7);
+        prob.solve();
+        assert_eq!(prob.count_trailheads(), 1);
     }
     #[test]
     fn run_prob_split_once() {
-        let prob = Prob::new(0, 10);
-        let result = prob.solve();
-        assert_eq!(result, 1);
-        let prob = Prob::new(34, 0);
-        let result = prob.solve();
-        assert_eq!(result, 1);
+        let mut prob = Prob::new(0, 10);
+        prob.solve();
+        assert_eq!(prob.count_trailheads(), 1);
+        let mut prob = Prob::new(34, 0);
+        prob.solve();
+        assert_eq!(prob.count_trailheads(), 1);
     }
     #[test]
     fn run_prob_split_multiple() {
-        let prob = Prob::new(16, 0);
-        let result = prob.solve();
-        assert_eq!(result, 3);
+        let mut prob = Prob::new(16, 0);
+        prob.solve();
+        assert_eq!(prob.count_trailheads(), 3);
     }
 }
