@@ -64,6 +64,10 @@ fn blink(line: Vec<Stone>) -> Vec<Stone>{
     line.iter().flat_map(|stone|{stone.change()}).collect()
 }
 
+fn blink_n_times(line: Vec<Stone>, n: usize) -> Vec<Stone>{
+    todo!()
+}
+
 #[cfg(test)]
 pub mod tests {
     use super::*;
@@ -139,6 +143,14 @@ pub mod tests {
         assert_eq!(result, expected);
         let line = parse_string("1036288 7 2 20 24 4048 1 4048 8096 28 67 60 32");
         let result = blink(line);
+        let expected = parse_string("2097446912 14168 4048 2 0 2 4 40 48 2024 40 48 80 96 2 8 6 7 6 0 3 2");
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn blink_7_times(){
+        let line = parse_string("125 17");
+        let result = blink_n_times(line, 7);
         let expected = parse_string("2097446912 14168 4048 2 0 2 4 40 48 2024 40 48 80 96 2 8 6 7 6 0 3 2");
         assert_eq!(result, expected);
     }
