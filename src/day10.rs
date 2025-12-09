@@ -1,23 +1,39 @@
 use std::collections::HashSet;
+use std::fs;
 use std::sync::OnceLock;
-const INPUT: &str = include_str!("../artifacts/input_files/input_day10.txt");
 static GRID: OnceLock<Vec<Vec<u32>>> = OnceLock::new();
+const FILE_NAME: &str = "input_day10.txt";
 
 pub fn main() {
     println!("this is main");
-    let grid = get_grid();
+    let file_path = format!("artifacts/input_files/{}", FILE_NAME);
+    let input_raw = fs::read_to_string(file_path).expect("Should have been able to read the file");
+    init_grid(&input_raw);
+    let mut probes = Probe::generate_probes(get_grid());
+    let result: usize = probes
+        .iter_mut()
+        .map(|mut probe| {
+            probe.solve();
+            probe.count_trailheads()
+        })
+        .sum();
+    println!("{}", result)
 }
 
-fn get_grid() -> &'static Vec<Vec<u32>> {
+fn init_grid(input:&str){
     GRID.get_or_init(|| {
-        INPUT
+        input
             .split_whitespace()
             .map(|str| str.chars().map(|c| c.to_digit(10).unwrap()).collect())
             .collect()
-    })
+    });
+}
+
+fn get_grid() -> &'static Vec<Vec<u32>> {
+    GRID.get().expect("get grid before init!!")
 }
 fn get_value(x: usize, y: usize) -> Option<u32> {
-    if y > get_grid().len() || x > get_grid()[0].len() {
+    if y >= get_grid().len() || x >= get_grid()[0].len() {
         return None;
     }
     Some(get_grid()[y][x])
@@ -51,25 +67,39 @@ impl Cell {
         .collect()
     }
 }
-
-struct Prob {
+#[derive(Debug, PartialEq, Eq)]
+struct Probe {
     status: Status,
     cells: HashSet<Cell>,
 }
+#[derive(Debug, PartialEq, Eq)]
 enum Status {
     Pending,
     Running,
     Ended,
     Error,
 }
-impl Prob {
-    fn new(x: usize, y: usize) -> Prob {
+impl Probe {
+    fn generate_probes(grid: &[Vec<u32>]) -> Vec<Probe> {
+        grid.iter()
+            .enumerate()
+            .flat_map(|(y, row)| {
+                row.iter()
+                    .enumerate()
+                    .filter(|(_, value)| **value == 0)
+                    .map(|(x, _)| Probe::new(x, y))
+                    .collect::<Vec<_>>()
+            })
+            .collect()
+    }
+
+    fn new(x: usize, y: usize) -> Probe {
         let init_cell = Cell::try_new(x, y).unwrap();
         let status = match init_cell.value {
             0 => Status::Pending,
             _ => Status::Error,
         };
-        Prob {
+        Probe {
             status,
             cells: HashSet::from([init_cell]),
         }
@@ -78,10 +108,8 @@ impl Prob {
     fn solve(&mut self) {
         self.status = Status::Running;
         for step in 1..=9 {
-            dbg!(&self.cells);
             self.cells = self.search_all_neighbors(step)
         }
-        dbg!(&self.cells);
         self.status = Status::Ended;
     }
 
@@ -95,9 +123,7 @@ impl Prob {
     fn count_trailheads(&self) -> usize {
         match self.status {
             Status::Ended => self.cells.iter().count(),
-            _ => {
-                panic!("status isn't ended!")
-            }
+            _ => panic!("status isn't ended!"),
         }
     }
 }
@@ -131,22 +157,22 @@ pub mod tests {
 
     #[test]
     fn run_prob_no_split() {
-        let mut prob = Prob::new(12, 7);
+        let mut prob = Probe::new(12, 7);
         prob.solve();
         assert_eq!(prob.count_trailheads(), 1);
     }
     #[test]
     fn run_prob_split_once() {
-        let mut prob = Prob::new(0, 10);
+        let mut prob = Probe::new(0, 10);
         prob.solve();
         assert_eq!(prob.count_trailheads(), 1);
-        let mut prob = Prob::new(34, 0);
+        let mut prob = Probe::new(34, 0);
         prob.solve();
         assert_eq!(prob.count_trailheads(), 1);
     }
     #[test]
     fn run_prob_split_multiple() {
-        let mut prob = Prob::new(16, 0);
+        let mut prob = Probe::new(16, 0);
         prob.solve();
         assert_eq!(prob.count_trailheads(), 3);
     }
