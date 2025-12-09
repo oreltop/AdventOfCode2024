@@ -61,7 +61,7 @@ fn parse_string(input: &str) -> Vec<Stone> {
 }
 
 fn blink(line: Vec<Stone>) -> Vec<Stone>{
-    todo!()
+    line.iter().flat_map(|stone|{stone.change()}).collect()
 }
 
 #[cfg(test)]
