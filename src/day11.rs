@@ -60,12 +60,12 @@ fn parse_string(input: &str) -> Vec<Stone> {
         .collect()
 }
 
-fn blink(line: Vec<Stone>) -> Vec<Stone>{
+fn blink(line: &[Stone]) -> Vec<Stone>{
     line.iter().flat_map(|stone|{stone.change()}).collect()
 }
 
-fn blink_n_times(line: Vec<Stone>, n: usize) -> Vec<Stone>{
-    todo!()
+fn blink_n_times(line: Vec<Stone>, n: usize) -> Vec<Stone> {
+    (0..n).fold(line, |acc, _| blink(&acc))
 }
 
 #[cfg(test)]
@@ -134,23 +134,23 @@ pub mod tests {
     #[test]
     fn test_bling(){
         let line = parse_string("125 17");
-        let result = blink(line);
+        let result = blink(&line);
         let expected = parse_string("253000 1 7");
         assert_eq!(result, expected);
         let line = parse_string("253 0 2024 14168");
-        let result = blink(line);
+        let result = blink(&line);
         let expected = parse_string("512072 1 20 24 28676032");
         assert_eq!(result, expected);
         let line = parse_string("1036288 7 2 20 24 4048 1 4048 8096 28 67 60 32");
-        let result = blink(line);
+        let result = blink(&line);
         let expected = parse_string("2097446912 14168 4048 2 0 2 4 40 48 2024 40 48 80 96 2 8 6 7 6 0 3 2");
         assert_eq!(result, expected);
     }
 
     #[test]
-    fn blink_7_times(){
+    fn blink_6_times(){
         let line = parse_string("125 17");
-        let result = blink_n_times(line, 7);
+        let result = blink_n_times(line, 6);
         let expected = parse_string("2097446912 14168 4048 2 0 2 4 40 48 2024 40 48 80 96 2 8 6 7 6 0 3 2");
         assert_eq!(result, expected);
     }
