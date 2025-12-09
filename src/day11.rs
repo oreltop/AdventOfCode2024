@@ -1,4 +1,5 @@
 use std::fs;
+use std::time::SystemTime;
 
 const FILE_NAME: &str = "input_day11.txt";
 
@@ -11,16 +12,36 @@ pub fn main() {
     println!("input parsed: {:?}", &parsed);
 }
 
-fn parse_string(input: &str) -> Vec<i32> {
-    let mut column1: Vec<i32> = Vec::new();
-    column1
+#[derive(PartialEq, Debug)]
+struct Stone {
+    number: u32,
+}
+
+impl Stone {
+    fn new(number: u32) -> Stone {
+        Stone { number }
+    }
+
+    fn change(&self) -> Vec<Stone> {
+        todo!()
+    }
+}
+
+fn parse_string(input: &str) -> Vec<Stone> {
+    input
+        .split_whitespace()
+        .map(|str| Stone::new(str.parse().expect("not a number!")))
+        .collect()
 }
 
 #[cfg(test)]
 pub mod tests {
     use super::*;
     #[test]
-    fn test_parse_string() {
-        println!("{}", "this is test dummy")
+    fn change_stone_0() {
+        let stone = Stone::new(0);
+        let result = stone.change();
+        let expected = vec![Stone::new(1)];
+        assert_eq!(result, expected);
     }
 }
