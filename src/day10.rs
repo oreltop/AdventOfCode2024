@@ -5,10 +5,6 @@ static GRID: OnceLock<Vec<Vec<u32>>> = OnceLock::new();
 const FILE_NAME: &str = "input_day10.txt";
 
 pub fn main() {
-    println!("this is main");
-    let file_path = format!("artifacts/input_files/{}", FILE_NAME);
-    let input_raw = fs::read_to_string(file_path).expect("Should have been able to read the file");
-    init_grid(&input_raw);
     let mut probes = Probe::generate_probes(get_grid());
     let result: usize = probes
         .iter_mut()
@@ -20,17 +16,16 @@ pub fn main() {
     println!("{}", result)
 }
 
-fn init_grid(input: &str) {
+fn get_grid() -> &'static Vec<Vec<u32>> {
     GRID.get_or_init(|| {
-        input
+        let file_path = format!("artifacts/input_files/{}", FILE_NAME);
+        let input_raw =
+            fs::read_to_string(file_path).expect("Should have been able to read the file");
+        input_raw
             .split_whitespace()
             .map(|str| str.chars().map(|c| c.to_digit(10).unwrap()).collect())
             .collect()
-    });
-}
-
-fn get_grid() -> &'static Vec<Vec<u32>> {
-    GRID.get().expect("get grid before init!!")
+    })
 }
 fn get_value(x: usize, y: usize) -> Option<u32> {
     if y >= get_grid().len() || x >= get_grid()[0].len() {

@@ -1,4 +1,3 @@
-use std::collections::HashSet;
 use std::fs;
 use std::sync::OnceLock;
 static GRID: OnceLock<Vec<Vec<u32>>> = OnceLock::new();
@@ -6,9 +5,6 @@ const FILE_NAME: &str = "input_day10.txt";
 
 pub fn main() {
     println!("this is main");
-    let file_path = format!("artifacts/input_files/{}", FILE_NAME);
-    let input_raw = fs::read_to_string(file_path).expect("Should have been able to read the file");
-    init_grid(&input_raw);
     let mut probes = Probe::generate_probes(get_grid());
     let result: usize = probes
         .iter_mut()
@@ -20,17 +16,16 @@ pub fn main() {
     println!("{}", result)
 }
 
-fn init_grid(input: &str) {
+fn get_grid() -> &'static Vec<Vec<u32>> {
     GRID.get_or_init(|| {
-        input
+        let file_path = format!("artifacts/input_files/{}", FILE_NAME);
+        let input_raw =
+            fs::read_to_string(file_path).expect("Should have been able to read the file");
+        input_raw
             .split_whitespace()
             .map(|str| str.chars().map(|c| c.to_digit(10).unwrap()).collect())
             .collect()
-    });
-}
-
-fn get_grid() -> &'static Vec<Vec<u32>> {
-    GRID.get().expect("get grid before init!!")
+    })
 }
 fn get_value(x: usize, y: usize) -> Option<u32> {
     if y >= get_grid().len() || x >= get_grid()[0].len() {
@@ -50,8 +45,8 @@ impl Cell {
     fn try_new(x: usize, y: usize) -> Option<Cell> {
         get_value(x, y).map(|value| Cell { x, y, value })
     }
-    fn search_neighbors(&self, value: u32) -> HashSet<Cell> {
-        HashSet::from([
+    fn search_neighbors(&self, value: u32) -> Vec<Cell> {
+        Vec::from([
             Cell::try_new(self.x.saturating_sub(1), self.y),
             Cell::try_new(self.x, self.y.saturating_sub(1)),
             Cell::try_new(self.x + 1, self.y),
@@ -66,7 +61,7 @@ impl Cell {
 #[derive(Debug, PartialEq, Eq)]
 struct Probe {
     status: Status,
-    cells: HashSet<Cell>,
+    cells: Vec<Cell>,
 }
 #[derive(Debug, PartialEq, Eq)]
 enum Status {
@@ -96,7 +91,7 @@ impl Probe {
         };
         Probe {
             status,
-            cells: HashSet::from([init_cell]),
+            cells: Vec::from([init_cell]),
         }
     }
 
@@ -108,7 +103,7 @@ impl Probe {
         self.status = Status::Ended;
     }
 
-    fn search_all_neighbors(&self, value: u32) -> HashSet<Cell> {
+    fn search_all_neighbors(&self, value: u32) -> Vec<Cell> {
         self.cells
             .iter()
             .flat_map(|cell| cell.search_neighbors(value))
@@ -142,11 +137,11 @@ pub mod tests {
     fn test_search_neighbors() {
         let cell = Cell::try_new(0, 0).unwrap();
         let result = cell.search_neighbors(6);
-        let expected = HashSet::from([Cell::try_new(1, 0).unwrap()]);
+        let expected = Vec::from([Cell::try_new(1, 0).unwrap()]);
         assert_eq!(result, expected);
         let cell = Cell::try_new(0, 0).unwrap();
         let result = cell.search_neighbors(1);
-        let expected = HashSet::new();
+        let expected = Vec::new();
         assert_eq!(result, expected);
     }
 
