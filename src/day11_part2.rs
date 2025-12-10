@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::fmt::{Debug, Formatter};
 use std::fs;
 
 const FILE_NAME: &str = "input_day11.txt";
@@ -7,18 +8,29 @@ pub fn main() {
     println!("this is main");
     let file_path = format!("artifacts/input_files/{}", FILE_NAME);
     let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
-    // let line = parse_string(&input);
+    // let line = StonesLine::from(&input);
     // let result = blink_n_times(line, 25);
     // println!("{}", result.len());
 }
 
-struct StonesLine{
-    stones: HashMap<u64,u64>
+
+struct StonesLine {
+    stones: HashMap<u64, u64>,
+    calculator: Calculator,
 }
 
-impl StonesLine{
-    fn new() -> StonesLine{
-        StonesLine{stones: HashMap::new()}
+impl StonesLine {
+    fn new() -> StonesLine {
+        StonesLine {
+            stones: HashMap::new(),
+            calculator: Calculator::new(),
+        }
+    }
+    fn with_calculator(calculator: Calculator) -> StonesLine {
+        StonesLine {
+            stones: HashMap::new(),
+            calculator
+        }
     }
 
     fn from(input: &str) -> StonesLine {
@@ -27,30 +39,49 @@ impl StonesLine{
             .map(|str| str.parse().expect("not a number!"));
 
         let mut result = StonesLine::new();
-        for stone in stones{
+        for stone in stones {
             result.add_one(stone);
         }
         result
     }
-    fn add(&mut self, number: u64, amount: u64){
+    fn add(&mut self, number: u64, amount: u64) {
         *self.stones.entry(number).or_insert(0) += amount;
     }
 
-    fn add_one(&mut self, number: u64){
+    fn add_one(&mut self, number: u64) {
         self.add(number, 1)
     }
-}
 
-struct Calculator{
-    cache: HashMap<u64, Vec<u64>>
-}
-impl Calculator {
-    fn new() -> Calculator{
-        Calculator{cache: HashMap::new()}
+    fn blink(&self) -> StonesLine {
+        // StonesLine::with_calculator(self.calculator);
+        todo!()
     }
 
-    fn change(&mut self, number:u64) -> &[u64]{
-        self.cache.entry(number).or_insert(Calculator::calculate_change(number))
+}
+impl Debug for StonesLine{
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        self.stones.fmt(f)
+    }
+}
+impl PartialEq<Self> for StonesLine {
+    fn eq(&self, other: &Self) -> bool {
+        self.stones == other.stones
+    }
+}
+struct Calculator {
+    cache: HashMap<u64, Vec<u64>>,
+}
+impl Calculator {
+    fn new() -> Calculator {
+        Calculator {
+            cache: HashMap::new(),
+        }
+    }
+
+    fn change(&mut self, number: u64) -> &[u64] {
+        self.cache
+            .entry(number)
+            .or_insert(Calculator::calculate_change(number))
     }
 
     fn calculate_change(number: u64) -> Vec<u64> {
@@ -98,7 +129,7 @@ pub mod tests {
     fn change_stone_split() {
         let stone = 1000;
         let result = Calculator::calculate_change(stone);
-        let expected = vec![10,0];
+        let expected = vec![10, 0];
         assert_eq!(result, expected);
     }
     #[test]
@@ -108,30 +139,31 @@ pub mod tests {
         let expected = vec![4048];
         assert_eq!(result, expected);
     }
-    //
-    // #[test]
-    // fn test_bling() {
-    //     let line = parse_string("125 17");
-    //     let result = blink(&line);
-    //     let expected = parse_string("253000 1 7");
-    //     assert_eq!(result, expected);
-    //     let line = parse_string("253 0 2024 14168");
-    //     let result = blink(&line);
-    //     let expected = parse_string("512072 1 20 24 28676032");
-    //     assert_eq!(result, expected);
-    //     let line = parse_string("1036288 7 2 20 24 4048 1 4048 8096 28 67 60 32");
-    //     let result = blink(&line);
-    //     let expected =
-    //         parse_string("2097446912 14168 4048 2 0 2 4 40 48 2024 40 48 80 96 2 8 6 7 6 0 3 2");
-    //     assert_eq!(result, expected);
-    // }
+
+    #[test]
+    fn test_bling() {
+        let line = StonesLine::from("125 17");
+        let result = line.blink();
+        let expected = StonesLine::from("253000 1 7");
+        assert_eq!(result, expected);
+        let line = StonesLine::from("253 0 2024 14168");
+        let result = line.blink();
+        let expected = StonesLine::from("512072 1 20 24 28676032");
+        assert_eq!(result, expected);
+        let line = StonesLine::from("1036288 7 2 20 24 4048 1 4048 8096 28 67 60 32");
+        let result = line.blink();
+        let expected = StonesLine::from(
+            "2097446912 14168 4048 2 0 2 4 40 48 2024 40 48 80 96 2 8 6 7 6 0 3 2",
+        );
+        assert_eq!(result, expected);
+    }
     //
     // #[test]
     // fn blink_6_times() {
-    //     let line = parse_string("125 17");
+    //     let line = StonesLine::from("125 17");
     //     let result = blink_n_times(line, 6);
     //     let expected =
-    //         parse_string("2097446912 14168 4048 2 0 2 4 40 48 2024 40 48 80 96 2 8 6 7 6 0 3 2");
+    //         StonesLine::from("2097446912 14168 4048 2 0 2 4 40 48 2024 40 48 80 96 2 8 6 7 6 0 3 2");
     //     assert_eq!(result, expected);
     // }
 }
