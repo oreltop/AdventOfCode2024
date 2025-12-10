@@ -19,7 +19,12 @@ struct Cell {
     group: Option<u64>,
 }
 
-fn parse_string(input: &str) -> HashMap<u32, HashSet<Cell>> {
+struct Polygon {
+    crop: char,
+    cells: HashSet<Cell>
+}
+
+fn parse_string(input: &str) -> HashSet<Polygon> {
     todo!()
 }
 
