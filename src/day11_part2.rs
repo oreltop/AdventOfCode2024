@@ -56,18 +56,18 @@ impl StonesLine {
         }
     }
 
-    fn blink(&mut self) -> StonesLine {
-        let mut result = StonesLine::with_calculator(self.calculator.clone());
+    fn blink(&mut self) {
+        let mut next_line = StonesLine::new();
         for (stone, amount) in &self.stones {
-            result.add_multiple(self.calculator.change(*stone), *amount)
+            next_line.add_multiple(self.calculator.change(*stone), *amount)
         }
-
-        result
+        self.stones = next_line.stones
     }
 
-    fn blink_n_times(&mut self, times: usize) -> StonesLine{
-
-        todo!()
+    fn blink_n_times(&mut self, times: usize) {
+        for _ in  0..times {
+            self.blink()
+        }
     }
 }
 impl Debug for StonesLine {
@@ -157,28 +157,28 @@ pub mod tests {
     #[test]
     fn test_bling() {
         let mut line = StonesLine::from("125 17");
-        let result = line.blink();
+        line.blink();
         let expected = StonesLine::from("253000 1 7");
-        assert_eq!(result, expected);
+        assert_eq!(line, expected);
         let mut line = StonesLine::from("253 0 2024 14168");
-        let result = line.blink();
+        line.blink();
         let expected = StonesLine::from("512072 1 20 24 28676032");
-        assert_eq!(result, expected);
+        assert_eq!(line, expected);
         let mut line = StonesLine::from("1036288 7 2 20 24 4048 1 4048 8096 28 67 60 32");
-        let result = line.blink();
+        line.blink();
         let expected = StonesLine::from(
             "2097446912 14168 4048 2 0 2 4 40 48 2024 40 48 80 96 2 8 6 7 6 0 3 2",
         );
-        assert_eq!(result, expected);
+        assert_eq!(line, expected);
     }
 
     #[test]
     fn blink_6_times() {
         let mut line = StonesLine::from("125 17");
-        let result = line.blink_n_times(6);
+        line.blink_n_times(6);
         let expected = StonesLine::from(
             "2097446912 14168 4048 2 0 2 4 40 48 2024 40 48 80 96 2 8 6 7 6 0 3 2",
         );
-        assert_eq!(result, expected);
+        assert_eq!(line, expected);
     }
 }
