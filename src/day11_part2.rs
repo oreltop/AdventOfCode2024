@@ -51,10 +51,20 @@ impl StonesLine {
     fn add_one(&mut self, number: u64) {
         self.add(number, 1)
     }
+    fn add_multiple(&mut self, numbers: &[u64], amount: u64){
+        for number in numbers{
+            self.add(*number, amount);
+        }
+    }
 
-    fn blink(&self) -> StonesLine {
-        // StonesLine::with_calculator(self.calculator);
-        todo!()
+    fn blink(&mut self) -> StonesLine {
+        let mut result = StonesLine::with_calculator(self.calculator.clone());
+        for (stone, amount) in &self.stones{
+            result.add_multiple(self.calculator.change(*stone), *amount)
+        }
+
+
+        result
     }
 
 }
@@ -68,6 +78,8 @@ impl PartialEq<Self> for StonesLine {
         self.stones == other.stones
     }
 }
+
+#[derive(Clone)]
 struct Calculator {
     cache: HashMap<u64, Vec<u64>>,
 }
@@ -142,15 +154,15 @@ pub mod tests {
 
     #[test]
     fn test_bling() {
-        let line = StonesLine::from("125 17");
+        let mut line = StonesLine::from("125 17");
         let result = line.blink();
         let expected = StonesLine::from("253000 1 7");
         assert_eq!(result, expected);
-        let line = StonesLine::from("253 0 2024 14168");
+        let mut line = StonesLine::from("253 0 2024 14168");
         let result = line.blink();
         let expected = StonesLine::from("512072 1 20 24 28676032");
         assert_eq!(result, expected);
-        let line = StonesLine::from("1036288 7 2 20 24 4048 1 4048 8096 28 67 60 32");
+        let mut line = StonesLine::from("1036288 7 2 20 24 4048 1 4048 8096 28 67 60 32");
         let result = line.blink();
         let expected = StonesLine::from(
             "2097446912 14168 4048 2 0 2 4 40 48 2024 40 48 80 96 2 8 6 7 6 0 3 2",
