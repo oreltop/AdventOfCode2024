@@ -1,5 +1,4 @@
 use std::fs;
-use std::time::SystemTime;
 
 const FILE_NAME: &str = "input_day11.txt";
 
@@ -10,11 +9,9 @@ pub fn main() {
     let line = parse_string(&input);
     let result = blink_n_times(line, 25);
     println!("{}", result.len());
-
-
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone)]
 struct Stone {
     number: u64,
 }
@@ -62,12 +59,20 @@ fn parse_string(input: &str) -> Vec<Stone> {
         .collect()
 }
 
-fn blink(line: &[Stone]) -> Vec<Stone>{
-    line.iter().flat_map(|stone|{stone.change()}).collect()
+fn blink(line: &[Stone]) -> Vec<Stone> {
+    let mut result = Vec::with_capacity(line.len() * 2);
+    for stone in line {
+        result.extend_from_slice(&stone.change());
+    }
+    result.shrink_to_fit();
+    result
 }
 
 fn blink_n_times(line: Vec<Stone>, n: usize) -> Vec<Stone> {
-    (0..n).fold(line, |acc, _| blink(&acc))
+    (0..n).enumerate().fold(line, |acc, (i, _)| {
+        println!("Blink {}/{}", i + 1, n);
+        blink(&acc)
+    })
 }
 
 #[cfg(test)]
@@ -134,7 +139,7 @@ pub mod tests {
     }
 
     #[test]
-    fn test_bling(){
+    fn test_bling() {
         let line = parse_string("125 17");
         let result = blink(&line);
         let expected = parse_string("253000 1 7");
@@ -145,17 +150,17 @@ pub mod tests {
         assert_eq!(result, expected);
         let line = parse_string("1036288 7 2 20 24 4048 1 4048 8096 28 67 60 32");
         let result = blink(&line);
-        let expected = parse_string("2097446912 14168 4048 2 0 2 4 40 48 2024 40 48 80 96 2 8 6 7 6 0 3 2");
+        let expected =
+            parse_string("2097446912 14168 4048 2 0 2 4 40 48 2024 40 48 80 96 2 8 6 7 6 0 3 2");
         assert_eq!(result, expected);
     }
 
     #[test]
-    fn blink_6_times(){
+    fn blink_6_times() {
         let line = parse_string("125 17");
         let result = blink_n_times(line, 6);
-        let expected = parse_string("2097446912 14168 4048 2 0 2 4 40 48 2024 40 48 80 96 2 8 6 7 6 0 3 2");
+        let expected =
+            parse_string("2097446912 14168 4048 2 0 2 4 40 48 2024 40 48 80 96 2 8 6 7 6 0 3 2");
         assert_eq!(result, expected);
     }
-
-
 }
