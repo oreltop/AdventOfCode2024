@@ -13,7 +13,6 @@ pub fn main() {
     // println!("{}", result.len());
 }
 
-
 struct StonesLine {
     stones: HashMap<u64, u64>,
     calculator: Calculator,
@@ -29,7 +28,7 @@ impl StonesLine {
     fn with_calculator(calculator: Calculator) -> StonesLine {
         StonesLine {
             stones: HashMap::new(),
-            calculator
+            calculator,
         }
     }
 
@@ -51,24 +50,27 @@ impl StonesLine {
     fn add_one(&mut self, number: u64) {
         self.add(number, 1)
     }
-    fn add_multiple(&mut self, numbers: &[u64], amount: u64){
-        for number in numbers{
+    fn add_multiple(&mut self, numbers: &[u64], amount: u64) {
+        for number in numbers {
             self.add(*number, amount);
         }
     }
 
     fn blink(&mut self) -> StonesLine {
         let mut result = StonesLine::with_calculator(self.calculator.clone());
-        for (stone, amount) in &self.stones{
+        for (stone, amount) in &self.stones {
             result.add_multiple(self.calculator.change(*stone), *amount)
         }
-
 
         result
     }
 
+    fn blink_n_times(&mut self, times: usize) -> StonesLine{
+
+        todo!()
+    }
 }
-impl Debug for StonesLine{
+impl Debug for StonesLine {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         self.stones.fmt(f)
     }
@@ -169,13 +171,14 @@ pub mod tests {
         );
         assert_eq!(result, expected);
     }
-    //
-    // #[test]
-    // fn blink_6_times() {
-    //     let line = StonesLine::from("125 17");
-    //     let result = blink_n_times(line, 6);
-    //     let expected =
-    //         StonesLine::from("2097446912 14168 4048 2 0 2 4 40 48 2024 40 48 80 96 2 8 6 7 6 0 3 2");
-    //     assert_eq!(result, expected);
-    // }
+
+    #[test]
+    fn blink_6_times() {
+        let mut line = StonesLine::from("125 17");
+        let result = line.blink_n_times(6);
+        let expected = StonesLine::from(
+            "2097446912 14168 4048 2 0 2 4 40 48 2024 40 48 80 96 2 8 6 7 6 0 3 2",
+        );
+        assert_eq!(result, expected);
+    }
 }
