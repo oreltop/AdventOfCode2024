@@ -8,9 +8,9 @@ pub fn main() {
     println!("this is main");
     let file_path = format!("artifacts/input_files/{}", FILE_NAME);
     let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
-    // let line = StonesLine::from(&input);
-    // let result = blink_n_times(line, 25);
-    // println!("{}", result.len());
+    let mut line = StonesLine::from(&input);
+    line.blink_n_times(25);
+    println!("{}", line.count_stones());
 }
 
 struct StonesLine {
@@ -65,9 +65,15 @@ impl StonesLine {
     }
 
     fn blink_n_times(&mut self, times: usize) {
-        for _ in  0..times {
+        for _ in 0..times {
             self.blink()
         }
+    }
+
+    fn count_stones(&self) -> u64 {
+        self.stones
+            .iter()
+            .fold(0, |acc, (_, amount)| acc + amount)
     }
 }
 impl Debug for StonesLine {
