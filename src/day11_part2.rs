@@ -9,7 +9,7 @@ pub fn main() {
     let file_path = format!("artifacts/input_files/{}", FILE_NAME);
     let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
     let mut line = StonesLine::from(&input);
-    line.blink_n_times(25);
+    line.blink_n_times(75);
     println!("{}", line.count_stones());
 }
 
@@ -23,12 +23,6 @@ impl StonesLine {
         StonesLine {
             stones: HashMap::new(),
             calculator: Calculator::new(),
-        }
-    }
-    fn with_calculator(calculator: Calculator) -> StonesLine {
-        StonesLine {
-            stones: HashMap::new(),
-            calculator,
         }
     }
 
@@ -71,9 +65,7 @@ impl StonesLine {
     }
 
     fn count_stones(&self) -> u64 {
-        self.stones
-            .iter()
-            .fold(0, |acc, (_, amount)| acc + amount)
+        self.stones.iter().fold(0, |acc, (_, amount)| acc + amount)
     }
 }
 impl Debug for StonesLine {
@@ -120,7 +112,7 @@ impl Calculator {
         (number as f64).log10().floor() as u64 + 1
     }
     fn is_even_digits(number: u64) -> bool {
-        Calculator::count_digits(number) % 2 == 0
+        Calculator::count_digits(number).is_multiple_of(2)
     }
 
     fn split_number(number: u64) -> (u64, u64) {
