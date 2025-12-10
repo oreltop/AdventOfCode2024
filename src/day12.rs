@@ -1,3 +1,4 @@
+use std::collections::{HashMap, HashSet};
 use std::fs;
 
 const FILE_NAME: &str = "input_day12.txt";
@@ -11,9 +12,15 @@ pub fn main() {
     // println!("input parsed: {:?}", &parsed);
 }
 
-fn parse_string(input: &str) -> Vec<i32> {
-    let mut column1: Vec<i32> = Vec::new();
-    column1
+struct Cell {
+    x: usize,
+    y: usize,
+    crop: char,
+    group: Option<u64>,
+}
+
+fn parse_string(input: &str) -> HashMap<u32, HashSet<Cell>> {
+    todo!()
 }
 
 #[cfg(test)]
@@ -21,6 +28,33 @@ pub mod tests {
     use super::*;
     #[test]
     fn test_parse_string() {
-        println!("{}", "this is test dummy")
+        let input = r"
+            AAAA
+            BBCD
+            BBCC
+            EEEC";
+        let result = parse_string(input);
+        assert_eq!(result.len(), 4);
+        let input = r"
+            OOOOO
+            OXOXO
+            OOOOO
+            OXOXO
+            OOOOO";
+        let result = parse_string(input);
+        assert_eq!(result.len(), 5);
+        let input = r"
+            RRRRIICCFF
+            RRRRIICCCF
+            VVRRRCCFFF
+            VVRCCCJFFF
+            VVVVCJJCFE
+            VVIVCCJJEE
+            VVIIICJJEE
+            MIIIIIJJEE
+            MIIISIJEEE
+            MMMISSJEEE";
+        let result = parse_string(input);
+        assert_eq!(result.len(), 11);
     }
 }
