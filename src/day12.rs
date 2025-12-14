@@ -2,6 +2,7 @@ use std::cmp::PartialEq;
 use std::collections::{HashMap, HashSet};
 use std::fs;
 use std::io::BufRead;
+use std::ops::Sub;
 
 const FILE_NAME: &str = "input_day12.txt";
 
@@ -24,6 +25,7 @@ struct Cell {
 
 struct Region {
     crop: char,
+    id: u64,
     cells: HashSet<Cell>,
 }
 
@@ -54,11 +56,11 @@ impl Grid {
         let shape = (data[0].len(), data.len());
         Grid { data, shape }
     }
-    fn iter(&self) -> impl Iterator{
+    fn iter(&self) -> impl Iterator {
         self.data.iter().flatten()
     }
 
-    fn iter_mut(&mut self) -> impl Iterator{
+    fn iter_mut(&mut self) -> impl Iterator {
         self.data.iter_mut().flatten()
     }
     fn get_cell(&self, x: usize, y: usize) -> Option<&Cell> {
@@ -68,7 +70,7 @@ impl Grid {
             Some(&self.data[y][x])
         }
     }
-    fn get_neighbors(&self, cell: &Cell) -> HashSet<&Cell> {
+    fn get_identical_neighbors(&self, cell: &Cell) -> HashSet<&Cell> {
         let candidates = [
             (cell.x, cell.y + 1),
             (cell.x + 1, cell.y),
@@ -79,12 +81,32 @@ impl Grid {
             .into_iter()
             .filter_map(|(x, y)| self.get_cell(x, y))
             .filter(|&c| c != cell)
+            .filter(|&c| c.crop == cell.crop)
             .collect()
     }
 
-    fn calculate_regions(&mut self) -> HashSet<Region>{
+    fn bfs_region<'a>(&'a self, init_cell: &'a Cell) -> HashSet<&'a Cell> {
+        let mut result = HashSet::new();
+        let mut new_cells = HashSet::from([init_cell]);
+        while true {
+            if new_cells.sub(&result).is_empty() {
+                break;
+            }
+
+            let mut discovered_cells = HashSet::new();
+            for cell in &new_cells {
+                discovered_cells.extend(self.get_identical_neighbors(cell));
+            }
+            result.extend(&new_cells);
+            new_cells.extend(discovered_cells)
+        }
+
+        result
+    }
+
+    fn calculate_regions(&mut self) -> HashSet<Region> {
         let result = HashSet::new();
-        for
+        for cell in self.iter_mut() {}
 
         result
     }
@@ -102,6 +124,32 @@ fn find_neighbors(grid: &[Vec<Cell>], cell: Cell) -> HashSet<Cell> {
 #[cfg(test)]
 pub mod tests {
     use super::*;
+
+    #[test]
+    fn grid_find_region() {
+        let input = r"
+            AAAA
+            BBCD
+            BBCC
+            EEEC";
+        let grid = Grid::from(input);
+        let cell = grid.get_cell(0, 0).unwrap();
+        let bfs_result = grid.bfs_region(cell);
+        assert_eq!(bfs_result.len(), 4);
+
+        let cell = grid.get_cell(1, 1).unwrap();
+        let bfs_result = grid.bfs_region(cell);
+        assert_eq!(bfs_result.len(), 4);
+
+        let cell = grid.get_cell(3, 1).unwrap();
+        let bfs_result = grid.bfs_region(cell);
+        assert_eq!(bfs_result.len(), 1);
+
+        let cell = grid.get_cell(1, 3).unwrap();
+        let bfs_result = grid.bfs_region(cell);
+        assert_eq!(bfs_result.len(), 3);
+    }
+
     #[test]
     fn test_parse_string() {
         let input = r"
