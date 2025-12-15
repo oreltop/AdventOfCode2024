@@ -1,5 +1,5 @@
 use std::cmp::PartialEq;
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, HashSet, VecDeque};
 use std::fs;
 use std::io::BufRead;
 use std::ops::Sub;
@@ -85,25 +85,20 @@ impl Grid {
             .collect()
     }
 
-    fn bfs_region<'a>(&'a self, init_cell: &'a Cell) -> HashSet<&'a Cell> {
-        let mut result = HashSet::new();
-        let mut new_cells = HashSet::from([init_cell]);
-        while true {
-            if new_cells.sub(&result).is_empty() {
-                break;
-            }
+    fn bfs_region<'a>(&'a self, start: &'a Cell) -> HashSet<&'a Cell> {
+        let mut visited = HashSet::from([start]);
+        let mut queue = VecDeque::from([start]);
 
-            let mut discovered_cells = HashSet::new();
-            for cell in &new_cells {
-                discovered_cells.extend(self.get_identical_neighbors(cell));
+        while let Some(cell) = queue.pop_front(){
+            for neighbor in self.get_identical_neighbors(cell){
+                if visited.insert(neighbor){
+                    queue.push_back(neighbor)
+                }
             }
-            result.extend(&new_cells);
-            new_cells.extend(discovered_cells)
         }
 
-        result
+        visited
     }
-
     fn calculate_regions(&mut self) -> HashSet<Region> {
         let result = HashSet::new();
         for cell in self.iter_mut() {}
