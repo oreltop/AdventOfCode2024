@@ -12,9 +12,14 @@ pub fn main() {
     let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
     let regions = parse_string(&input);
     let result = calculate_fence_cost(&regions);
-    println!("{}", result)
+    println!("fence cost = {}", result)
 
 
+
+}
+
+fn calculate_bulk_fence_cost(regions: &[Region]) -> u32{
+    regions.iter().map(|region: &Region| {region.bulk_fence_cost()}).sum()
 }
 
 fn calculate_fence_cost(regions: &[Region]) -> u32{
@@ -46,6 +51,7 @@ impl Region {
             cells,
         }
     }
+
     fn area(&self) -> u32 {
         self.cells.len() as u32
     }
@@ -54,6 +60,17 @@ impl Region {
         let edges_to_substruct = self.cells.iter().cartesian_product(self.cells.iter())
             .filter(|(cell1, cell2)| {cell1.distance(cell2)==1}).count();
         (cells_diameter - edges_to_substruct) as u32
+    }
+    fn sides(&self)-> u32{
+        let cells_diameter = self.cells.len() * 4;
+        let edges_to_substruct = self.cells.iter().cartesian_product(self.cells.iter())
+                                     .filter(|(cell1, cell2)| {cell1.distance(cell2)==1}).count();
+        (cells_diameter as f32  - edges_to_substruct as f32 *1.5) as u32
+    }
+
+
+    fn bulk_fence_cost(&self) -> u32 {
+        self.area() * self.sides()
     }
 
     fn fence_cost(&self) -> u32{
@@ -227,6 +244,25 @@ pub mod tests {
         let regions = parse_string(input);
         let cost = calculate_fence_cost(&regions);
         assert_eq!(cost, 1930);
+
+    }
+
+    #[test]
+    fn bulk_fence_cost(){
+        let input = r"
+            RRRRIICCFF
+            RRRRIICCCF
+            VVRRRCCFFF
+            VVRCCCJFFF
+            VVVVCJJCFE
+            VVIVCCJJEE
+            VVIIICJJEE
+            MIIIIIJJEE
+            MIIISIJEEE
+            MMMISSJEEE";
+        let regions = parse_string(input);
+        let cost = calculate_bulk_fence_cost(&regions);
+        assert_eq!(cost, 1206);
 
     }
 }
