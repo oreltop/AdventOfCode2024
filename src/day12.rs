@@ -250,6 +250,14 @@ pub mod tests {
     #[test]
     fn bulk_fence_cost(){
         let input = r"
+            AAAA
+            BBCD
+            BBCC
+            EEEC";
+        let regions = parse_string(input);
+        let cost = calculate_bulk_fence_cost(&regions);
+        assert_eq!(cost, 80);
+        let input = r"
             RRRRIICCFF
             RRRRIICCCF
             VVRRRCCFFF
