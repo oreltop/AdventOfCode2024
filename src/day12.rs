@@ -16,7 +16,7 @@ pub fn main() {
 }
 
 fn calculate_fence_cost(regions: &[Region]) -> u32{
-    todo!()
+    regions.iter().map(|region: &Region| {region.fence_cost()}).sum()
 }
 
 #[derive(Hash, Eq, PartialEq, Clone, Copy)]
@@ -44,19 +44,18 @@ impl Region {
             cells,
         }
     }
-    fn area(&self) -> usize {
-        self.cells.len()
+    fn area(&self) -> u32 {
+        self.cells.len() as u32
     }
-    fn diameter(&self) -> usize {
+    fn perimeter(&self) -> u32 {
         let cells_diameter = self.cells.len() * 4;
         let edges_to_substruct = self.cells.iter().cartesian_product(self.cells.iter())
             .filter(|(cell1, cell2)| {cell1.distance(cell2)==1}).count();
-        cells_diameter - edges_to_substruct*2
+        (cells_diameter - edges_to_substruct) as u32
     }
 
     fn fence_cost(&self) -> u32{
-        todo!()
-    }
+        self.area() * self.perimeter()    }
 }
 
 struct Grid {
