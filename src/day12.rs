@@ -1,8 +1,7 @@
 use std::cmp::PartialEq;
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::fs;
-use std::io::BufRead;
-use std::ops::Sub;
+use std::ops::Deref;
 
 const FILE_NAME: &str = "input_day12.txt";
 
@@ -15,18 +14,26 @@ pub fn main() {
     // println!("input parsed: {:?}", &parsed);
 }
 
-#[derive(Hash, Eq, PartialEq)]
+#[derive(Hash, Eq, PartialEq, Clone, Copy)]
 struct Cell {
     x: usize,
     y: usize,
     crop: char,
-    region: Option<u64>,
 }
 
+#[derive(Eq, PartialEq)]
 struct Region {
     crop: char,
-    id: u64,
     cells: HashSet<Cell>,
+}
+
+impl Region {
+    fn from(cells: HashSet<Cell>) -> Region {
+        Region {
+            crop: cells.iter().next().unwrap().crop,
+            cells,
+        }
+    }
 }
 
 struct Grid {
@@ -44,19 +51,14 @@ impl Grid {
                 line.trim()
                     .chars()
                     .enumerate()
-                    .map(move |(x, crop)| Cell {
-                        x,
-                        y,
-                        crop,
-                        region: None,
-                    })
+                    .map(move |(x, crop)| Cell { x, y, crop })
                     .collect::<Vec<_>>()
             })
             .collect();
         let shape = (data[0].len(), data.len());
         Grid { data, shape }
     }
-    fn iter(&self) -> impl Iterator {
+    fn iter(&self) -> impl Iterator<Item = &Cell> {
         self.data.iter().flatten()
     }
 
@@ -85,32 +87,40 @@ impl Grid {
             .collect()
     }
 
-    fn bfs_region<'a>(&'a self, start: &'a Cell) -> HashSet<&'a Cell> {
-        let mut visited = HashSet::from([start]);
+    fn bfs<'a>(&'a self, start: &'a Cell) -> HashSet<&'a Cell> {
+        let mut visited: HashSet<&Cell> = HashSet::from([start]);
         let mut queue = VecDeque::from([start]);
 
-        while let Some(cell) = queue.pop_front(){
-            for neighbor in self.get_identical_neighbors(cell){
-                if visited.insert(neighbor){
+        while let Some(cell) = queue.pop_front() {
+            for neighbor in self.get_identical_neighbors(cell) {
+                if visited.insert(&*neighbor) {
                     queue.push_back(neighbor)
                 }
             }
         }
-
         visited
     }
-    fn calculate_regions(&mut self) -> HashSet<Region> {
-        let result = HashSet::new();
-        for cell in self.iter_mut() {}
+
+    fn calculate_regions(&mut self) -> Vec<Region> {
+        let mut result = Vec::new();
+        let mut visited: HashSet<&Cell> = HashSet::new();
+        for cell in self.iter() {
+            if visited.contains(&cell) {
+                continue;
+            } else {
+                let cells_in_region = self.bfs(cell);
+                visited.extend(&cells_in_region);
+                result.push(Region::from(cells_in_region.into_iter().cloned().collect()))
+            }
+        }
 
         result
     }
 }
 
-fn parse_string(input: &str) -> HashSet<Region> {
-    let grid = Grid::from(input);
-
-    todo!()
+fn parse_string(input: &str) -> Vec<Region> {
+    let mut grid = Grid::from(input);
+    grid.calculate_regions()
 }
 fn find_neighbors(grid: &[Vec<Cell>], cell: Cell) -> HashSet<Cell> {
     todo!()
@@ -129,19 +139,19 @@ pub mod tests {
             EEEC";
         let grid = Grid::from(input);
         let cell = grid.get_cell(0, 0).unwrap();
-        let bfs_result = grid.bfs_region(cell);
+        let bfs_result = grid.bfs(cell);
         assert_eq!(bfs_result.len(), 4);
 
         let cell = grid.get_cell(1, 1).unwrap();
-        let bfs_result = grid.bfs_region(cell);
+        let bfs_result = grid.bfs(cell);
         assert_eq!(bfs_result.len(), 4);
 
         let cell = grid.get_cell(3, 1).unwrap();
-        let bfs_result = grid.bfs_region(cell);
+        let bfs_result = grid.bfs(cell);
         assert_eq!(bfs_result.len(), 1);
 
         let cell = grid.get_cell(1, 3).unwrap();
-        let bfs_result = grid.bfs_region(cell);
+        let bfs_result = grid.bfs(cell);
         assert_eq!(bfs_result.len(), 3);
     }
 
