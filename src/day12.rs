@@ -2,6 +2,7 @@ use std::cmp::PartialEq;
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::fs;
 use std::ops::Deref;
+use itertools::Itertools;
 
 const FILE_NAME: &str = "input_day12.txt";
 
@@ -14,11 +15,20 @@ pub fn main() {
     // println!("input parsed: {:?}", &parsed);
 }
 
+fn calculate_fence_cost(regions: &[Region]) -> u32{
+    todo!()
+}
+
 #[derive(Hash, Eq, PartialEq, Clone, Copy)]
 struct Cell {
     x: usize,
     y: usize,
     crop: char,
+}
+impl Cell {
+    fn distance(&self, other: &Cell) -> usize {
+        self.x.abs_diff(other.x) + self.y.abs_diff(other.y)
+    }
 }
 
 #[derive(Eq, PartialEq)]
@@ -33,6 +43,19 @@ impl Region {
             crop: cells.iter().next().unwrap().crop,
             cells,
         }
+    }
+    fn area(&self) -> usize {
+        self.cells.len()
+    }
+    fn diameter(&self) -> usize {
+        let cells_diameter = self.cells.len() * 4;
+        let edges_to_substruct = self.cells.iter().cartesian_product(self.cells.iter())
+            .filter(|(cell1, cell2)| {cell1.distance(cell2)==1}).count();
+        cells_diameter - edges_to_substruct*2
+    }
+
+    fn fence_cost(&self) -> u32{
+        todo!()
     }
 }
 
@@ -58,7 +81,7 @@ impl Grid {
         let shape = (data[0].len(), data.len());
         Grid { data, shape }
     }
-    fn iter(&self) -> impl Iterator<Item = &Cell> {
+    fn iter(&self) -> impl Iterator<Item=&Cell> {
         self.data.iter().flatten()
     }
 
@@ -185,5 +208,24 @@ pub mod tests {
             MMMISSJEEE";
         let result = parse_string(input);
         assert_eq!(result.len(), 11);
+    }
+
+    #[test]
+    fn fence_cost(){
+        let input = r"
+            RRRRIICCFF
+            RRRRIICCCF
+            VVRRRCCFFF
+            VVRCCCJFFF
+            VVVVCJJCFE
+            VVIVCCJJEE
+            VVIIICJJEE
+            MIIIIIJJEE
+            MIIISIJEEE
+            MMMISSJEEE";
+        let regions = parse_string(input);
+        let cost = calculate_fence_cost(&regions);
+        assert_eq!(cost, 1930);
+
     }
 }
