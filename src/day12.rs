@@ -163,7 +163,7 @@ pub mod tests {
             BBCC
             EEEC";
         let result = parse_string(input);
-        assert_eq!(result.len(), 4);
+        assert_eq!(result.len(), 5);
         let input = r"
             OOOOO
             OXOXO
