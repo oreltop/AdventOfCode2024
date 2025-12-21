@@ -214,9 +214,6 @@ fn parse_string(input: &str) -> Vec<Region> {
     let mut grid = Grid::from(input);
     grid.calculate_regions()
 }
-fn find_neighbors(grid: &[Vec<Cell>], cell: Cell) -> HashSet<Cell> {
-    todo!()
-}
 
 #[cfg(test)]
 pub mod tests {
@@ -336,11 +333,10 @@ pub mod tests {
             ]
         });
         let region = Region { crop, cells };
-        let cell =
-            Cell { x: 1, y: 1, crop };
+        let cell = Cell { x: 1, y: 1, crop };
         let direction = Direction::Down;
-        assert!(region.is_edge(&cell, &direction ));
+        assert!(region.is_edge(&cell, &direction));
         let direction = Direction::Up;
-        assert!(!region.is_edge(&cell, &direction ));
+        assert!(!region.is_edge(&cell, &direction));
     }
 }
