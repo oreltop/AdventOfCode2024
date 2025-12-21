@@ -352,5 +352,10 @@ pub mod tests {
         assert!(region.is_edge(&cell, &direction));
         let direction = Direction::Up;
         assert!(!region.is_edge(&cell, &direction));
+        let cell = Cell { x: 1, y: 0, crop };
+        let direction = Direction::Down;
+        assert!(!region.is_edge(&cell, &direction));
+        let direction = Direction::Up;
+        assert!(region.is_edge(&cell, &direction));
     }
 }
