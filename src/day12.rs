@@ -82,7 +82,7 @@ impl Region {
                 crop: cell.crop,
             })
         } else {
-            false
+            true
         }
     }
 
