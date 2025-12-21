@@ -1,8 +1,8 @@
+use itertools::Itertools;
 use std::cmp::PartialEq;
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::fs;
 use std::ops::Deref;
-use itertools::Itertools;
 
 const FILE_NAME: &str = "input_day12.txt";
 
@@ -11,19 +11,35 @@ pub fn main() {
     let file_path = format!("artifacts/input_files/{}", FILE_NAME);
     let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
     let regions = parse_string(&input);
+
     let result = calculate_fence_cost(&regions);
     println!("fence cost = {}", result)
-
-
-
 }
 
-fn calculate_bulk_fence_cost(regions: &[Region]) -> u32{
-    regions.iter().map(|region: &Region| {region.bulk_fence_cost()}).sum()
+fn calculate_bulk_fence_cost(regions: &[Region]) -> u32 {
+    for r in regions {
+        dbg!(r.crop);
+        dbg!(r.area());
+        dbg!(r.sides());
+    }
+    regions
+        .iter()
+        .map(|region: &Region| region.bulk_fence_cost())
+        .sum()
 }
 
-fn calculate_fence_cost(regions: &[Region]) -> u32{
-    regions.iter().map(|region: &Region| {region.fence_cost()}).sum()
+fn calculate_fence_cost(regions: &[Region]) -> u32 {
+    regions
+        .iter()
+        .map(|region: &Region| region.fence_cost())
+        .sum()
+}
+
+enum Direction {
+    Up,
+    Down,
+    Left,
+    Right,
 }
 
 #[derive(Hash, Eq, PartialEq, Clone, Copy)]
@@ -52,29 +68,68 @@ impl Region {
         }
     }
 
+    fn is_edge(&self, cell: &Cell, direction: &Direction) -> bool {
+        todo!()
+    }
+
     fn area(&self) -> u32 {
         self.cells.len() as u32
     }
     fn perimeter(&self) -> u32 {
         let cells_diameter = self.cells.len() * 4;
-        let edges_to_substruct = self.cells.iter().cartesian_product(self.cells.iter())
-            .filter(|(cell1, cell2)| {cell1.distance(cell2)==1}).count();
+        let edges_to_substruct = self
+            .iter()
+            .cartesian_product(self.cells.iter())
+            .filter(|(cell1, cell2)| cell1.distance(cell2) == 1)
+            .count();
         (cells_diameter - edges_to_substruct) as u32
     }
-    fn sides(&self)-> u32{
-        let cells_diameter = self.cells.len() * 4;
-        let edges_to_substruct = self.cells.iter().cartesian_product(self.cells.iter())
-                                     .filter(|(cell1, cell2)| {cell1.distance(cell2)==1}).count();
-        (cells_diameter as f32  - edges_to_substruct as f32 *1.5) as u32
+    fn sides(&self) -> u32 {
+        // let mut grouped_by_x = HashMap::new();
+        // for cell in self.iter() {
+        //     grouped_by_x
+        //         .entry(cell.x)
+        //         .or_insert(Vec::new())
+        //         .push(cell.y);
+        // }
+        // let x_sides: u32 = Self::count_consecutive_numbers(&mut grouped_by_x);
+        // let mut grouped_by_y = HashMap::new();
+        // for cell in self.iter() {
+        //     grouped_by_y
+        //         .entry(cell.y)
+        //         .or_insert(Vec::new())
+        //         .push(cell.x);
+        // }
+        // let y_sides: u32 = Self::count_consecutive_numbers(&mut grouped_by_y);
+        //
+        // x_sides + y_sides
+
+        todo!()
     }
 
+    fn count_consecutive_numbers(collection: &mut HashMap<usize, Vec<usize>>) -> u32 {
+        dbg!(&collection);
+
+        collection
+            .iter_mut()
+            .map(|(_, vec)| {
+                vec.sort();
+                vec.chunk_by(|a, b| a + 1 == *b).count() as u32
+            })
+            .sum()
+    }
+
+    fn iter(&self) -> impl Iterator<Item = &Cell> {
+        self.cells.iter()
+    }
 
     fn bulk_fence_cost(&self) -> u32 {
         self.area() * self.sides()
     }
 
-    fn fence_cost(&self) -> u32{
-        self.area() * self.perimeter()    }
+    fn fence_cost(&self) -> u32 {
+        self.area() * self.perimeter()
+    }
 }
 
 struct Grid {
@@ -99,12 +154,8 @@ impl Grid {
         let shape = (data[0].len(), data.len());
         Grid { data, shape }
     }
-    fn iter(&self) -> impl Iterator<Item=&Cell> {
+    fn iter(&self) -> impl Iterator<Item = &Cell> {
         self.data.iter().flatten()
-    }
-
-    fn iter_mut(&mut self) -> impl Iterator {
-        self.data.iter_mut().flatten()
     }
     fn get_cell(&self, x: usize, y: usize) -> Option<&Cell> {
         if x >= self.shape.0 || y >= self.shape.1 {
@@ -229,7 +280,7 @@ pub mod tests {
     }
 
     #[test]
-    fn fence_cost(){
+    fn fence_cost() {
         let input = r"
             RRRRIICCFF
             RRRRIICCCF
@@ -244,11 +295,10 @@ pub mod tests {
         let regions = parse_string(input);
         let cost = calculate_fence_cost(&regions);
         assert_eq!(cost, 1930);
-
     }
 
     #[test]
-    fn bulk_fence_cost(){
+    fn bulk_fence_cost() {
         let input = r"
             AAAA
             BBCD
@@ -256,6 +306,7 @@ pub mod tests {
             EEEC";
         let regions = parse_string(input);
         let cost = calculate_bulk_fence_cost(&regions);
+
         assert_eq!(cost, 80);
         let input = r"
             RRRRIICCFF
@@ -271,6 +322,25 @@ pub mod tests {
         let regions = parse_string(input);
         let cost = calculate_bulk_fence_cost(&regions);
         assert_eq!(cost, 1206);
+    }
 
+    #[test]
+    fn is_edge() {
+        let crop = 'r';
+        let cells = HashSet::from({
+            [
+                Cell { x: 0, y: 0, crop },
+                Cell { x: 0, y: 1, crop },
+                Cell { x: 1, y: 0, crop },
+                Cell { x: 1, y: 1, crop },
+            ]
+        });
+        let region = Region { crop, cells };
+        let cell =
+            Cell { x: 1, y: 1, crop };
+        let direction = Direction::Down;
+        assert!(region.is_edge(&cell, &direction ));
+        let direction = Direction::Up;
+        assert!(!region.is_edge(&cell, &direction ));
     }
 }
