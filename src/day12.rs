@@ -69,7 +69,21 @@ impl Region {
     }
 
     fn is_edge(&self, cell: &Cell, direction: &Direction) -> bool {
-        todo!()
+        let next_xy = match direction {
+            Direction::Up => (Some(cell.x), cell.y.checked_sub(1)),
+            Direction::Down => (Some(cell.x), Some(cell.y + 1)),
+            Direction::Left => (cell.x.checked_sub(1), Some(cell.y)),
+            Direction::Right => (Some(cell.x + 1), Some(cell.y)),
+        };
+        if let (Some(x), Some(y)) = next_xy {
+            !self.cells.contains(&Cell {
+                x,
+                y,
+                crop: cell.crop,
+            })
+        } else {
+            false
+        }
     }
 
     fn area(&self) -> u32 {
