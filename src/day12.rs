@@ -10,9 +10,10 @@ pub fn main() {
     let file_path = format!("artifacts/input_files/{}", FILE_NAME);
     let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
     let regions = parse_string(&input);
-
-    let result = calculate_fence_cost(&regions);
-    println!("fence cost = {}", result)
+    let part1_cost = calculate_fence_cost(&regions);
+    println!("fence cost = {}", part1_cost);
+    let part2_cost = calculate_bulk_fence_cost(&regions);
+    println!("bulk fence cost = {}", part2_cost);
 }
 
 fn calculate_bulk_fence_cost(regions: &[Region]) -> u32 {
