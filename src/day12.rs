@@ -1,8 +1,7 @@
 use itertools::Itertools;
 use std::cmp::PartialEq;
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::{HashSet, VecDeque};
 use std::fs;
-use std::ops::Deref;
 
 const FILE_NAME: &str = "input_day12.txt";
 
@@ -101,7 +100,7 @@ impl Region {
                 .filter(|cell: &&Cell| self.is_edge(cell, &direction))
                 .map(|cell: &Cell| (cell.x, cell.y))
                 .sorted_by(|(x1, y1), (x2, y2)| y1.cmp(y2).then(x1.cmp(x2)))
-                .chunk_by(|(x, y)| *y)
+                .chunk_by(|(_x, y)| *y)
                 .into_iter()
                 .map(|(_, group)| {
                     let x_values: Vec<usize> = group.map(|(x, _y)| x).collect();
@@ -197,7 +196,7 @@ impl Grid {
 
         while let Some(cell) = queue.pop_front() {
             for neighbor in self.get_identical_neighbors(cell) {
-                if visited.insert(&*neighbor) {
+                if visited.insert(neighbor) {
                     queue.push_back(neighbor)
                 }
             }
