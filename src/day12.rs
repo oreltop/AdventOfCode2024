@@ -99,25 +99,20 @@ impl Region {
         (cells_diameter - edges_to_substruct) as u32
     }
     fn sides(&self) -> u32 {
-        for direction in [Direction::Up, Direction::Down]{
-            let x = self.iter()
-                .filter(|cell: &&Cell| {self.is_edge(cell,&direction)})
-                .map(|cell: &Cell| {(cell.x, cell.y)})
-                .sorted_by(|(x1,y1), (x2,y2)| {y1.cmp(y2).then(x1.cmp(x2))})
-                .chunk_by(|(x,y)| *y)
+        for direction in [Direction::Up, Direction::Down] {
+            let x = self
+                .iter()
+                .filter(|cell: &&Cell| self.is_edge(cell, &direction))
+                .map(|cell: &Cell| (cell.x, cell.y))
+                .sorted_by(|(x1, y1), (x2, y2)| y1.cmp(y2).then(x1.cmp(x2)))
+                .chunk_by(|(x, y)| *y)
                 .into_iter()
-                .map(|(_, group)| {group.collect::<Vec<_>>()})
-                .map(|x3| {})
-
-            ;
-
-
-                // .chunk_by(|(x,y)| {*y})
+                .map(|(_, group)| group.collect::<Vec<_>>())
+                .map(|x3| {});
+            // .chunk_by(|(x,y)| {*y})
                 // .into_iter()
                 // .map(|(_, group)| {group.chunk_by(|(_, )| {})})
-                ;
         }
-
 
         // let mut grouped_by_x = HashMap::new();
         // for cell in self.iter() {
@@ -141,17 +136,8 @@ impl Region {
         todo!()
     }
 
-    fn count_consecutive_numbers(collection: &[u32]) -> u32 {
-        // dbg!(&collection);
-        //
-        // collection
-        //     .iter_mut()
-        //     .map(|(_, vec)| {
-        //         vec.sort();
-        //         vec.chunk_by(|a, b| a + 1 == *b).count() as u32
-        //     })
-        //     .sum()
-        todo!()
+    fn count_consecutive_numbers(collection: &[u32]) -> usize {
+        collection.chunk_by(|a, b| a + 1 == *b).count()
     }
 
     fn iter(&self) -> impl Iterator<Item = &Cell> {
@@ -381,12 +367,12 @@ pub mod tests {
     }
 
     #[test]
-    fn count_consecutive_numbers(){
-        let result = Region::count_consecutive_numbers(&[1,2,3,5,7,8,9]);
+    fn count_consecutive_numbers() {
+        let result = Region::count_consecutive_numbers(&[1, 2, 3, 5, 7, 8, 9]);
         let expected = 3;
         assert_eq!(result, expected);
 
-        let result = Region::count_consecutive_numbers(&[1,2,3,5,7,9]);
+        let result = Region::count_consecutive_numbers(&[1, 2, 3, 5, 7, 9]);
         let expected = 4;
         assert_eq!(result, expected);
     }
