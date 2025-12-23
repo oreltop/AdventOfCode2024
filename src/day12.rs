@@ -106,13 +106,14 @@ impl Region {
                 .filter(|cell: &&Cell| self.is_edge(cell, &direction))
                 .map(|cell: &Cell| (cell.x, cell.y))
                 .sorted_by(|(x1, y1), (x2, y2)| y1.cmp(y2).then(x1.cmp(x2)))
-                .inspect(|x3| {dbg!(x3);})
+                .inspect(|x3| {
+                    dbg!(x3);
+                })
                 .chunk_by(|(x, y)| *y)
                 .into_iter()
                 .map(|(_, group)| {
-                    let x_values: Vec<usize> = group.map(|(x, _y)| {x}).collect();
+                    let x_values: Vec<usize> = group.map(|(x, _y)| x).collect();
                     Region::count_consecutive_numbers(&x_values)
-
                 })
                 .sum::<usize>()
         }
@@ -124,48 +125,48 @@ impl Region {
                 .filter(|cell: &&Cell| self.is_edge(cell, &direction))
                 .map(|cell: &Cell| (cell.x, cell.y))
                 .sorted_by(|(x1, y1), (x2, y2)| x1.cmp(x2).then(y1.cmp(y2)))
-                .inspect(|x3| {dbg!(x3);})
-
+                .inspect(|x3| {
+                    dbg!(x3);
+                })
                 .chunk_by(|(x, _y)| *x)
                 .into_iter()
                 .map(|(_, group)| {
-                    let x_values: Vec<usize> = group.map(|(_x, y)| {y}).collect();
+                    let x_values: Vec<usize> = group.map(|(_x, y)| y).collect();
                     Region::count_consecutive_numbers(&x_values)
-
                 })
                 .sum::<usize>()
         }
         result as u32
     }
-// fn sides(&self) -> u32 {
-//         let mut result = 0;
-//         for direction in [Direction::Up, Direction::Down] {
-//             result += self
-//                 .iter()
-//                 .filter(|cell: &&Cell| self.is_edge(cell, &direction))
-//                 .map(|cell: &Cell| (cell.x, cell.y))
-//                 .sorted_by(|(x1, y1), (x2, y2)| y1.cmp(y2).then(x1.cmp(x2)))
-//                 .inspect(|x3| {dbg!(x3);})
-//                 .chunk_by(|(x, y)| *y)
-//                 .into_iter()
-//                 .count()
-//         }
-//
-//         dbg!("----------");
-//         for direction in [Direction::Right, Direction::Left] {
-//             result += self
-//                 .iter()
-//                 .filter(|cell: &&Cell| self.is_edge(cell, &direction))
-//                 .map(|cell: &Cell| (cell.x, cell.y))
-//                 .sorted_by(|(x1, y1), (x2, y2)| x1.cmp(x2).then(y1.cmp(y2)))
-//                 .inspect(|x3| {dbg!(x3);})
-//
-//                 .chunk_by(|(x, _y)| *x)
-//                 .into_iter()
-//                 .count()
-//         }
-//         result as u32
-//     }
+    // fn sides(&self) -> u32 {
+    //         let mut result = 0;
+    //         for direction in [Direction::Up, Direction::Down] {
+    //             result += self
+    //                 .iter()
+    //                 .filter(|cell: &&Cell| self.is_edge(cell, &direction))
+    //                 .map(|cell: &Cell| (cell.x, cell.y))
+    //                 .sorted_by(|(x1, y1), (x2, y2)| y1.cmp(y2).then(x1.cmp(x2)))
+    //                 .inspect(|x3| {dbg!(x3);})
+    //                 .chunk_by(|(x, y)| *y)
+    //                 .into_iter()
+    //                 .count()
+    //         }
+    //
+    //         dbg!("----------");
+    //         for direction in [Direction::Right, Direction::Left] {
+    //             result += self
+    //                 .iter()
+    //                 .filter(|cell: &&Cell| self.is_edge(cell, &direction))
+    //                 .map(|cell: &Cell| (cell.x, cell.y))
+    //                 .sorted_by(|(x1, y1), (x2, y2)| x1.cmp(x2).then(y1.cmp(y2)))
+    //                 .inspect(|x3| {dbg!(x3);})
+    //
+    //                 .chunk_by(|(x, _y)| *x)
+    //                 .into_iter()
+    //                 .count()
+    //         }
+    //         result as u32
+    //     }
 
     fn count_consecutive_numbers(collection: &[usize]) -> usize {
         // dbg!(collection);
@@ -415,11 +416,11 @@ pub mod tests {
     }
     #[test]
     fn count_identical_runs() {
-        let result = Region::count_identical_runs(&[0,0,0,0,3,0,0,0,0]);
+        let result = Region::count_identical_runs(&[0, 0, 0, 0, 3, 0, 0, 0, 0]);
         let expected = 3;
         assert_eq!(result, expected);
 
-        let result = Region::count_identical_runs(&[0,0,0,1,0,3,0,0,0,0]);
+        let result = Region::count_identical_runs(&[0, 0, 0, 1, 0, 3, 0, 0, 0, 0]);
         let expected = 5;
         assert_eq!(result, expected);
     }
