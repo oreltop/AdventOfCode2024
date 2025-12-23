@@ -99,45 +99,82 @@ impl Region {
         (cells_diameter - edges_to_substruct) as u32
     }
     fn sides(&self) -> u32 {
+        let mut result = 0;
         for direction in [Direction::Up, Direction::Down] {
-            let x = self
+            result += self
                 .iter()
                 .filter(|cell: &&Cell| self.is_edge(cell, &direction))
                 .map(|cell: &Cell| (cell.x, cell.y))
                 .sorted_by(|(x1, y1), (x2, y2)| y1.cmp(y2).then(x1.cmp(x2)))
+                .inspect(|x3| {dbg!(x3);})
                 .chunk_by(|(x, y)| *y)
                 .into_iter()
-                .map(|(_, group)| group.collect::<Vec<_>>())
-                .map(|x3| {});
-            // .chunk_by(|(x,y)| {*y})
-                // .into_iter()
-                // .map(|(_, group)| {group.chunk_by(|(_, )| {})})
+                .map(|(_, group)| {
+                    let x_values: Vec<usize> = group.map(|(x, _y)| {x}).collect();
+                    Region::count_consecutive_numbers(&x_values)
+
+                })
+                .sum::<usize>()
         }
 
-        // let mut grouped_by_x = HashMap::new();
-        // for cell in self.iter() {
-        //     grouped_by_x
-        //         .entry(cell.x)
-        //         .or_insert(Vec::new())
-        //         .push(cell.y);
-        // }
-        // let x_sides: u32 = Self::count_consecutive_numbers(&mut grouped_by_x);
-        // let mut grouped_by_y = HashMap::new();
-        // for cell in self.iter() {
-        //     grouped_by_y
-        //         .entry(cell.y)
-        //         .or_insert(Vec::new())
-        //         .push(cell.x);
-        // }
-        // let y_sides: u32 = Self::count_consecutive_numbers(&mut grouped_by_y);
-        //
-        // x_sides + y_sides
+        dbg!("----------");
+        for direction in [Direction::Right, Direction::Left] {
+            result += self
+                .iter()
+                .filter(|cell: &&Cell| self.is_edge(cell, &direction))
+                .map(|cell: &Cell| (cell.x, cell.y))
+                .sorted_by(|(x1, y1), (x2, y2)| x1.cmp(x2).then(y1.cmp(y2)))
+                .inspect(|x3| {dbg!(x3);})
 
-        todo!()
+                .chunk_by(|(x, _y)| *x)
+                .into_iter()
+                .map(|(_, group)| {
+                    let x_values: Vec<usize> = group.map(|(_x, y)| {y}).collect();
+                    Region::count_consecutive_numbers(&x_values)
+
+                })
+                .sum::<usize>()
+        }
+        result as u32
+    }
+// fn sides(&self) -> u32 {
+//         let mut result = 0;
+//         for direction in [Direction::Up, Direction::Down] {
+//             result += self
+//                 .iter()
+//                 .filter(|cell: &&Cell| self.is_edge(cell, &direction))
+//                 .map(|cell: &Cell| (cell.x, cell.y))
+//                 .sorted_by(|(x1, y1), (x2, y2)| y1.cmp(y2).then(x1.cmp(x2)))
+//                 .inspect(|x3| {dbg!(x3);})
+//                 .chunk_by(|(x, y)| *y)
+//                 .into_iter()
+//                 .count()
+//         }
+//
+//         dbg!("----------");
+//         for direction in [Direction::Right, Direction::Left] {
+//             result += self
+//                 .iter()
+//                 .filter(|cell: &&Cell| self.is_edge(cell, &direction))
+//                 .map(|cell: &Cell| (cell.x, cell.y))
+//                 .sorted_by(|(x1, y1), (x2, y2)| x1.cmp(x2).then(y1.cmp(y2)))
+//                 .inspect(|x3| {dbg!(x3);})
+//
+//                 .chunk_by(|(x, _y)| *x)
+//                 .into_iter()
+//                 .count()
+//         }
+//         result as u32
+//     }
+
+    fn count_consecutive_numbers(collection: &[usize]) -> usize {
+        // dbg!(collection);
+        collection.chunk_by(|a, b| a + 1 == *b).count()
     }
 
-    fn count_consecutive_numbers(collection: &[u32]) -> usize {
-        collection.chunk_by(|a, b| a + 1 == *b).count()
+    fn count_identical_runs(collection: &[usize]) -> usize {
+        // dbg!(collection);
+        collection.chunk_by(|a, b| *a == *b).count()
     }
 
     fn iter(&self) -> impl Iterator<Item = &Cell> {
@@ -374,6 +411,16 @@ pub mod tests {
 
         let result = Region::count_consecutive_numbers(&[1, 2, 3, 5, 7, 9]);
         let expected = 4;
+        assert_eq!(result, expected);
+    }
+    #[test]
+    fn count_identical_runs() {
+        let result = Region::count_identical_runs(&[0,0,0,0,3,0,0,0,0]);
+        let expected = 3;
+        assert_eq!(result, expected);
+
+        let result = Region::count_identical_runs(&[0,0,0,1,0,3,0,0,0,0]);
+        let expected = 5;
         assert_eq!(result, expected);
     }
 }
