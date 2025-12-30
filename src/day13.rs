@@ -52,9 +52,8 @@ impl ClawMachine {
         let (n1, n2) = s
             .trim()
             .strip_prefix(pre)
-            .expect("prefix mismatch")
-            .split_once(mid)
-            .expect("middle mismatch");
+            .and_then(|s| {s.split_once(mid)})
+            .expect("pattern mismatch");
         (
             n1.parse().expect("invalid u32"),
             n2.parse().expect("invalid u32"),
