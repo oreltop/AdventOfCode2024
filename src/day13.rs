@@ -64,8 +64,9 @@ impl ClawMachine {
 }
 
 fn parse_string(input: &str) -> Vec<ClawMachine> {
-    input.split("\r\n\r\n")
-        .map(|s| {ClawMachine::from(s)})
+    input
+        .split("\r\n\r\n")
+        .map(|s| ClawMachine::from(s))
         .collect()
 }
 
