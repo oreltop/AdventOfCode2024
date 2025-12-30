@@ -50,7 +50,7 @@ impl ClawMachine {
         let (n1, n2) = s
             .trim()
             .strip_prefix(pre)
-            .and_then(|s| {s.split_once(mid)})
+            .and_then(|s| s.split_once(mid))
             .expect("pattern mismatch");
         (
             n1.parse().expect("invalid u32"),
@@ -64,9 +64,9 @@ impl ClawMachine {
 }
 
 fn parse_string(input: &str) -> Vec<ClawMachine> {
-
-
-    todo!();
+    input.split("\r\n\r\n")
+        .map(|s| {ClawMachine::from(s)})
+        .collect()
 }
 
 #[cfg(test)]
@@ -94,8 +94,6 @@ pub mod tests {
         let file_path = format!("artifacts/input_files/{}", FILE_NAME);
         let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
         let parsed = parse_string(&input);
-        assert_eq!(parsed.len(),320);
-
-
+        assert_eq!(parsed.len(), 320);
     }
 }
