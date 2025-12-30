@@ -8,9 +8,7 @@ pub fn main() {
     println!("this is main");
     let file_path = format!("artifacts/input_files/{}", FILE_NAME);
     let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
-    println!("input: {:?}", input);
     let parsed = parse_string(&input);
-    println!("input parsed: {:?}", &parsed);
 }
 
 enum NumberOfSolutions {
@@ -65,11 +63,10 @@ impl ClawMachine {
     }
 }
 
-fn parse_string(input: &str) -> Vec<i32> {
-    todo!();
+fn parse_string(input: &str) -> Vec<ClawMachine> {
 
-    let mut column1: Vec<i32> = Vec::new();
-    column1
+
+    todo!();
 }
 
 #[cfg(test)]
@@ -90,5 +87,15 @@ pub mod tests {
         assert_eq!(machine.movement_matrix[(1, 1)], 67);
         assert_eq!(machine.target[0], 8400);
         assert_eq!(machine.target[1], 5400);
+    }
+
+    #[test]
+    fn parse_string_test() {
+        let file_path = format!("artifacts/input_files/{}", FILE_NAME);
+        let input = fs::read_to_string(file_path).expect("Should have been able to read the file");
+        let parsed = parse_string(&input);
+        assert_eq!(parsed.len(),320);
+
+
     }
 }
