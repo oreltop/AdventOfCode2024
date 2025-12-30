@@ -1,5 +1,7 @@
+use itertools::Itertools;
 use nalgebra::{DMatrix, DVector};
 use std::fs;
+
 const FILE_NAME: &str = "input_day13.txt";
 
 pub fn main() {
@@ -11,10 +13,10 @@ pub fn main() {
     println!("input parsed: {:?}", &parsed);
 }
 
-enum NumberOfSolutions{
+enum NumberOfSolutions {
     Zero,
     One,
-    Infinity
+    Infinity,
 }
 
 struct ClawMachine {
@@ -29,22 +31,48 @@ impl ClawMachine {
                 2,
                 &[a_movement.0, a_movement.1, b_movement.0, b_movement.1],
             ),
-            target: DVector::from_row_slice(&[target.0, target.1])
+            target: DVector::from_row_slice(&[target.0, target.1]),
         }
     }
 
-    fn from(input: &str) -> ClawMachine{
-        todo!()
+    fn from(input: &str) -> ClawMachine {
+        let mut input_lines = input.trim().lines();
+        assert_eq!(input_lines.try_len(), Ok(3));
+        let a_movement = Self::parse_line(input_lines.next(), "Button A: X+{d}, Y+{d}");
+        let b_movement = Self::parse_line(input_lines.next(), "Button B: X+{d}, Y+{d}");
+        let target = Self::parse_line(input_lines.next(), "Prize: X=18641, Y=10279");
+
+        ClawMachine::new(a_movement, b_movement, target)
     }
 
-    fn number_of_solutions(&self) -> NumberOfSolutions{
+    fn parse_line(line: Option<&str>, pattern: &str) -> (u32, u32) {
+        let s = line.expect("missing line");
+        let mut p = pattern.split("{d}");
+        let (pre, mid, suf) = (p.next().unwrap(), p.next().unwrap(), p.next().unwrap());
+
+        let (n1, rest) = s
+            .strip_prefix(pre)
+            .expect("prefix mismatch")
+            .split_once(mid)
+            .expect("middle mismatch");
+
+        let n2 = rest.strip_suffix(suf).expect("suffix mismatch");
+        dbg!((n1,n2));
+
+
+        (
+            n1.parse().expect("invalid u32"),
+            n2.parse().expect("invalid u32"),
+        )
+    }
+
+    fn number_of_solutions(&self) -> NumberOfSolutions {
         todo!()
     }
 }
 
 fn parse_string(input: &str) -> Vec<i32> {
     todo!();
-
 
     let mut column1: Vec<i32> = Vec::new();
     column1
@@ -62,10 +90,10 @@ pub mod tests {
 
         let machine = ClawMachine::from(s);
 
-        assert_eq!(machine.movement_matrix[(0,0)], 94);
-        assert_eq!(machine.movement_matrix[(0,1)], 34);
-        assert_eq!(machine.movement_matrix[(1,0)], 22);
-        assert_eq!(machine.movement_matrix[(1,1)], 67);
+        assert_eq!(machine.movement_matrix[(0, 0)], 94);
+        assert_eq!(machine.movement_matrix[(0, 1)], 34);
+        assert_eq!(machine.movement_matrix[(1, 0)], 22);
+        assert_eq!(machine.movement_matrix[(1, 1)], 67);
         assert_eq!(machine.target[0], 8400);
         assert_eq!(machine.target[1], 5400);
     }
