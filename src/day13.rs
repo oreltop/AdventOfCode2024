@@ -36,10 +36,7 @@ impl ClawMachine {
     }
 
     fn from(input: &str) -> ClawMachine {
-        // dbg!(&input);
         let mut input_lines = input.trim().lines();
-        // dbg!(&input_lines);
-        // assert_eq!(input_lines.try_len(), Ok(3));
         let a_movement = Self::parse_line(input_lines.next(), "Button A: X+{d}, Y+{d}");
         let b_movement = Self::parse_line(input_lines.next(), "Button B: X+{d}, Y+{d}");
         let target = Self::parse_line(input_lines.next(), "Prize: X={d}, Y={d}");
@@ -50,19 +47,14 @@ impl ClawMachine {
     fn parse_line(line: Option<&str>, pattern: &str) -> (u32, u32) {
         let s = line.expect("missing line");
         let mut p = pattern.split("{d}");
-        let (pre, mid, suf) = (p.next().unwrap(), p.next().unwrap(), p.next().unwrap());
+        let (pre, mid) = (p.next().unwrap(), p.next().unwrap());
 
-        let (n1, rest) = s
+        let (n1, n2) = s
             .trim()
             .strip_prefix(pre)
             .expect("prefix mismatch")
             .split_once(mid)
             .expect("middle mismatch");
-
-        let n2 = rest.strip_suffix(suf).expect("suffix mismatch");
-        dbg!((n1,n2));
-
-
         (
             n1.parse().expect("invalid u32"),
             n2.parse().expect("invalid u32"),
