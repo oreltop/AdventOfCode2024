@@ -11,8 +11,7 @@ pub fn main() {
     let parsed = parse_string(&input);
 }
 
-#[derive(PartialEq)]
-#[derive(Debug)]
+#[derive(PartialEq, Debug)]
 enum NumberOfSolutions {
     None,
     One,
@@ -29,7 +28,7 @@ impl ClawMachine {
             movement_matrix: DMatrix::from_row_slice(
                 2,
                 2,
-                &[a_movement.0, a_movement.1, b_movement.0, b_movement.1],
+                &[a_movement.0, b_movement.0, a_movement.1, b_movement.1],
             ),
             target: DVector::from_row_slice(&[target.0, target.1]),
         }
