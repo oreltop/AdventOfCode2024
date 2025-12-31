@@ -11,8 +11,10 @@ pub fn main() {
     let parsed = parse_string(&input);
 }
 
+#[derive(PartialEq)]
+#[derive(Debug)]
 enum NumberOfSolutions {
-    Zero,
+    None,
     One,
     Infinity,
 }
@@ -83,8 +85,8 @@ pub mod tests {
         let machine = ClawMachine::from(s);
 
         assert_eq!(machine.movement_matrix[(0, 0)], 94);
-        assert_eq!(machine.movement_matrix[(0, 1)], 34);
-        assert_eq!(machine.movement_matrix[(1, 0)], 22);
+        assert_eq!(machine.movement_matrix[(0, 1)], 22);
+        assert_eq!(machine.movement_matrix[(1, 0)], 34);
         assert_eq!(machine.movement_matrix[(1, 1)], 67);
         assert_eq!(machine.target[0], 8400);
         assert_eq!(machine.target[1], 5400);
@@ -97,4 +99,15 @@ pub mod tests {
         let parsed = parse_string(&input);
         assert_eq!(parsed.len(), 320);
     }
+    // #[test]
+    // fn number_of_solutions() {
+    //     let s = r"
+    //     Button A: X+94, Y+34
+    //     Button B: X+22, Y+67
+    //     Prize: X=8400, Y=5400";
+    //
+    //     let machine = ClawMachine::from(s);
+    //
+    //     assert_eq!(machine.number_of_solutions(), NumberOfSolutions::One)
+    // }
 }
