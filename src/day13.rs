@@ -134,6 +134,34 @@ pub mod tests {
 
         let machine = ClawMachine::from(s);
 
-        assert_eq!(machine.number_of_solutions, NumberOfSolutions::One)
+        assert_eq!(machine.number_of_solutions, NumberOfSolutions::One);
+    }
+    #[test]
+    fn no_solution() {
+        let s = r"
+        Button A: X+26, Y+66
+        Button B: X+67, Y+21
+        Prize: X=12748, Y=12176";
+
+        let machine = ClawMachine::from(s);
+        assert_eq!(machine.number_of_solutions, NumberOfSolutions::None);
+        let s = r"
+        Button A: X+26, Y+52
+        Button B: X+67, Y+132
+        Prize: X=12748, Y=12176";
+
+        let machine = ClawMachine::from(s);
+        assert_eq!(machine.number_of_solutions, NumberOfSolutions::None);
+    }
+    #[test]
+    fn infinity_solutions() {
+        let s = r"
+        Button A: X+26, Y+52
+        Button B: X+67, Y+132
+        Prize: X=3198, Y=6396";
+
+        let machine = ClawMachine::from(s);
+
+        assert_eq!(machine.number_of_solutions, NumberOfSolutions::Infinity)
     }
 }
