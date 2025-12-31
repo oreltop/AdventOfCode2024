@@ -18,21 +18,50 @@ enum NumberOfSolutions {
     Infinity,
 }
 
+impl NumberOfSolutions {
+    fn calculate(matrix: &Matrix2<f32>, rhs: &Vector2<f32>) -> NumberOfSolutions{
+        let option_solution = matrix.clone().lu().solve(rhs);
+        match option_solution {
+            None => {
+                let cramer_matrix =
+                    Matrix2::from_columns(&[matrix.column(0), rhs.column(0)]);
+                if cramer_matrix.determinant().abs() < 1e-7 {
+                    NumberOfSolutions::Infinity
+                } else {
+                    NumberOfSolutions::None
+                }
+            }
+            Some(solution) => {
+                if ClawMachine::is_vector_natural(solution) {
+                    NumberOfSolutions::One
+                } else {
+                    NumberOfSolutions::None
+                }
+            }
+        }
+    }
+}
+
 struct ClawMachine {
     movement_matrix: Matrix2<f32>,
     target: Vector2<f32>,
+    number_of_solutions: NumberOfSolutions
 }
 
 impl ClawMachine {
     fn new(a_movement: (f32, f32), b_movement: (f32, f32), target: (f32, f32)) -> ClawMachine {
+        let movement_matrix = Matrix2::from_row_slice(&[
+            a_movement.0,
+            b_movement.0,
+            a_movement.1,
+            b_movement.1,
+        ]);
+        let target = Vector2::from_row_slice(&[target.0, target.1]);
+
         ClawMachine {
-            movement_matrix: Matrix2::from_row_slice(&[
-                a_movement.0,
-                b_movement.0,
-                a_movement.1,
-                b_movement.1,
-            ]),
-            target: Vector2::from_row_slice(&[target.0, target.1]),
+            movement_matrix,
+            target,
+            number_of_solutions: NumberOfSolutions::calculate(&movement_matrix,&target)
         }
     }
 
@@ -62,25 +91,7 @@ impl ClawMachine {
     }
 
     fn number_of_solutions(&self) -> NumberOfSolutions {
-        let option_solution = self.movement_matrix.clone().lu().solve(&self.target);
-        match option_solution {
-            None => {
-                let cramer_matrix =
-                    Matrix2::from_columns(&[self.movement_matrix.column(0), self.target.column(0)]);
-                if cramer_matrix.determinant().abs() < 1e-7 {
-                    NumberOfSolutions::Infinity
-                } else {
-                    NumberOfSolutions::None
-                }
-            }
-            Some(solution) => {
-                if ClawMachine::is_vector_natural(solution) {
-                    NumberOfSolutions::One
-                } else {
-                    NumberOfSolutions::None
-                }
-            }
-        }
+todo!()
     }
 
     fn is_vector_natural(v: Vector2<f32>) -> bool {
@@ -132,6 +143,6 @@ pub mod tests {
 
         let machine = ClawMachine::from(s);
 
-        assert_eq!(machine.number_of_solutions(), NumberOfSolutions::One)
+        assert_eq!(machine.number_of_solutions, NumberOfSolutions::One)
     }
 }
